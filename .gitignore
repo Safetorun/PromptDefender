@@ -1,0 +1,7 @@
+main.wasm
+.spin/
+terraform/.terraform
+terraform/*tfstate*
+terraform/funtion.zip
+main
+.vscode/

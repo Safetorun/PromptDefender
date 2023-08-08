@@ -1,0 +1,22 @@
+spin_manifest_version = "1"
+authors = ["dllewellyn <danieln.llewellyn@gmail.com>"]
+description = "Protection against prompt engineering for your AI Applications"
+name = "prompt-protect-go"
+trigger = { type = "http", base = "/" }
+version = "0.1.0"
+
+[variables]
+open_ai_api_key = { required = true }
+
+[[component]]
+id = "prompt-protect-go"
+source = "main.wasm"
+allowed_http_hosts = ["api.openai.com", "insecure:allow-all"]
+[component.trigger]
+route = "/..."
+[component.build]
+command = "tinygo build -target=wasi -gc=leaking -o main.wasm main.go"
+watch = ["**/*.go", "go.mod"]
+
+[component.config]
+open_ai_api_key = "{{ open_ai_api_key }}"
