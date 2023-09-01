@@ -1,9 +1,9 @@
 package pii
 
-type PiiScanResult struct {
-    ContainingPii bool
+type ScanResult struct {
+	ContainingPii bool
 }
 
-type PiiScanner interface {
-    Scan(pii string) (PiiScanResult, error)
+type Scanner interface {
+	Scan(pii string) (*ScanResult, error)
 }
