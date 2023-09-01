@@ -3,8 +3,12 @@ module github.com/safetorun/PromptShield/app
 go 1.17
 
 replace github.com/safetorun/PromptShield/aiprompt => ../aiprompt
+replace github.com/safetorun/PromptShield/pii => ../pii
+replace github.com/safetorun/PromptShield/pii_aws => ../pii_aws
 
 require github.com/safetorun/PromptShield/aiprompt v0.0.0-00010101000000-000000000000
+require github.com/safetorun/PromptShield/pii v0.0.0-00010101000000-000000000000
+require github.com/safetorun/PromptShield/pii_aws v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
