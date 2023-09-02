@@ -33,13 +33,16 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	var promptRequest PromptRequest
 
 	if err := json.Unmarshal([]byte(request.Body), &promptRequest); err != nil {
-		// Handle error
+		fmt.Printf("error unmarshalling request: %v\n", err)
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
 	}
+
+	fmt.Printf("Received request for %v\n", promptRequest)
 
 	answer, err := app.New(*aiprompt.NewOpenAI(openAIKey)).CheckAI(promptRequest.Prompt)
 
 	if err != nil {
+		fmt.Printf("error processing AI: %v\n", err)
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error processing AI request: %v", err)
 	}
 
@@ -48,6 +51,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	if promptRequest.ScanPii {
 		piiResult, err := pii_aws.New().Scan(promptRequest.Prompt)
 		if err != nil {
+			fmt.Printf("Error scanning for PII %v\n", err)
 			return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error scanning for PII: %v", err)
 		} else {
 			containsPii = piiResult.ContainingPii
