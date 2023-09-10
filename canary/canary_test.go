@@ -31,6 +31,18 @@ func TestCheckBasic(t *testing.T) {
 	}
 }
 
+func TestCheckNoneMode(t *testing.T) {
+	checker := New(None, "testCanary")
+
+	result, err := checker.Check("testCanary")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if result.Detected {
+		t.Errorf("Canary detected, got: %v, want: false", result.Detected)
+	}
+}
+
 func TestCheckUnsupportedMode(t *testing.T) {
 	checker := New(Intermediate, "testCanary")
 

@@ -10,7 +10,8 @@ type Mode int
 
 // Enumeration of available Modes.
 const (
-	Basic        Mode = iota // Basic mode performs an exact match check.
+	None         Mode = iota // None No canary checking is performed.
+	Basic                    // Basic mode performs an exact match check.
 	Intermediate             // Intermediate mode is not implemented yet.
 	Advanced                 // Advanced mode is not implemented yet.
 )
@@ -37,6 +38,8 @@ func New(mode Mode, canary string) *Checker {
 // The only implemented Mode as of now is Basic, which performs an exact match check.
 func (c *Checker) Check(output string) (Result, error) {
 	switch c.Mode {
+	case None:
+		return Result{Detected: false}, nil
 	case Basic:
 		return Result{Detected: output == c.Canary}, nil
 	default:
