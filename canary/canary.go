@@ -40,6 +40,6 @@ func (c *Checker) Check(output string) (Result, error) {
 	case Basic:
 		return Result{Detected: output == c.Canary}, nil
 	default:
-		return Result{}, errors.New("Mode not implemented")
+		return Result{}, errors.New("mode not implemented")
 	}
 }
