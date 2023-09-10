@@ -47,7 +47,7 @@ func TestCheckUnsupportedMode(t *testing.T) {
 	checker := New(Intermediate, "testCanary")
 
 	_, err := checker.Check("testCanary")
-	if err == nil || err.Error() != "Mode not implemented" {
+	if err == nil || err.Error() != "mode not implemented" {
 		t.Errorf("Unexpected error, got: %v, want: Mode not implemented", err)
 	}
 }
