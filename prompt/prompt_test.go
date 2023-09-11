@@ -1,4 +1,4 @@
-package game
+package prompt
 
 import (
 	"strings"
