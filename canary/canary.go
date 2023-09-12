@@ -3,6 +3,7 @@ package canary
 
 import (
 	"errors"
+	"strings"
 )
 
 // Mode represents the type of canary checking to be performed.
@@ -41,7 +42,7 @@ func (c *Checker) Check(output string) (Result, error) {
 	case None:
 		return Result{Detected: false}, nil
 	case Basic:
-		return Result{Detected: output == c.Canary}, nil
+		return Result{Detected: strings.Contains(output, c.Canary)}, nil
 	default:
 		return Result{}, errors.New("mode not implemented")
 	}

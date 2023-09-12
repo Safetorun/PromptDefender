@@ -14,7 +14,7 @@ func TestNew(t *testing.T) {
 func TestCheckBasic(t *testing.T) {
 	checker := New(Basic, "testCanary")
 
-	result, err := checker.Check("testCanary")
+	result, err := checker.Check("Abcdef testCanary Defegi")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
