@@ -43,6 +43,8 @@ func (c *Checker) Check(output string) (Result, error) {
 		return Result{Detected: false}, nil
 	case Basic:
 		return Result{Detected: strings.Contains(output, c.Canary)}, nil
+	case Intermediate:
+		return Result{Detected: checkForCanary(output, c.Canary)}, nil
 	default:
 		return Result{}, errors.New("mode not implemented")
 	}
