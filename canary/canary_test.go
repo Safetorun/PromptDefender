@@ -44,7 +44,7 @@ func TestCheckNoneMode(t *testing.T) {
 }
 
 func TestCheckUnsupportedMode(t *testing.T) {
-	checker := New(Intermediate, "testCanary")
+	checker := New(Advanced, "testCanary")
 
 	_, err := checker.Check("testCanary")
 	if err == nil || err.Error() != "mode not implemented" {

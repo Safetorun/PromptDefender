@@ -20,7 +20,7 @@ func TestCheckBase64(t *testing.T) {
 }
 
 func TestCheckURLEncode(t *testing.T) {
-	if !checkURLEncode("hello%20world", " ") {
+	if !checkURLEncode("hello%20world", "hello world") {
 		t.Errorf("Failed URL encode match test")
 	}
 }

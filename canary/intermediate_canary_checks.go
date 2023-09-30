@@ -5,7 +5,9 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"encoding/hex"
-	"fmt"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
+	"io/ioutil"
 	"net/url"
 	"strings"
 )
@@ -19,7 +21,11 @@ func checkBase64(input, canary string) bool {
 }
 
 func checkURLEncode(input, canary string) bool {
-	return strings.Contains(input, url.QueryEscape(canary))
+	decodedInput, err := url.QueryUnescape(input)
+	if err != nil {
+		return false
+	}
+	return strings.Contains(decodedInput, canary)
 }
 
 func checkHTMLEntityEncode(input, canary string) bool {
@@ -36,11 +42,11 @@ func checkHex(input, canary string) bool {
 }
 
 func checkUTF16(input, canary string) bool {
-	utf16Canary := ""
-	for _, r := range canary {
-		utf16Canary += fmt.Sprintf("%c%c", r>>8&0xFF, r&0xFF)
-	}
-	return strings.Contains(input, utf16Canary)
+	utf16Encoder := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder()
+
+	canaryBytes, _ := ioutil.ReadAll(transform.NewReader(bytes.NewReader([]byte(canary)), utf16Encoder))
+
+	return bytes.Contains([]byte(input), canaryBytes)
 }
 
 func checkGzip(input, canary string) bool {
