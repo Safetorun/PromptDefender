@@ -1,0 +1,2 @@
+# PromptShield
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9ac65767b1e4e4797073d209d08af87)](https://app.codacy.com/gh/Safetorun/PromptShield?utm_source=github.com&utm_medium=referral&utm_content=Safetorun/PromptShield&utm_campaign=Badge_Grade)
