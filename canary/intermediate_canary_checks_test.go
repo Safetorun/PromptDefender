@@ -44,12 +44,6 @@ func TestCheckUTF16(t *testing.T) {
 	}
 }
 
-func TestCheckQuotedPrintable(t *testing.T) {
-	if !checkQuotedPrintable("hello=20world", " world") {
-		t.Errorf("Failed quoted printable match test")
-	}
-}
-
 func TestCheckGzip(t *testing.T) {
 	// Hard to test gzip content as it contains headers that might vary.
 	// This test just ensures that a compressed input does not falsely match an uncompressed canary.

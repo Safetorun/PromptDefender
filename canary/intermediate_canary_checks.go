@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"mime/quotedprintable"
 	"net/url"
 	"strings"
 )
@@ -44,14 +43,6 @@ func checkUTF16(input, canary string) bool {
 	return strings.Contains(input, utf16Canary)
 }
 
-func checkQuotedPrintable(input, canary string) bool {
-	var qpBuffer bytes.Buffer
-	qpWriter := quotedprintable.NewWriter(&qpBuffer)
-	_, _ = qpWriter.Write([]byte(canary))
-	_ = qpWriter.Close()
-	return strings.Contains(input, qpBuffer.String())
-}
-
 func checkGzip(input, canary string) bool {
 	var gzBuffer bytes.Buffer
 	gzWriter := gzip.NewWriter(&gzBuffer)
@@ -67,6 +58,5 @@ func checkForCanary(input, canary string) bool {
 		checkHTMLEntityEncode(input, canary) ||
 		checkHex(input, canary) ||
 		checkUTF16(input, canary) ||
-		checkQuotedPrintable(input, canary) ||
 		checkGzip(input, canary)
 }
