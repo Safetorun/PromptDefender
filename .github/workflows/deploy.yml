@@ -28,8 +28,12 @@ jobs:
       run: make build
 
     - name: Test
-      run: make test 
-      
+      run: make test
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   deploy:
       runs-on: ubuntu-latest
       environment: production
