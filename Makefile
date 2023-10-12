@@ -1,3 +1,5 @@
+MODULES := $(shell (find .  -type f -name '*.go' -maxdepth 2 | sed -r 's|/[^/]+$$||' |cut -c 3-|sort |uniq))
+
 test:
 	cd aiprompt && go test -v ./... -cover
 	cd app && go test -v ./... -cover
@@ -7,23 +9,33 @@ test:
 	cd prompt && go test -v ./... -cover
 
 build:
-	cd lambda && go build -v ./...
-	cd lambda && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main lambda.go
+	cd lambda_prompt_shield && go build -v ./...
+	cd lambda_prompt_shield && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main lambda.go
+	cd lambda_prompt_builder && go build -v ./...
+	cd lambda_prompt_builder && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+
 
 deploy:
-	cd lambda && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main lambda.go
+	cd lambda_prompt_shield && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main lambda.go
+	cd lambda_prompt_builder && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 	cd terraform && terraform init && terraform apply -auto-approve
-update:
-	cd aiprompt && go get -u ./...
-	cd app && go get -u ./...
-	cd pii && go get -u ./...
-	cd pii_aws && go get -u ./...
-	cd canary && go get -u ./...
-	cd prompt && go get -u ./...
+
+install:
+	for number in  $(MODULES) ; do \
+       cd $$number && go get ./... || exit 1; cd .. ; \
+    done
 
 tidy:
-	cd lambda && go mod tidy
-	cd app && go mod tidy
-	cd aiprompt && go mod tidy
-	cd pii && go mod tidy 
-	cd pii_aws && go mod tidy 
+	for number in  $(MODULES) ; do \
+	   cd $$number && go mod tidy  || exit 1; cd .. ; \
+	done
+
+upgrade:
+	for number in  $(MODULES) ; do \
+	   cd $$number && go get -u all  || exit 1; cd .. ; \
+	done
+
+clean:
+	for number in  $(MODULES) ; do \
+	   cd $$number && go clean || exit 1; cd .. ; \
+	done
