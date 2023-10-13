@@ -27,7 +27,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
 	if !exists {
-		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error retrieving API key: environment variable not set")
+		return events.APIGatewayProxyResponse{StatusCode: 400},
+			fmt.Errorf("error retrieving API key: environment variable not set")
 	}
 
 	var promptRequest PromptRequest
@@ -56,7 +57,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		} else {
 			containsPii = piiResult.ContainingPii
 		}
-
 	}
 
 	response := AppResponse{AiScore: answer, ContainsPii: containsPii}
