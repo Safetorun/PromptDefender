@@ -33,6 +33,6 @@ resource "aws_lambda_function" "prompt_protect_builder" {
 
 data "archive_file" "lambda_zip_builder" {
   type        = "zip"
-  source_file = "../lambda_prompt_builder/main"
+  source_file = "../aws/lambda_keep/main"
   output_path = "function-2.zip"
 }

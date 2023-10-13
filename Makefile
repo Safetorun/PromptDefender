@@ -1,4 +1,4 @@
-MODULES := $(shell (find .  -type f -name '*.go' -maxdepth 2 | sed -r 's|/[^/]+$$||' |cut -c 3-|sort |uniq))
+MODULES := $(shell (find .  -type f -name '*.go' -maxdepth 4 | sed -r 's|/[^/]+$$||' |cut -c 3-|sort |uniq))
 
 test:
 	cd aiprompt && go test -v ./... -cover
@@ -9,15 +9,15 @@ test:
 	cd prompt && go test -v ./... -cover
 
 build:
-	cd lambda_prompt_shield && go build -v ./...
-	cd lambda_prompt_shield && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main lambda.go
-	cd lambda_prompt_builder && go build -v ./...
-	cd lambda_prompt_builder && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+	cd deployments/aws/lambda_moat && go build -v ./...
+	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+	cd deployments/aws/lambda_keep && go build -v ./...
+	cd deployments/aws/lambda_keep && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 
 
 deploy:
-	cd lambda_prompt_shield && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main lambda.go
-	cd lambda_prompt_builder && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+	cd deployments/aws/lambda_keep && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 	cd terraform && terraform init && terraform apply -auto-approve
 
 install:
