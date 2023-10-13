@@ -39,3 +39,4 @@ clean:
 	for number in  $(MODULES) ; do \
 	   cd $$number && go clean || exit 1; cd .. ; \
 	done
+
