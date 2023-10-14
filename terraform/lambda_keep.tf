@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
 
 
 resource "aws_lambda_function" "aws_Lambda_keep" {
-  function_name    = "PromptProtect"
+  function_name    = "PromptDefender-Keep"
   handler          = "main"
   role             = aws_iam_role.lambda_role.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
@@ -39,7 +39,7 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
 data "archive_file" "lambda_keep_zip" {
   type        = "zip"
   source_file = var.lambda_keep_path
-  output_path = "function1.zip"
+  output_path = "keep_function.zip"
 }
 
 variable "lambda_keep_path" {
