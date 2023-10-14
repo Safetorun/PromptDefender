@@ -12,10 +12,10 @@ servers:
     description: 'Production server'
 
 paths:
-  /verify:
+  /keep:
     post:
       x-amazon-apigateway-integration:
-        uri: ${prompt_shield_lambda_arn}
+        uri: ${lambda_keep_arn}
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -41,10 +41,10 @@ paths:
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
           description: 'Internal server error.'
-  /shield:
+  /moat:
     post:
       x-amazon-apigateway-integration:
-        uri: ${prompt_shield_builder_lambda_arn}
+        uri: ${lambda_moat_arn}
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"

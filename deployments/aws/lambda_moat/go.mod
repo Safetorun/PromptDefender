@@ -20,8 +20,8 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.45.24 // indirect
+	github.com/aws/aws-sdk-go v1.45.25 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/safetorun/PromptShield/pii v0.0.0-20231003080446-3884f5ee0afd // indirect
+	github.com/safetorun/PromptShield/pii v0.0.0-20231013064351-91b52b94a017 // indirect
 	github.com/safetorun/PromptShield/prompt v0.0.0-20231013064101-13fd645292ce // indirect
 )

@@ -12,7 +12,7 @@ servers:
     description: 'Production server'
 
 paths:
-  /verify:
+  /keep:
     post:
       x-amazon-apigateway-integration:
         uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:PromptProtect/invocations
@@ -41,7 +41,7 @@ paths:
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
           description: 'Internal server error.'
-  /shield:
+  /moat:
     post:
       x-amazon-apigateway-integration:
         uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:PromptProtect-Builder/invocations
