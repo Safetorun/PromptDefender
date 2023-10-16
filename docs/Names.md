@@ -10,9 +10,9 @@ A prompt defence is a multi-layer defence that can be used to protect your appli
 
 Ring 1 is the first layer of defence, and is intended to sanitise input before it moves through the layers of defence. This will typically look at prompt input, and ensure that it meets certain rules. For example:
 
-- Does it contain keywords that are known for jailbreaking attacks
-- Does the information reveal PII which should not be provided to your LLM
-- Is this prompt from a user / ip address (or any other identifier you want to provide) which is probing or attacking your system?
+- Does it contain keywords that are known for jail-breaking attacks
+- Does the information reveal PII which should not be provided to your LLM (e.g. email addresses, phone numbers, etc)
+- Is this prompt from a user / ip address (or any other identifier you want to provide) which is probing or attacking your system? [Coming soon]
 
 **Ring 2 - Walls**
 
