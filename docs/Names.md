@@ -1,4 +1,8 @@
-# Prompt Defender names
+---
+title: Prompt Defender names
+excerpt: A prompt defence is made up of multiple layers. This guide talks through the different layers available and how to build a comprehensive shield for your app
+category: 652be292f7eae600244211de
+---
 
 A prompt defence is a multi-layer defence that can be used to protect your applications against prompt injection attacks. You can use this with any LLM APIs (whether Bard, LlaMa, ChatGPT - or any other LLM) These types of attack are complex, and are difficult to solve with a single layer of defence - as such, a prompt shield is made up of multiple 'rings' of defence.
 

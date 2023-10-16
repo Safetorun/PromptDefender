@@ -11,8 +11,8 @@ replace github.com/safetorun/PromptShield/pii_aws => ../pii_aws
 replace github.com/safetorun/PromptShield/prompt => ../prompt
 
 require (
-	github.com/safetorun/PromptShield/aiprompt v0.0.0-20231013064351-91b52b94a017
-	github.com/safetorun/PromptShield/prompt v0.0.0-20231013064101-13fd645292ce
+	github.com/safetorun/PromptShield/aiprompt v0.0.0-20231014075714-cbf445fc8e67
+	github.com/safetorun/PromptShield/prompt v0.0.0-20231014075714-cbf445fc8e67
 )
 
 require (
