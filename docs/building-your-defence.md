@@ -33,7 +33,5 @@ This will look for keywords which are known to be used in jailbreak attacks. Thi
 for each of these commands - Prompt Defender will look for common techniques such a base64 encoding that someone might use to 
 disguise a jailbreak attack. 
 
-### Intermediate jailbreak detection [Coming soon] 
-will use AI to detect if the prompt is attempting to jailbreak the
 
 ```
