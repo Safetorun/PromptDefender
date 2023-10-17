@@ -1,7 +1,5 @@
 module github.com/safetorun/PromptDefender/moat
 
-replace github.com/safetorun/PromptDefender/aiprompt => ../aiprompt
-
 replace github.com/safetorun/PromptDefender/pii => ../pii
 
 replace github.com/safetorun/PromptDefender/prompt => ../prompt
@@ -9,8 +7,7 @@ replace github.com/safetorun/PromptDefender/prompt => ../prompt
 go 1.20
 
 require (
-	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231017075420-f34296ffedcf
-	github.com/safetorun/PromptDefender/pii v0.0.0-20231017075420-f34296ffedcf
+	github.com/safetorun/PromptDefender/pii v0.0.0-20231017114830-c0695821fa78
 	github.com/stretchr/testify v1.8.4
 )
 

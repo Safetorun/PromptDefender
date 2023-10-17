@@ -14,11 +14,12 @@ test:
 build:
 	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 	cd deployments/aws/lambda_keep && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
-
+	cd deployments/aws/lambda_wall && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 
 deploy:
 	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 	cd deployments/aws/lambda_keep && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+	cd deployments/aws/lambda_wall && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
 	cd terraform && terraform init && terraform apply -auto-approve
 
 install:
@@ -32,6 +33,7 @@ tidy:
 	done
 	cd deployments/aws/lambda_moat && go mod tidy
 	cd deployments/aws/lambda_keep && go mod tidy
+	cd deployments/aws/lambda_wall && go mod tidy
 
 upgrade:
 	for number in  $(MODULES) ; do \
@@ -39,6 +41,7 @@ upgrade:
 	done
 	cd deployments/aws/lambda_moat && go get -u all
 	cd deployments/aws/lambda_keep && go get -u all
+	cd deployments/aws/lambda_wall && go get -u all
 
 clean:
 	for number in  $(MODULES) ; do \
@@ -46,3 +49,4 @@ clean:
 	done
 	cd deployments/aws/lambda_moat && go clean
 	cd deployments/aws/lambda_keep && go clean
+	cd deployments/aws/lambda_wall && go clean
