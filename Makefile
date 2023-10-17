@@ -3,11 +3,12 @@ AWS_MODULES := $(shell cd deployments/aws && find . -type f -name '*.go' -maxdep
 
 test:
 	cd aiprompt && go test -v ./... -cover
-	cd app && go test -v ./... -cover
 	cd pii && go test -v ./... -cover
 	cd pii_aws && go test -v ./... -cover
 	cd canary && go test -v ./... -cover
 	cd prompt && go test -v ./... -cover
+	cd moat  && go test -v ./... -cover
+	cd keep  && go test -v ./... -cover
 
 build:
 	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
