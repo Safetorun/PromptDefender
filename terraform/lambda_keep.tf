@@ -1,4 +1,4 @@
-resource "aws_iam_role" "lambda_role" {
+resource "aws_iam_role" "lambda_role_keep" {
   name = "lambda_role"
 
   assume_role_policy = jsonencode({
@@ -15,16 +15,10 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
-}
-
-
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name    = "PromptDefender-Keep"
   handler          = "main"
-  role             = aws_iam_role.lambda_role.arn
+  role             = aws_iam_role.lambda_role_keep.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
   runtime          = "go1.x"
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
