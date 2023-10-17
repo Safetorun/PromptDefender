@@ -27,10 +27,9 @@ func (m *MockPIIScannerError) Scan(_ string) (*pii.ScanResult, error) {
 }
 
 func TestMoat(t *testing.T) {
-	mockAIChecker := &MockAIChecker{}
 	mockPIIScanner := &MockPIIScanner{}
 	mockPIIScannerError := &MockPIIScannerError{}
-	m := New(mockAIChecker, mockPIIScanner)
+	m := New(mockPIIScanner)
 
 	t.Run("CheckMoat_WithPIIScan", func(t *testing.T) {
 		promptToCheck := PromptToCheck{
@@ -41,7 +40,6 @@ func TestMoat(t *testing.T) {
 		result, err := m.CheckMoat(promptToCheck)
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
-		assert.NotNil(t, result.InjectionScore)
 		assert.NotNil(t, result.PiiResult)
 	})
 
@@ -54,12 +52,11 @@ func TestMoat(t *testing.T) {
 		result, err := m.CheckMoat(promptToCheck)
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
-		assert.NotNil(t, result.InjectionScore)
 		assert.Nil(t, result.PiiResult)
 	})
 
 	t.Run("CheckMoat_PiiScannerError", func(t *testing.T) {
-		m := New(mockAIChecker, mockPIIScannerError)
+		m := New(mockPIIScannerError)
 		promptToCheck := PromptToCheck{
 			Prompt:  "test prompt",
 			ScanPii: true,
