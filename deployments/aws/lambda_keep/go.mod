@@ -16,11 +16,8 @@ replace github.com/safetorun/PromptDefender/keep => ../../../keep
 
 require (
 	github.com/aws/aws-lambda-go v1.41.0
-	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231014075714-cbf445fc8e67
-	github.com/safetorun/PromptDefender/keep v0.0.0-00010101000000-000000000000
+	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231017075420-f34296ffedcf
+	github.com/safetorun/PromptDefender/keep v0.0.0-20231017114355-94a066de9d10
 )
 
-require (
-	github.com/safetorun/PromptDefender/prompt v0.0.0-20231014075714-cbf445fc8e67 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
-)
+require github.com/safetorun/PromptDefender/prompt v0.0.0-20231017114355-94a066de9d10 // indirect

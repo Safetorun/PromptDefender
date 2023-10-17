@@ -5,8 +5,8 @@ replace github.com/safetorun/PromptDefender/aiprompt => ../aiprompt
 replace github.com/safetorun/PromptDefender/prompt => ../prompt
 
 require (
-	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231014075714-cbf445fc8e67
-	github.com/safetorun/PromptDefender/prompt v0.0.0-20231014075714-cbf445fc8e67
+	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231017075420-f34296ffedcf
+	github.com/safetorun/PromptDefender/prompt v0.0.0-20231017114355-94a066de9d10
 	github.com/stretchr/testify v1.8.4
 )
 

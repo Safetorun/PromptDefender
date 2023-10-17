@@ -9,8 +9,8 @@ replace github.com/safetorun/PromptDefender/prompt => ../prompt
 go 1.20
 
 require (
-	github.com/safetorun/PromptDefender/aiprompt v0.0.0-00010101000000-000000000000
-	github.com/safetorun/PromptDefender/pii v0.0.0-00010101000000-000000000000
+	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231017075420-f34296ffedcf
+	github.com/safetorun/PromptDefender/pii v0.0.0-20231017075420-f34296ffedcf
 	github.com/stretchr/testify v1.8.4
 )
 
