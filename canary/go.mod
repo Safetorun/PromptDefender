@@ -1,4 +1,4 @@
-module github.com/safetorun/PromptShield/canary
+module github.com/safetorun/PromptDefender/canary
 
 go 1.20
 

@@ -5,13 +5,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
-	pii_scanner "github.com/safetorun/PromptShield/pii"
+	pii_scanner "github.com/safetorun/PromptDefender/pii"
 )
 
 type AwsPIIScanner struct {
 }
 
-func New() AwsPIIScanner {
+func New() pii_scanner.Scanner {
 	return AwsPIIScanner{}
 }
 

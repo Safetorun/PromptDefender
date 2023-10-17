@@ -14,9 +14,8 @@ instead it something you can perform once and then forget about.
 
 # Moat
 
-The first thing to do is to look at the prompt inside your application and ask yourself if you want Personally identifiable
-information PII
-to be detected? 
+The next thing to do is to build your moat. For the prompt inside your application, ask yourself if you want Personally identifiable
+information PII to be detected? 
 
 ## PII Detection 
 
@@ -24,14 +23,24 @@ PII Detection involves looking at user input and determining if it contains info
 This could be email addresses, phone numbers, names, addresses, etc. If PII Detection is enabled, then the prompt will be
 checked for any personal information.
 
+In order to enable PII Detection, you will need to add the following to your request:
+
+```json
+{
+    "pii": true
+}
+```
+
 ## Jailbreak detection
 
-How 'smart' do I want to my jailbreak detection to be? 
-
-### Basic jailbreak detection 
-This will look for keywords which are known to be used in jailbreak attacks. This might check for things like "ignore previous"; 
+It is recommended to turn on jail-break detection; for now the only option available in 'Basic' jailbreak detection. This will look for keywords which are known to be used in jailbreak attacks. This might check for things like "ignore previous"; 
 for each of these commands - Prompt Defender will look for common techniques such a base64 encoding that someone might use to 
 disguise a jailbreak attack. 
 
+In order to enable jailbreak detection, you will need to add the following to your request:
 
+```json
+{
+    "jailbreak": 0
+}
 ```

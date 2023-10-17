@@ -1,8 +1,8 @@
 openapi: '3.0.0'
 info:
   version: '1.0.0'
-  title: 'PromptShield - PII and Prompt Injection Verification Service'
-  description: "PromptShield's API provides a mechanism to strip PII and check for prompt injection, ensuring safe text processing."
+  title: 'PromptDefender - PII and Prompt Injection Verification Service'
+  description: "PromptDefender's API provides a mechanism to strip PII and check for prompt injection, ensuring safe text processing."
   contact:
     name: 'Support'
     email: 'admin@safetorun.com'
@@ -58,14 +58,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PromptShieldRequest'
+              $ref: '#/components/schemas/PromptDefenderRequest'
       responses:
         '200':
           description: 'Successful operation.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PromptShieldResponse'
+                $ref: '#/components/schemas/PromptDefenderResponse'
         '400':
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
@@ -87,7 +87,7 @@ components:
           type: 'string'
           description: 'The text prompt to be verified.'
 
-    PromptShieldRequest:
+    PromptDefenderRequest:
       type: 'object'
       required:
         - 'prompt'
@@ -96,7 +96,7 @@ components:
           type: 'string'
           description: 'The text prompt to be verified.'
 
-    PromptShieldResponse:
+    PromptDefenderResponse:
       type: 'object'
       properties:
         shielded_prompt:

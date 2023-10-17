@@ -15,8 +15,8 @@ type OpenAI struct {
 	ApiKey string
 }
 
-func NewOpenAI(apiKey string) *OpenAI {
-	return &OpenAI{ApiKey: apiKey}
+func NewOpenAI(apiKey string) RemoteAIChecker {
+	return OpenAI{ApiKey: apiKey}
 }
 
 // Message represents a message for the OpenAI API.

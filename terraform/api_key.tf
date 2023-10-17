@@ -4,7 +4,7 @@ resource "aws_api_gateway_api_key" "api_key" {
 }
 
 resource "aws_api_gateway_usage_plan" "usage_plan" {
-  name = "PromptShieldUsagePlan"
+  name = "PromptDefenderUsagePlan"
 
   api_stages {
     api_id = aws_api_gateway_rest_api.api.id

@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/safetorun/PromptShield/aiprompt"
-	"github.com/safetorun/PromptShield/app"
+	"github.com/safetorun/PromptDefender/aiprompt"
+	"github.com/safetorun/PromptDefender/keep"
+	"os"
 )
 
 type PromptBuilderResponse struct {
@@ -20,7 +19,7 @@ type PromptBuilderRequest struct {
 	Prompt string `json:"prompt"`
 }
 
-func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
 	if !exists {
@@ -36,14 +35,15 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	fmt.Printf("Received request for %v\n", promptRequest)
 
-	answer, err := app.New(*aiprompt.NewOpenAI(openAIKey)).BuildPromptDefense(promptRequest.Prompt)
+	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey))
+	answer, err := keepBuilder.BuildKeep(keep.StartingPrompt{Prompt: promptRequest.Prompt})
 
 	if err != nil {
 		fmt.Printf("error processing AI: %v\n", err)
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error processing AI request: %v", err)
 	}
 
-	response := PromptBuilderResponse{NewPrompt: *answer}
+	response := PromptBuilderResponse{NewPrompt: answer.NewPrompt}
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {

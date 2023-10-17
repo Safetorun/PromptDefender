@@ -8,9 +8,9 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/safetorun/PromptShield/aiprompt"
-	"github.com/safetorun/PromptShield/app"
-	"github.com/safetorun/PromptShield/pii_aws"
+	"github.com/safetorun/PromptDefender/aiprompt"
+	"github.com/safetorun/PromptDefender/moat"
+	"github.com/safetorun/PromptDefender/pii_aws"
 )
 
 type AppResponse struct {
@@ -40,26 +40,24 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	fmt.Printf("Received request for %v\n", promptRequest)
 
-	answer, err := app.New(*aiprompt.NewOpenAI(openAIKey)).CheckAI(promptRequest.Prompt)
+	moatInstance := moat.New(aiprompt.NewOpenAI(openAIKey), pii_aws.New())
+	answer, err := moatInstance.CheckMoat(moat.PromptToCheck{
+		Prompt:  promptRequest.Prompt,
+		ScanPii: promptRequest.ScanPii,
+	},
+	)
 
 	if err != nil {
 		fmt.Printf("error processing AI: %v\n", err)
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error processing AI request: %v", err)
 	}
 
-	var containsPii = false
-
-	if promptRequest.ScanPii {
-		piiResult, err := pii_aws.New().Scan(promptRequest.Prompt)
-		if err != nil {
-			fmt.Printf("Error scanning for PII %v\n", err)
-			return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error scanning for PII: %v", err)
-		} else {
-			containsPii = piiResult.ContainingPii
-		}
+	containsPii := false
+	if answer != nil && answer.PiiResult != nil {
+		containsPii = answer.PiiResult.ContainsPii
 	}
 
-	response := AppResponse{AiScore: answer, ContainsPii: containsPii}
+	response := AppResponse{AiScore: answer.InjectionScore.Score, ContainsPii: containsPii}
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {
