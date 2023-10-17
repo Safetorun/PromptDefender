@@ -9,6 +9,7 @@ test:
 	cd prompt && go test -v ./... -cover
 	cd moat  && go test -v ./... -cover
 	cd keep  && go test -v ./... -cover
+	cd wall && go test -v ./... -cover
 
 build:
 	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go

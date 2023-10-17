@@ -2,7 +2,6 @@ module github.com/safetorun/PromptDefender/deployments/aws/lambda_keep
 
 go 1.20
 
-replace github.com/safetorun/PromptDefender/app => ../../../app
 
 replace github.com/safetorun/PromptDefender/aiprompt => ../../../aiprompt
 
