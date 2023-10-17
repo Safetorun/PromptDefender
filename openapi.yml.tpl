@@ -29,14 +29,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PromptRequest'
+              $ref: '#/components/schemas/KeepRequest'
       responses:
         '200':
           description: 'Successful operation.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InjectionScoreResponse'
+                $ref: '#/components/schemas/KeepResponse'
         '400':
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
@@ -58,14 +58,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PromptDefenderRequest'
+              $ref: '#/components/schemas/MoatRequest'
       responses:
         '200':
           description: 'Successful operation.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PromptDefenderResponse'
+                $ref: '#/components/schemas/MoatResponse'
         '400':
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
@@ -78,7 +78,29 @@ components:
       name: 'x-api-key'
       description: 'API key required for AWS API Gateway'
   schemas:
-    PromptRequest:
+    KeepRequest:
+      type: 'object'
+      required:
+        - 'prompt'
+      properties:
+        prompt:
+          type: 'string'
+          description: 'The base prompt you want to build a keep for'
+
+    MoatRequest:
+      type: 'object'
+      required:
+        - 'prompt'
+        - 'scan_pii'
+      properties:
+        prompt:
+          type: 'string'
+          description: 'The text prompt to be verified.'
+        scan_pii:
+          type: 'boolean'
+          description: 'Whether to scan for PII in the prompt.'
+
+    WallRequest:
       type: 'object'
       required:
         - 'prompt'
@@ -87,23 +109,21 @@ components:
           type: 'string'
           description: 'The text prompt to be verified.'
 
-    PromptDefenderRequest:
-      type: 'object'
-      required:
-        - 'prompt'
-      properties:
-        prompt:
-          type: 'string'
-          description: 'The text prompt to be verified.'
-
-    PromptDefenderResponse:
+    KeepResponse:
       type: 'object'
       properties:
         shielded_prompt:
           type: 'string'
           description: 'The shielded prompt.'
 
-    InjectionScoreResponse:
+    MoatResponse:
+      type: 'object'
+      properties:
+        contains_pii:
+          type: 'boolean'
+          description: 'Whether the prompt contains PII.'
+
+    WallResponse:
       type: 'object'
       properties:
         injection_score:

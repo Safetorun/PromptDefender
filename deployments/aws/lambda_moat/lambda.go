@@ -10,17 +10,8 @@ import (
 	"github.com/safetorun/PromptDefender/pii_aws"
 )
 
-type AppResponse struct {
-	ContainsPii bool `json:"contains_pii"`
-}
-
-type PromptRequest struct {
-	Prompt  string `json:"prompt"`
-	ScanPii bool   `json:"scan_pii"`
-}
-
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var promptRequest PromptRequest
+	var promptRequest MoatRequest
 
 	if err := json.Unmarshal([]byte(request.Body), &promptRequest); err != nil {
 		fmt.Printf("error unmarshalling request: %v\n", err)
@@ -46,7 +37,7 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 		containsPii = answer.PiiResult.ContainsPii
 	}
 
-	response := AppResponse{ContainsPii: containsPii}
+	response := MoatResponse{ContainsPii: &containsPii}
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {

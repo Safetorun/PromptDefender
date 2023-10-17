@@ -11,14 +11,6 @@ import (
 	"os"
 )
 
-type LambdaWallResponse struct {
-	AiScore float32 `json:"injection_score"`
-}
-
-type LambdaWallRequest struct {
-	Prompt string `json:"prompt"`
-}
-
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
@@ -26,7 +18,7 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error retrieving API key: environment variable not set")
 	}
 
-	var promptRequest LambdaWallRequest
+	var promptRequest WallRequest
 
 	if err := json.Unmarshal([]byte(request.Body), &promptRequest); err != nil {
 		fmt.Printf("error unmarshalling request: %v\n", err)
@@ -43,7 +35,7 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error processing AI request: %v", err)
 	}
 
-	response := LambdaWallResponse{AiScore: answer.Score}
+	response := WallResponse{InjectionScore: &answer.Score}
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {

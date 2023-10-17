@@ -1,7 +1,8 @@
 MODULES := $(shell (find .  -type f -name '*.go' -maxdepth 2 | sed -r 's|/[^/]+$$||' |cut -c 3-|sort |uniq))
-AWS_MODULES := $(shell cd deployments/aws && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|/[^/]+$$||' | cut -c 3- | sort | uniq)
+AWS_MODULES := $(shell cd deployments/aws && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|^\./|deployments/aws/|' | sed -r 's|/[^/]+$$||' | sort | uniq)
+PROJECT_DIR := $(shell pwd)
 
-test:
+test: build
 	cd aiprompt && go test -v ./... -cover
 	cd pii && go test -v ./... -cover
 	cd pii_aws && go test -v ./... -cover
@@ -11,42 +12,48 @@ test:
 	cd keep  && go test -v ./... -cover
 	cd wall && go test -v ./... -cover
 
-build:
-	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
-	cd deployments/aws/lambda_keep && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
-	cd deployments/aws/lambda_wall && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+build: generate
+	for aws_module in $(AWS_MODULES) ; do \
+	   cd $$aws_module && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main || exit 1; cd $(PROJECT_DIR) ; \
+	done
 
-deploy:
-	cd deployments/aws/lambda_moat && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
-	cd deployments/aws/lambda_keep && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
-	cd deployments/aws/lambda_wall && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main lambda.go
+deploy: build
 	cd terraform && terraform init && terraform apply -auto-approve
 
 install:
 	for number in  $(MODULES) ; do \
        cd $$number && go get ./... || exit 1; cd .. ; \
     done
+	for aws_module in $(AWS_MODULES) ; do \
+	   cd $$aws_module && go get ./... || exit 1; cd $(PROJECT_DIR) ; \
+	done
 
 tidy:
 	for number in $(MODULES); do \
 		cd $$number && go mod tidy || exit 1; cd .. ; \
 	done
-	cd deployments/aws/lambda_moat && go mod tidy
-	cd deployments/aws/lambda_keep && go mod tidy
-	cd deployments/aws/lambda_wall && go mod tidy
+	for aws_module in $(AWS_MODULES) ; do \
+	   cd $$aws_module && go mod tidy || exit 1; cd $(PROJECT_DIR) ; \
+	done
 
 upgrade:
 	for number in  $(MODULES) ; do \
 	   cd $$number && go get -u all  || exit 1; cd .. ; \
 	done
-	cd deployments/aws/lambda_moat && go get -u all
-	cd deployments/aws/lambda_keep && go get -u all
-	cd deployments/aws/lambda_wall && go get -u all
+	for aws_module in $(AWS_MODULES) ; do \
+	   cd $$aws_module && go get -u all || exit 1; cd $(PROJECT_DIR) ; \
+	done
 
 clean:
 	for number in  $(MODULES) ; do \
 	   cd $$number && go clean || exit 1; cd .. ; \
 	done
-	cd deployments/aws/lambda_moat && go clean
-	cd deployments/aws/lambda_keep && go clean
-	cd deployments/aws/lambda_wall && go clean
+	for aws_module in $(AWS_MODULES) ; do \
+	   cd $$aws_module && go clean || exit 1; cd $(PROJECT_DIR) ; \
+	done
+
+generate:
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
+	for aws_module in $(AWS_MODULES) ; do \
+	   cd $$aws_module && oapi-codegen -package main -generate types $(PROJECT_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
+	done
