@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role_moat" {
-  name = "lambda_role_builder"
+  name = "lambda_role_moat"
 
   assume_role_policy = jsonencode({
     Statement = [
