@@ -15,7 +15,7 @@ paths:
   /keep:
     post:
       x-amazon-apigateway-integration:
-        uri: ${lambda_keep_arn}
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -44,7 +44,7 @@ paths:
   /moat:
     post:
       x-amazon-apigateway-integration:
-        uri: ${lambda_moat_arn}
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:PromptDefender-Moat/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -66,35 +66,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MoatResponse'
-        '400':
-          description: 'Bad request. The prompt field is missing or invalid.'
-        '500':
-          description: 'Internal server error.'
-  /wall:
-    post:
-      x-amazon-apigateway-integration:
-        uri: ${lambda_wall_arn
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        type: "aws_proxy"
-      summary: 'Get your ring 2 wall defence'
-      description: 'TODO.'
-      operationId: 'checkWall'
-      security:
-        - ApiKeyAuth: [ ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WallRequest'
-      responses:
-        '200':
-          description: 'Successful operation.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WallResponse'
         '400':
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':

@@ -57,3 +57,6 @@ generate:
 	for aws_module in $(AWS_MODULES) ; do \
 	   cd $$aws_module && oapi-codegen -package main -generate types $(PROJECT_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
 	done
+
+generate_jailbreak:
+	cd builder && pip install -r requirements.txt && python clean_jailbreaks_into_json.py && python generate_jailbreaks.py

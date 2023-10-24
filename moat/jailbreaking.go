@@ -1,4 +1,4 @@
-package wall
+package moat
 
 type BadWordsResult struct {
 	ContainsBadWords bool

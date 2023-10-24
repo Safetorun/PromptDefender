@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/moat"
 	"github.com/safetorun/PromptDefender/pii_aws"
 )
@@ -20,7 +21,8 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 
 	fmt.Printf("Received request for %v\n", promptRequest)
 
-	moatInstance := moat.New(pii_aws.New())
+	moatInstance := moat.New(pii_aws.New(), badwords.New())
+
 	answer, err := moatInstance.CheckMoat(moat.PromptToCheck{
 		Prompt:  promptRequest.Prompt,
 		ScanPii: promptRequest.ScanPii,
