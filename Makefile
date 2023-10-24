@@ -59,4 +59,4 @@ generate:
 	done
 
 generate_jailbreak:
-	cd builder && pip install -r requirements.txt && python clean_jailbreaks_into_json.py && python generate_jailbreaks.py
+	cd builder && pip install -r requirements.txt && python3 clean_jailbreaks_into_json.py && python3 jailbreak_embeddings.py
