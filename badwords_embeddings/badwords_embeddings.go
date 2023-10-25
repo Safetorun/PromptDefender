@@ -21,7 +21,7 @@ func (bw BadwordsEmbeddings) GetClosestMatch(prompt string) (*badwords.ClosestMa
 		return nil, err
 	}
 
-	embeddedBadwords, err := bw.embeddings.RetrieveBadwordEmbeddings()
+	embeddedBadwords, err := bw.embeddings.RetrieveBadwordsEmbeddings()
 
 	if err != nil {
 		return nil, err

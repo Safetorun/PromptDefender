@@ -12,6 +12,35 @@ servers:
     description: 'Production server'
 
 paths:
+  /wall:
+    post:
+      x-amazon-apigateway-integration:
+        uri: ${lambda_keep_arn}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
+      summary: 'Verify and Analyze Prompt'
+      description: 'This endpoint accepts a text prompt and provides a first layer of defense against prompt injection'
+      operationId: 'wallPrompt'
+      security:
+        - ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WallRequest'
+      responses:
+        '200':
+          description: 'Successful operation.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WallResponse'
+        '400':
+          description: 'Bad request. The prompt field is missing or invalid.'
+        '500':
+          description: 'Internal server error.'
   /keep:
     post:
       x-amazon-apigateway-integration:

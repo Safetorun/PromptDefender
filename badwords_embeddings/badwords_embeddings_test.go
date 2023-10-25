@@ -16,7 +16,7 @@ func (m *MockEmbeddings) CreateEmbeddings(prompt string) (*embeddings.EmbeddingV
 	return args.Get(0).(*embeddings.EmbeddingValue), args.Error(1)
 }
 
-func (m *MockEmbeddings) RetrieveBadwordEmbeddings() (*[]embeddings.EmbeddingValue, error) {
+func (m *MockEmbeddings) RetrieveBadwordsEmbeddings() (*[]embeddings.EmbeddingValue, error) {
 	args := m.Called()
 	return args.Get(0).(*[]embeddings.EmbeddingValue), args.Error(1)
 }
@@ -29,7 +29,7 @@ func TestGetClosestMatch(t *testing.T) {
 		{EmbeddingValue: []float64{0.7, 0.8, 0.9}},
 	}
 	mockEmbeddings.On("CreateEmbeddings", "test prompt").Return(samplePromptEmbeddings, nil)
-	mockEmbeddings.On("RetrieveBadwordEmbeddings").Return(sampleBadwordEmbeddings, nil)
+	mockEmbeddings.On("RetrieveBadwordsEmbeddings").Return(sampleBadwordEmbeddings, nil)
 	bw := New(mockEmbeddings)
 	result, err := bw.GetClosestMatch("test prompt")
 	if err != nil {

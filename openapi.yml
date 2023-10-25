@@ -41,6 +41,35 @@ paths:
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
           description: 'Internal server error.'
+  /wall:
+    post:
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:PromptDefender-Keep/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
+      summary: 'Verify and Analyze Prompt'
+      description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
+      operationId: 'wallPrompt'
+      security:
+        - ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WallRequest'
+      responses:
+        '200':
+          description: 'Successful operation.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WallResponse'
+        '400':
+          description: 'Bad request. The prompt field is missing or invalid.'
+        '500':
+          description: 'Internal server error.'
   /moat:
     post:
       x-amazon-apigateway-integration:
@@ -78,15 +107,6 @@ components:
       name: 'x-api-key'
       description: 'API key required for AWS API Gateway'
   schemas:
-    KeepRequest:
-      type: 'object'
-      required:
-        - 'prompt'
-      properties:
-        prompt:
-          type: 'string'
-          description: 'The base prompt you want to build a keep for'
-
     MoatRequest:
       type: 'object'
       required:
@@ -99,6 +119,14 @@ components:
         scan_pii:
           type: 'boolean'
           description: 'Whether to scan for PII in the prompt.'
+    KeepRequest:
+      type: 'object'
+      required:
+        - 'prompt'
+      properties:
+        prompt:
+          type: 'string'
+          description: 'The base prompt you want to build a keep for'
 
     WallRequest:
       type: 'object'

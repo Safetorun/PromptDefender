@@ -6,5 +6,5 @@ type EmbeddingValue struct {
 
 type Embeddings interface {
 	CreateEmbeddings(string) (*EmbeddingValue, error)
-	RetrieveBadwordEmbeddings() (*[]EmbeddingValue, error)
+	RetrieveBadwordsEmbeddings() (*[]EmbeddingValue, error)
 }
