@@ -1,6 +1,7 @@
 package badwords_embeddings
 
 import (
+	"github.com/drewlanenga/govector"
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/embeddings"
 )
@@ -14,11 +15,35 @@ func New(embeddings embeddings.Embeddings) BadwordsEmbeddings {
 }
 
 func (bw BadwordsEmbeddings) GetClosestMatch(prompt string) (*badwords.ClosestMatchScore, error) {
-	err, promptEmbeddingsValue := bw.embeddings.CreateEmbeddings(prompt)
+	promptEmbeddingsValue, err := bw.embeddings.CreateEmbeddings(prompt)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: implement with embeddings probably loaded from file.
+	embeddedBadwords, err := bw.embeddings.RetrieveBadwordEmbeddings()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var lowestScore float64 = 1.0
+
+	for _, embeddings := range *embeddedBadwords {
+		newScore := cosineSimilarity(promptEmbeddingsValue.EmbeddingValue, embeddings.EmbeddingValue)
+
+		if newScore < lowestScore {
+			lowestScore = newScore
+		}
+	}
+
+	return &badwords.ClosestMatchScore{Score: lowestScore}, nil
+}
+
+func cosineSimilarity(a, b []float64) float64 {
+	vector1, _ := govector.AsVector(a)
+	vector2, _ := govector.AsVector(b)
+	cosineSimilarity, _ := govector.Cosine(vector1, vector2)
+	cosineDistance := 1 - cosineSimilarity
+	return cosineDistance
 }

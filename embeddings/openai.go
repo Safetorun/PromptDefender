@@ -2,11 +2,24 @@ package embeddings
 
 import (
 	"context"
-	"github.com/sashabaranov/go-openai"
+
+	openai "github.com/sashabaranov/go-openai"
 )
 
 type OpenAI struct {
 	ApiKey string
+}
+
+func New(apiKey string) *OpenAI {
+	return &OpenAI{ApiKey: apiKey}
+}
+
+func convertFloat32ToFloat64(float32Array []float32) []float64 {
+	float64Array := make([]float64, len(float32Array))
+	for i, v := range float32Array {
+		float64Array[i] = float64(v)
+	}
+	return float64Array
 }
 
 func (o OpenAI) CreateEmbeddings(inputText string) (*EmbeddingValue, error) {
@@ -20,5 +33,5 @@ func (o OpenAI) CreateEmbeddings(inputText string) (*EmbeddingValue, error) {
 		return nil, err
 	}
 
-	return &EmbeddingValue{response.Data[0].Embedding}, nil
+	return &EmbeddingValue{convertFloat32ToFloat64(response.Data[0].Embedding)}, nil
 }

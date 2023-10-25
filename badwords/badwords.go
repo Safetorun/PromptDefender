@@ -1,8 +1,12 @@
 package badwords
 
+import (
+	"github.com/safetorun/PromptDefender/embeddings"
+)
+
 type ClosestMatchScore struct {
 	MatchDescription string
-	Score            float32
+	Score            float64
 }
 
 type ClosestMatcher interface {
@@ -11,7 +15,7 @@ type ClosestMatcher interface {
 
 type BadWords struct {
 	matcher   ClosestMatcher
-	threshold float32
+	threshold float64
 }
 
 func New(matcher ClosestMatcher) *BadWords {
@@ -28,4 +32,9 @@ func (badWords BadWords) CheckPromptContainsBadWords(prompt string) (*bool, erro
 	containsBadWord := score.Score > badWords.threshold
 	return &containsBadWord, nil
 
+}
+
+func (badWords BadWords) RetrieveBadwordEmbeddings() (*[]embeddings.EmbeddingValue, error) {
+	embeddings := make([]embeddings.EmbeddingValue, 0)
+	return &embeddings, nil
 }
