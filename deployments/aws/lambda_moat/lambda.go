@@ -51,7 +51,7 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 		containsPii = answer.PiiResult.ContainsPii
 	}
 
-	response := MoatResponse{ContainsPii: &containsPii}
+	response := MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords}
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {

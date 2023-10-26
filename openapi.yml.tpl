@@ -151,6 +151,9 @@ components:
         contains_pii:
           type: 'boolean'
           description: 'Whether the prompt contains PII.'
+        potential_jailbreak:
+          type: 'boolean'
+          description: 'Whether the prompt contains a potential jailbreak.'
 
     WallResponse:
       type: 'object'
