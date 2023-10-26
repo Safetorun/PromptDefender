@@ -2,9 +2,6 @@ package embeddings
 
 import (
 	"context"
-	"strconv"
-	"strings"
-
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -12,8 +9,8 @@ type OpenAI struct {
 	ApiKey string
 }
 
-func New(apiKey string) *OpenAI {
-	return &OpenAI{ApiKey: apiKey}
+func New(apiKey string) OpenAI {
+	return OpenAI{ApiKey: apiKey}
 }
 
 func convertFloat32ToFloat64(float32Array []float32) []float64 {
@@ -22,19 +19,6 @@ func convertFloat32ToFloat64(float32Array []float32) []float64 {
 		float64Array[i] = float64(v)
 	}
 	return float64Array
-}
-
-func stringToFloatArray(str string) ([]float64, error) {
-	strs := strings.Split(str, ",")
-	floats := make([]float64, len(strs))
-	for i, s := range strs {
-		f, err := strconv.ParseFloat(strings.TrimSpace(s), 64)
-		if err != nil {
-			return nil, err
-		}
-		floats[i] = f
-	}
-	return floats, nil
 }
 
 func (o OpenAI) CreateEmbeddings(inputText string) (*EmbeddingValue, error) {

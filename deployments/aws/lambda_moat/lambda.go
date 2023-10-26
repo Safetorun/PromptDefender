@@ -32,7 +32,7 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 
 	moatInstance := moat.New(
 		pii_aws.New(),
-		*badwords.New(badwords_embeddings.New(embeddings.New(openAIKey))),
+		badwords.New(badwords_embeddings.New(embeddings.New(openAIKey))),
 	)
 
 	answer, err := moatInstance.CheckMoat(moat.PromptToCheck{

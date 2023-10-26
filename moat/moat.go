@@ -16,7 +16,7 @@ import (
 
 type Moat struct {
 	piiScanner    pii.Scanner
-	badWordsCheck badwords.BadWords
+	badWordsCheck *badwords.BadWords
 }
 
 type PromptToCheck struct {
@@ -33,7 +33,7 @@ type CheckResult struct {
 	ContainsBadWords bool
 }
 
-func New(piiScanner pii.Scanner, badWordsCheck badwords.BadWords) *Moat {
+func New(piiScanner pii.Scanner, badWordsCheck *badwords.BadWords) *Moat {
 	return &Moat{piiScanner: piiScanner, badWordsCheck: badWordsCheck}
 }
 
