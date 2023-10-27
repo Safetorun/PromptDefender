@@ -14,8 +14,15 @@ type BadWords struct {
 	threshold float64
 }
 
-func New(matcher ClosestMatcher) *BadWords {
-	return &BadWords{matcher: matcher}
+type BadWordsOption func(*BadWords)
+
+func New(matcher ClosestMatcher, opts ...BadWordsOption) *BadWords {
+	badWords := &BadWords{matcher: matcher, threshold: 0.1}
+	for _, opt := range opts {
+		opt(badWords)
+	}
+
+	return badWords
 }
 
 func (badWords BadWords) CheckPromptContainsBadWords(prompt string) (*bool, error) {
