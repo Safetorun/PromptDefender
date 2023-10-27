@@ -27,7 +27,7 @@ func (bw BadwordsEmbeddings) GetClosestMatch(prompt string) (*badwords.ClosestMa
 		return nil, err
 	}
 
-	var lowestScore float64 = 1.0
+	var lowestScore = 1.0
 
 	for _, embeddings := range *embeddedBadwords {
 		newScore := cosineSimilarity(promptEmbeddingsValue.EmbeddingValue, embeddings.EmbeddingValue)

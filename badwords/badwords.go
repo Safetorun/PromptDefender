@@ -32,7 +32,7 @@ func (badWords BadWords) CheckPromptContainsBadWords(prompt string) (*bool, erro
 		return nil, err
 	}
 
-	containsBadWord := score.Score > badWords.threshold
+	containsBadWord := score.Score < badWords.threshold
 	return &containsBadWord, nil
 
 }
