@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/safetorun/PromptDefender/aws/base_aws"
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/badwords_embeddings"
 	"github.com/safetorun/PromptDefender/embeddings"
@@ -14,53 +14,50 @@ import (
 	"os"
 )
 
-func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var promptRequest MoatRequest
+type MoatLambda struct {
+	moatInstance *moat.Moat
+}
 
-	openAIKey, exists := os.LookupEnv("open_ai_api_key")
-
-	if !exists {
-		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error retrieving API key: environment variable not set")
-	}
-
-	if err := json.Unmarshal([]byte(request.Body), &promptRequest); err != nil {
-		fmt.Printf("error unmarshalling request: %v\n", err)
-		return events.APIGatewayProxyResponse{StatusCode: 400}, err
-	}
-
-	fmt.Printf("Received request for %v\n", promptRequest)
-
-	moatInstance := moat.New(
-		pii_aws.New(),
-		badwords.New(badwords_embeddings.New(embeddings.New(openAIKey))),
-	)
-
-	answer, err := moatInstance.CheckMoat(moat.PromptToCheck{
-		Prompt:  promptRequest.Prompt,
-		ScanPii: promptRequest.ScanPii,
+func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
+	answer, err := m.moatInstance.CheckMoat(moat.PromptToCheck{
+		Prompt:  moatRequest.Prompt,
+		ScanPii: moatRequest.ScanPii,
 	},
 	)
-
-	if err != nil {
-		fmt.Printf("error processing AI: %v\n", err)
-		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error processing AI request: %v", err)
-	}
 
 	containsPii := false
 	if answer != nil && answer.PiiResult != nil {
 		containsPii = answer.PiiResult.ContainsPii
 	}
 
-	response := MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords}
+	if err != nil {
+		return nil, err
+	}
 
-	jsonBytes, err := json.Marshal(response)
+	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords}, nil
+}
+
+func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	openAIKey, exists := os.LookupEnv("open_ai_api_key")
+
+	if !exists {
+		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")
+	}
+
+	moatLambda := MoatLambda{
+		moat.New(
+			pii_aws.New(),
+			badwords.New(badwords_embeddings.New(embeddings.New(openAIKey))),
+		),
+	}
+
+	response, err := base_aws.BaseHandler[MoatRequest, MoatResponse](request, &moatLambda)
+
 	if err != nil {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
 	}
 
-	jsonString := string(jsonBytes)
-
-	return events.APIGatewayProxyResponse{StatusCode: 200, Body: jsonString}, nil
+	return response, nil
 }
 
 func main() {
