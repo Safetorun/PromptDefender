@@ -41,7 +41,9 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 	}
 
 	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey))
-	response, err := base_aws.Handler(KeepLambda{keepInstance: keepBuilder})
+	handler := KeepLambda{keepInstance: keepBuilder}
+
+	response, err := base_aws.BaseHandler[KeepRequest, KeepResponse](request, &handler)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
