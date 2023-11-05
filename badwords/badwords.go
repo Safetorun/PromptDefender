@@ -1,8 +1,18 @@
 package badwords
 
+type MatchLevel int
+
+const (
+	ExactMatch MatchLevel = iota
+	VeryClose
+	Medium
+	NoMatch
+	TotallyDifferent
+)
+
 type ClosestMatchScore struct {
 	MatchDescription string
-	Score            float64
+	Score            MatchLevel
 }
 
 type ClosestMatcher interface {
@@ -11,13 +21,13 @@ type ClosestMatcher interface {
 
 type BadWords struct {
 	matcher   ClosestMatcher
-	threshold float64
+	threshold MatchLevel
 }
 
 type BadWordsOption func(*BadWords)
 
 func New(matcher ClosestMatcher, opts ...BadWordsOption) *BadWords {
-	badWords := &BadWords{matcher: matcher, threshold: 0.1}
+	badWords := &BadWords{matcher: matcher, threshold: VeryClose}
 	for _, opt := range opts {
 		opt(badWords)
 	}
