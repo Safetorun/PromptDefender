@@ -1,13 +1,19 @@
 go 1.20
 
 use (
-    ./moat
-    ./keep
-    ./wall
-    ./embeddings
-    ./badwords
-    ./badwords_embeddings
-    ./builder
-    ./canary
-    ./aiprompt
+	./aiprompt
+	./badwords
+	./badwords_embeddings
+	./builder
+	./canary
+	./deployments/aws/lambda_keep
+	./deployments/aws/lambda_moat
+	./deployments/aws/lambda_wall
+	./embeddings
+	./keep
+	./moat
+	./pii
+	./pii_aws
+	./prompt
+	./wall
 )
