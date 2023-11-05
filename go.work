@@ -1,0 +1,13 @@
+go 1.20
+
+use (
+    ./moat
+    ./keep
+    ./wall
+    ./embeddings
+    ./badwords
+    ./badwords_embeddings
+    ./builder
+    ./canary
+    ./aiprompt
+)
