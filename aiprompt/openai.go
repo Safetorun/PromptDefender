@@ -41,7 +41,7 @@ type OpenAIResponse struct {
 
 func (o OpenAI) CheckAI(prompt string) (*string, error) {
 	payloadData := Payload{
-		Model: "gpt-3.5-turbo",
+		Model: "gpt-4",
 		Messages: []Message{
 			{
 				Role:    "system",

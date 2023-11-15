@@ -1,12 +1,14 @@
 package prompt
 
-import "fmt"
+import "log"
 
 type SmartPromptRequest struct {
 	BasePrompt string
 }
 
 const promptDescription = `
+You ar a bot which is used to take a prompt, and return something which fulfills the same requirements
+but is more robust against prompt injection. You will use two techniques for this; sandwich defense and XML tagging.
 
 Sandwich defense: The sandwich defense involves sandwiching user input between two prompts. 
 It is intended to protect a user from project injection.
@@ -79,12 +81,16 @@ sandwich defense and XML tagging defense to prompt injection. It is important to
 as part of the response, but to modify it so that it is more robust against prompt injection using the techniques
 explained above. When you do so, if there is any string holder characters (e.g. %s) ensure these are preserved.
 
-Command: %s`
+Command:`
 
 func SmartPrompt(smartPromptRequest SmartPromptRequest) string {
 	builder := NewPromptBuilder()
 
 	builder.AddContext(promptDescription)
 
-	return fmt.Sprintf(builder.Build(), smartPromptRequest.BasePrompt)
+	newPrompt := promptDescription + " " + smartPromptRequest.BasePrompt
+
+	log.Default().Println(newPrompt)
+
+	return newPrompt
 }

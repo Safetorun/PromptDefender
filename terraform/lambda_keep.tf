@@ -50,6 +50,7 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
   filename         = data.archive_file.lambda_keep_zip.output_path
   runtime          = "go1.x"
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
+  timeout          = 60
 
 
   environment {
