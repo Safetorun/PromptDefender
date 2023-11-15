@@ -76,7 +76,9 @@ I will hand you input from a prompt command.
 
 Take this command, and return a prompt that keeps its core purpose, but enhances it to use
 sandwich defense and XML tagging defense to prompt injection. It is important to return the initial prompt
-as part of the response.`
+as part of the response.
+
+Command: %s`
 
 func SmartPrompt(smartPromptRequest SmartPromptRequest) string {
 	builder := NewPromptBuilder()
