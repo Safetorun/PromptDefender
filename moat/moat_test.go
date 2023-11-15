@@ -2,11 +2,12 @@ package moat
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/pii"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 type MockPiiScanner struct {
@@ -57,7 +58,7 @@ func TestCheckMoat(t *testing.T) {
 		badWordsCheck := badwords.New(closestMatcher)
 		m := New(piiScanner, badWordsCheck)
 
-		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: 0.7}, nil)
+		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
 		result, err := m.CheckMoat(check)
 		assert.Nil(t, err)
@@ -72,7 +73,7 @@ func TestCheckMoat(t *testing.T) {
 		m := New(piiScanner, badWordsCheck)
 
 		piiScanner.On("Scan", "some text").Return(&pii.ScanResult{ContainingPii: true}, nil)
-		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: 0.4}, nil)
+		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: true}
 		result, err := m.CheckMoat(check)
 		assert.Nil(t, err)
@@ -99,7 +100,7 @@ func TestCheckMoat(t *testing.T) {
 		m := New(piiScanner, badWordsCheck)
 
 		piiScanner.On("Scan", "some text").Return(nil, errors.New("an error"))
-		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: 0.4}, nil)
+		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: true}
 		result, err := m.CheckMoat(check)
 		assert.Nil(t, result)

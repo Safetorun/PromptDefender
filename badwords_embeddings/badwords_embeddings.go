@@ -37,7 +37,22 @@ func (bw BadwordsEmbeddings) GetClosestMatch(prompt string) (*badwords.ClosestMa
 		}
 	}
 
-	return &badwords.ClosestMatchScore{Score: lowestScore}, nil
+	return &badwords.ClosestMatchScore{Score: determineMatchLevel(lowestScore)}, nil
+}
+
+func determineMatchLevel(value float64) badwords.MatchLevel {
+	switch {
+	case value == 0:
+		return badwords.ExactMatch
+	case value < 0.1:
+		return badwords.VeryClose
+	case value < 0.5:
+		return badwords.Medium
+	case value < 1.0:
+		return badwords.NoMatch
+	default:
+		return badwords.TotallyDifferent
+	}
 }
 
 func cosineSimilarity(a, b []float64) float64 {
