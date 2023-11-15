@@ -45,7 +45,10 @@ func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 	}
 
 	if k.Callback != nil {
-		(*k.Callback)(startingPrompt.Prompt, *response)
+		err := (*k.Callback)(startingPrompt.Prompt, *response)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &NewPrompt{NewPrompt: *response}, nil
