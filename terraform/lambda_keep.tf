@@ -15,6 +15,34 @@ resource "aws_iam_role" "lambda_role_keep" {
   })
 }
 
+resource "aws_cloudwatch_log_group" "lambda_log_group" {
+  name = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
+  retention_in_days = 14
+}
+
+resource "aws_iam_policy" "lambda_logging_policy" {
+  name   = "lambda_logging_policy"
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Action   = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow",
+        Resource = aws_cloudwatch_log_group.lambda_log_group.arn
+      },
+    ],
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
+  role       = aws_iam_role.lambda_role_keep.name
+  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+}
+
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name    = "PromptDefender-Keep"
   handler          = "main"
