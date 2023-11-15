@@ -76,7 +76,8 @@ I will hand you input from a prompt command.
 
 Take this command, and return a prompt that keeps its core purpose, but enhances it to use
 sandwich defense and XML tagging defense to prompt injection. It is important to return the initial prompt
-as part of the response.
+as part of the response, but to modify it so that it is more robust against prompt injection using the techniques
+explained above. When you do so, if there is any string holder characters (e.g. %s) ensure these are preserved.
 
 Command: %s`
 
