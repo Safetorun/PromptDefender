@@ -5,6 +5,10 @@ import (
 	"github.com/safetorun/PromptDefender/prompt"
 )
 
+type KeepCallback *func(prompt string, newPrompt string)
+
+type KeepOption func(*Keep)
+
 type Keep struct {
 	openAi aiprompt.RemoteAIChecker
 }
@@ -15,12 +19,19 @@ type StartingPrompt struct {
 
 type NewPrompt struct {
 	NewPrompt string
+	Callback  KeepCallback
 }
 
-func New(aiPrompt aiprompt.RemoteAIChecker) *Keep {
-	return &Keep{
+func New(aiPrompt aiprompt.RemoteAIChecker, options ...KeepOption) *Keep {
+	k := &Keep{
 		openAi: aiPrompt,
 	}
+
+	for _, opt := range options {
+		opt(k)
+	}
+
+	return k
 }
 
 func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
