@@ -27,7 +27,7 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
   environment {
     variables = {
       open_ai_api_key = var.openai_secret_key
-      sqs_queue_name  = aws_sqs_queue.keep_queue.name
+      keep_sqs_queue_url  = aws_sqs_queue.keep_queue.url
     }
   }
 }
