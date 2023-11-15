@@ -21,7 +21,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 }
 
 resource "aws_iam_policy" "lambda_logging_policy" {
-  name   = "lambda_logging_policy"
+  name   = "lambda_logging_policy_keep"
   policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [
