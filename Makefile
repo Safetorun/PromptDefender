@@ -62,3 +62,6 @@ generate_jailbreak:
 	cd builder\
 	 && pip install -r requirements.txt && python3 clean_jailbreaks_into_json.py\
   	 && python3 jailbreak_embeddings.py && go build -o main && ./main
+
+integration_test:
+	cd keep_test_harness && go test -v ./...

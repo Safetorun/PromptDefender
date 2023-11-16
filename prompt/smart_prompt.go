@@ -1,7 +1,5 @@
 package prompt
 
-import "log"
-
 type SmartPromptRequest struct {
 	BasePrompt string
 }
@@ -90,8 +88,6 @@ func SmartPrompt(smartPromptRequest SmartPromptRequest) string {
 	builder.AddContext(promptDescription)
 
 	newPrompt := promptDescription + " " + smartPromptRequest.BasePrompt
-
-	log.Default().Println(newPrompt)
 
 	return newPrompt
 }
