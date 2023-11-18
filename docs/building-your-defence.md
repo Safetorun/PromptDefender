@@ -12,6 +12,9 @@ protect your application. It involves designing your base prompt so that it is a
 This is effective as it does not add any additional API calls to your application before after the prompt is called, and
 instead it something you can perform once and then forget about.
 
+Check out a [guide on building your keep](/building-your-keep.md) for more information.
+Or you find more information about prompt injection and what prompt defence looks like here: [prompt defence](https://medium.com/p/eadd2b993e45)
+
 # Moat
 
 The next thing to do is to build your moat. For the prompt inside your application, ask yourself if you want Personally identifiable
