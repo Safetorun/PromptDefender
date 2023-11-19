@@ -46,11 +46,15 @@ var sqsQueueCallback keep.Callback = func(prompt string, newPrompt string) error
 	}
 
 	queueMessage := struct {
-		Request   KeepRequest
-		Rersponse KeepResponse
+		Request  KeepRequest
+		Response KeepResponse
+		UserId   string
+		Version  string
 	}{
-		Request:   KeepRequest{Prompt: prompt},
-		Rersponse: KeepResponse{ShieldedPrompt: &newPrompt},
+		UserId:   "1234",
+		Version:  "1.0.1",
+		Request:  KeepRequest{Prompt: prompt},
+		Response: KeepResponse{ShieldedPrompt: &newPrompt},
 	}
 
 	jsonMessage, err := json.Marshal(queueMessage)
