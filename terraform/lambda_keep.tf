@@ -16,7 +16,7 @@ resource "aws_iam_role" "lambda_role_keep" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-  name = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
   retention_in_days = 14
 }
 
@@ -26,7 +26,7 @@ resource "aws_iam_policy" "lambda_logging_policy" {
     Version   = "2012-10-17",
     Statement = [
       {
-        Action   = [
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
@@ -55,8 +55,9 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
 
   environment {
     variables = {
-      open_ai_api_key = var.openai_secret_key
-      keep_sqs_queue_url  = aws_sqs_queue.keep_queue.url
+      open_ai_api_key    = var.openai_secret_key
+      keep_sqs_queue_url = aws_sqs_queue.keep_queue.url
+      version            = var.commit_version
     }
   }
 }

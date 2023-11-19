@@ -5,7 +5,7 @@ terraform {
       version = "~> 4.16"
     }
   }
-  
+
   backend "s3" {
     bucket = "tf-state-bucket-prompt-shield"
     key    = "tfstate"
@@ -16,5 +16,16 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-west-1"
+  region = "eu-west-1"
+
+  default_tags {
+    tags = {
+      Repo = "https://github.com/safetorun/PromptDefender"
+    }
+  }
+
+}
+
+variable "commit_version" {
+  type = string
 }

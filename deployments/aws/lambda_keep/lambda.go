@@ -1,3 +1,4 @@
+// / This file contains the lambda handler for the keep lambda
 package main
 
 import (
@@ -38,7 +39,7 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 	return &KeepResponse{ShieldedPrompt: &answer.NewPrompt}, nil
 }
 
-var sqsQueueCallback keep.Callback = func(prompt string, newPrompt string) error {
+var sqsQueueCallback = func(prompt string, newPrompt string, userId string, version string) error {
 	cfg, err := config.LoadDefaultConfig(context.Background())
 
 	if err != nil {
@@ -51,8 +52,8 @@ var sqsQueueCallback keep.Callback = func(prompt string, newPrompt string) error
 		UserId   string
 		Version  string
 	}{
-		UserId:   "1234",
-		Version:  "1.0.1",
+		UserId:   userId,
+		Version:  version,
 		Request:  KeepRequest{Prompt: prompt},
 		Response: KeepResponse{ShieldedPrompt: &newPrompt},
 	}
@@ -65,7 +66,7 @@ var sqsQueueCallback keep.Callback = func(prompt string, newPrompt string) error
 
 	svc := sqs.NewFromConfig(cfg)
 
-	queueName := os.Getenv("keep_sqs_queue_url")
+	queueName := retrieveQueueNameOrPanic()
 
 	input := &sqs.SendMessageInput{
 		MessageBody: aws.String(string(jsonMessage)),
@@ -82,15 +83,32 @@ var sqsQueueCallback keep.Callback = func(prompt string, newPrompt string) error
 	return nil
 }
 
-func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	openAIKey, exists := os.LookupEnv("open_ai_api_key")
+func retrieveQueueNameOrPanic() string {
+	queueName, exists := os.LookupEnv("keep_sqs_queue_url")
 
 	if !exists {
-		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error retrieving API key: environment variable not set")
+		panic(fmt.Errorf("error retrieving API key: environment (keep_sqs_queue_url) variable not set"))
+	}
+
+	return queueName
+}
+
+// Handler is the lambda handler for the keep lambda
+// The following enivorment variables are required:
+// open_ai_api_key: The OpenAI API key
+// version: The version of the lambda
+// keep_sqs_queue_url: The SQS queue URL to send the message to
+func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	openAIKey := retrieveApiKeyOrPanic()
+	version := retrieveVersionOrPanic()
+	_ = retrieveQueueNameOrPanic() // Fail early if queue name does not exist
+
+	var addCallbackWithUserId keep.Callback = func(prompt string, newPrompt string) error {
+		return sqsQueueCallback(prompt, newPrompt, request.RequestContext.Identity.APIKeyID, version)
 	}
 
 	addCallback := func(k *keep.Keep) {
-		k.Callback = &sqsQueueCallback
+		k.Callback = &addCallbackWithUserId
 	}
 
 	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey), addCallback)
@@ -104,6 +122,24 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 	}
 
 	return response, nil
+}
+
+func retrieveVersionOrPanic() string {
+	version, exists := os.LookupEnv("version")
+
+	if !exists {
+		panic(fmt.Errorf("error retrieving API key: environment (version) variable not set"))
+	}
+	return version
+}
+
+func retrieveApiKeyOrPanic() string {
+	openAIKey, exists := os.LookupEnv("open_ai_api_key")
+
+	if !exists {
+		panic(fmt.Errorf("error retrieving API key: environment (openAI key) variable not set"))
+	}
+	return openAIKey
 }
 
 func main() {

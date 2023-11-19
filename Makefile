@@ -18,7 +18,8 @@ build: generate
 	done
 
 deploy: build
-	cd terraform && terraform init && terraform apply -auto-approve
+
+	VERSION=`git rev-parse --short HEAD` cd terraform && terraform init && terraform apply -auto-approve -var="commit_version=$$VERSION"
 
 install:
 	for number in  $(MODULES) ; do \
