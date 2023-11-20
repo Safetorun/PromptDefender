@@ -47,3 +47,29 @@ In order to enable jailbreak detection, you will need to add the following to yo
     "jailbreak": 0
 }
 ```
+
+## User and session detection
+
+You can also enable user and session detection. This will look at the user and session information provided in the request, and
+will check to see if this user or session has been flagged as suspicious. This is useful if you have a user who is attempting
+to attack your system, and you want to block them from using your LLMs.
+
+## Script detection 
+
+You can also enable script detection. This will look at the prompt and will check to see if it contains any script tags or
+other HTML tags which could be used to inject scripts into your application. This is useful as there are a lot of cases
+where script tags and html tags are not needed, and so this can be used to block them. 
+
+## XML Escaping
+
+If you are you using a keep defence (above), you can also enable XML escaping. This will look at the prompt and
+will check to see if it contains any XML tag escaping which will likely indicate an attacker is trying to bypass your prompt defence
+
+
+# Walls
+
+The next thing to do is to build your walls. For the prompt inside your application, ask yourself if you want to use AI to
+detect attacks? The advantage of this is that a lot of the work is done for you, and you can use the same AI to protect
+against a range of attacks and jailbreaks. The key drawbacks at the moment are that it can be expensive, and it can be
+difficult to understand what is happening inside the AI and therefore if it is working effectively. It can also have a negative
+impact on performance as it adds a time consuming API call to your application.
