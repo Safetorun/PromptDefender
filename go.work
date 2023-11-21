@@ -16,5 +16,5 @@ use (
 	./pii_aws
 	./prompt
 	./wall
-	./keep_test_harness
+	./integration_test_harness
 )
