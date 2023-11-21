@@ -58,6 +58,7 @@ generate:
 	for aws_module in $(AWS_MODULES) ; do \
 	   cd $$aws_module && oapi-codegen -package main -generate types $(PROJECT_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
 	done
+	oapi-codegen -package integration_test_harness -generate types,client $(PROJECT_DIR)/openapi.yml > integration_test_harness/api.gen.go
 
 generate_jailbreak:
 	cd builder\
@@ -65,4 +66,4 @@ generate_jailbreak:
   	 && python3 jailbreak_embeddings.py && go build -o main && ./main
 
 integration_test:
-	cd keep_test_harness && go test -v ./...
+	cd integration_test_harness && go test -v ./...

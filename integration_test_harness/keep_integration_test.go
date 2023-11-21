@@ -1,4 +1,4 @@
-package keep_test_harness
+package integration_test_harness
 
 import (
 	"fmt"
