@@ -4,18 +4,16 @@ PROJECT_DIR := $(shell pwd)
 
 setup-workspace:
 	export TF_VAR_branch_name=$$(git rev-parse --abbrev-ref HEAD);\
-	if [ "$$TF_VAR_branch_name" = "main" ]; then \
+	if [ "$$TF_VAR_branch_name" = "main" ] && [ "$$INTEGRATION_TEST" != "true" ]; then \
 		echo "On 'main' branch. Using the 'default' workspace..."; \
-		terraform workspace select default; \
+		cd terraform && terraform workspace select -or-create default; \
+		terraform workspace show; \
+		cd ..; \
 	else \
-		workspace_exists=$$(terraform workspace list | grep -w $$TF_VAR_branch_name); \
-		if [ -z "$$workspace_exists" ]; then \
-			echo "Workspace $$TF_VAR_branch_name does not exist. Creating it..."; \
-			terraform workspace new $$TF_VAR_branch_name; \
-		else \
-			echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
-			terraform workspace select $$TF_VAR_branch_name; \
-		fi; \
+		echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
+		cd terraform && terraform workspace select -or-create  $$TF_VAR_branch_name; \
+		terraform workspace show; \
+		cd ..; \
 	fi
 
 test: build
@@ -35,7 +33,8 @@ build: generate
 
 deploy: setup-workspace build
 	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
-	cd terraform && terraform init && terraform apply -auto-approve
+	cd terraform && terraform init && terraform apply -auto-approve &&\
+	terraform output -json > terraform_output.json
 
 install:
 	for number in  $(MODULES) ; do \
@@ -82,7 +81,10 @@ generate_jailbreak:
   	 && python3 jailbreak_embeddings.py && go build -o main && ./main
 
 integration_test:
-	cd integration_test_harness && go test -p 1 ./...
+	go install github.com/tomwright/dasel/cmd/dasel@latest
+	export URL=`dasel select -f terraform/terraform_output.json '.api_url.value' | tr -d '"'` &&\
+	export DEFENDER_API_KEY=`dasel select -f terraform/terraform_output.json '.api_key_value.value' | tr -d '"'` &&\
+	cd integration_test_harness && go test ./...
 
 destroy: setup-workspace
 	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\

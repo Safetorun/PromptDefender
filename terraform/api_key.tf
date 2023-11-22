@@ -26,8 +26,3 @@ resource "aws_api_gateway_method_settings" "method_settings" {
   settings {
   }
 }
-
-output "api_key_value" {
-  value = aws_api_gateway_api_key.api_key.value
-  sensitive = true
-}

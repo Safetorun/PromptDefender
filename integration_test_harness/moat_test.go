@@ -3,6 +3,7 @@ package integration_test_harness
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cucumber/godog"
 	"net/http"
 	"os"
@@ -14,15 +15,34 @@ const RequestKey = "request"
 const ResponseKey = "response"
 
 func sendRequest(ctx context.Context) (context.Context, error) {
-	gClient, _ := createClient()
-	response, err := gClient.BuildShieldWithResponse(ctx, *ctx.Value(RequestKey).(*MoatRequest))
+	gClient, err := createClient()
 
 	if err != nil {
 		return nil, err
 	}
 
+	if ctx.Value(RequestKey) == nil {
+		return ctx, errors.New("request is nil")
+	}
+
+	request, ok := ctx.Value(RequestKey).(*MoatRequest)
+
+	if ok == false {
+		return ctx, errors.New("request is not castable to MoatRequest")
+	}
+
+	response, err := gClient.BuildShieldWithResponse(context.Background(), *request)
+
+	if err != nil {
+		return ctx, fmt.Errorf("got error (%s) when building shield", err)
+	}
+
 	if response.StatusCode() != 200 {
-		return nil, godog.ErrPending
+		return ctx, errors.New("error processing request")
+	}
+
+	if response.JSON200 == nil {
+		return ctx, errors.New("response is nil")
 	}
 
 	return context.WithValue(ctx, ResponseKey, response.JSON200), nil
@@ -34,16 +54,29 @@ func requestToMoat(ctx context.Context) (context.Context, error) {
 }
 
 func createClient() (*ClientWithResponses, error) {
+
+	apiKey, exists := os.LookupEnv("DEFENDER_API_KEY")
+
+	if exists == false {
+		return nil, errors.New("DEFENDER_API_KEY not set")
+	}
+
+	url, exists := os.LookupEnv("URL")
+
+	if exists == false {
+		return nil, errors.New("URL not set")
+	}
+
 	addApiKey := func(c *Client) error {
 		c.RequestEditors = append(c.RequestEditors, func(ctx context.Context, req *http.Request) error {
-			req.Header.Add("x-api-key", os.Getenv("DEFENDER_API_KEY"))
+			req.Header.Add("x-api-key", apiKey)
 			return nil
 		})
 
 		return nil
 	}
 
-	client, err := NewClientWithResponses("https://prompt.safetorun.com", addApiKey)
+	client, err := NewClientWithResponses(url, addApiKey)
 	return client, err
 }
 
