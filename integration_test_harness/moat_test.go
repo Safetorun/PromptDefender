@@ -10,12 +10,12 @@ import (
 	"testing"
 )
 
-var (
-	gClient *ClientWithResponses
-)
+const RequestKey = "request"
+const ResponseKey = "response"
 
 func sendRequest(ctx context.Context) (context.Context, error) {
-	response, err := gClient.BuildShieldWithResponse(ctx, *ctx.Value("request").(*MoatRequest))
+	gClient, _ := createClient()
+	response, err := gClient.BuildShieldWithResponse(ctx, *ctx.Value(RequestKey).(*MoatRequest))
 
 	if err != nil {
 		return nil, err
@@ -25,11 +25,15 @@ func sendRequest(ctx context.Context) (context.Context, error) {
 		return nil, godog.ErrPending
 	}
 
-	return context.WithValue(ctx, "response", response.JSON200), nil
+	return context.WithValue(ctx, ResponseKey, response.JSON200), nil
 
 }
 
 func requestToMoat(ctx context.Context) (context.Context, error) {
+	return context.WithValue(ctx, RequestKey, &MoatRequest{}), nil
+}
+
+func createClient() (*ClientWithResponses, error) {
 	addApiKey := func(c *Client) error {
 		c.RequestEditors = append(c.RequestEditors, func(ctx context.Context, req *http.Request) error {
 			req.Header.Add("x-api-key", os.Getenv("DEFENDER_API_KEY"))
@@ -40,13 +44,7 @@ func requestToMoat(ctx context.Context) (context.Context, error) {
 	}
 
 	client, err := NewClientWithResponses("https://prompt.safetorun.com", addApiKey)
-	gClient = client
-
-	if err != nil {
-		return nil, err
-	}
-
-	return context.WithValue(ctx, "request", &MoatRequest{}), nil
+	return client, err
 }
 
 func setPiiDetection(ctx context.Context, enablePii string) (context.Context, error) {
@@ -55,13 +53,13 @@ func setPiiDetection(ctx context.Context, enablePii string) (context.Context, er
 	if err != nil {
 		return nil, err
 	}
-	request := ctx.Value("request").(*MoatRequest)
+	request := ctx.Value(RequestKey).(*MoatRequest)
 	request.ScanPii = pii
 	return ctx, nil
 }
 
 func setPromptBody(ctx context.Context, prompt string) (context.Context, error) {
-	request := ctx.Value("request").(*MoatRequest)
+	request := ctx.Value(RequestKey).(*MoatRequest)
 	request.Prompt = prompt
 	return ctx, nil
 }
@@ -73,7 +71,7 @@ func validateResponseDetectedPii(context context.Context, piiDetected string) er
 		return err
 	}
 
-	response := context.Value("response").(*MoatResponse)
+	response := context.Value(ResponseKey).(*MoatResponse)
 	if *response.ContainsPii != detected {
 		return errors.New("pii detected not set correctly")
 	}

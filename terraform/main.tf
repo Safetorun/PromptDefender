@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "${local.sanitized_branch_name}tf-state-bucket-prompt-shield"
+    bucket = "tf-state-bucket-prompt-shield"
     key    = "tfstate"
     region = "eu-west-1"
   }
