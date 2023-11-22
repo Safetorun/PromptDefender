@@ -21,7 +21,6 @@ provider "aws" {
   default_tags {
     tags = {
       Repo   = "https://github.com/safetorun/PromptDefender"
-      Branch = local.sanitized_branch_name
       Workspace = terraform.workspace
     }
   }
