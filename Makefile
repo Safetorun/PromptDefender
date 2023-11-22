@@ -3,7 +3,11 @@ AWS_MODULES := $(shell cd deployments/aws && find . -type f -name '*.go' -maxdep
 PROJECT_DIR := $(shell pwd)
 
 setup-workspace:
-	export TF_VAR_branch_name=$$(git rev-parse --abbrev-ref HEAD);\
+	if [ -n "$$GITHUB_REF_NAME" ]; then \
+    	export TF_VAR_branch_name=$$GITHUB_REF_NAME; \
+	else \
+		export TF_VAR_branch_name=$$(git rev-parse --abbrev-ref HEAD); \
+	fi; \
 	if [ "$$TF_VAR_branch_name" = "main" ] && [ "$$INTEGRATION_TEST" != "true" ]; then \
 		echo "On 'main' branch. Using the 'default' workspace..."; \
 		cd terraform && terraform workspace select -or-create default; \
@@ -32,8 +36,8 @@ build: generate
 	done
 
 deploy: setup-workspace build
-	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
-	cd terraform && terraform init && terraform apply -auto-approve &&\
+	export TF_VAR_commit_version=`git rev-parse --short HEAD` || exit 1; &&\
+	cd terraform && terraform init || exit 1; && terraform apply -auto-approve || exit 1; &&\
 	terraform output -json > terraform_output.json
 
 install:
