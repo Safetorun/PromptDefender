@@ -49,13 +49,11 @@ jobs:
       - name: Build
         run: make build
       - name: Deploy
+        run: make deploy integration_test
         env:
           TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
-        run: make deploy
-      - name: Integration test
-        run: make integration_test
-        env:
           open_ai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
       - name: Destroy
         run: make destroy
         if: always()
