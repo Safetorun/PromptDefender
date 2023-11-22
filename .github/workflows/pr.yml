@@ -1,3 +1,5 @@
+name: PR
+
 permissions:
   id-token: write
   contents: read
@@ -29,7 +31,6 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   deploy:
     runs-on: ubuntu-latest
-    environment: production
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
