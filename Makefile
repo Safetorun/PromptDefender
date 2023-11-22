@@ -18,8 +18,16 @@ build: generate
 	done
 
 deploy: build
-	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
 	export TF_VAR_branch_name=`git rev-parse --abbrev-ref HEAD` &&\
+	workspace_exists=$$(terraform workspace list | grep -w $$TF_VAR_branch_name); \
+	if [ -z "$$workspace_exists" ]; then \
+		echo "Workspace $$TF_VAR_branch_name does not exist. Creating it..."; \
+		terraform workspace new $$TF_VAR_branch_name; \
+	else \
+		echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
+		terraform workspace select $$TF_VAR_branch_name; \
+	fi
+	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
 	cd terraform && terraform init && terraform apply -auto-approve
 
 install:
