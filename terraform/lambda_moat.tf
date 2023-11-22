@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role_moat" {
-  name = "lambda_role_moat"
+  name = "${local.sanitized_branch_name}-lambda_role_moat"
 
   assume_role_policy = jsonencode({
     Statement = [
@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
 
 
 resource "aws_lambda_function" "aws_lambda_moat" {
-  function_name    = "PromptDefender-Moat"
+  function_name    = "${local.sanitized_branch_name}-PromptDefender-Moat"
   handler          = "main"
   role             = aws_iam_role.lambda_role_moat.arn
   filename         = data.archive_file.lambda_moat_zip.output_path

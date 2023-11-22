@@ -19,6 +19,7 @@ build: generate
 
 deploy: build
 	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
+	export TF_VAR_branch_name=`git rev-parse --abbrev-ref HEAD` &&\
 	cd terraform && terraform init && terraform apply -auto-approve
 
 install:

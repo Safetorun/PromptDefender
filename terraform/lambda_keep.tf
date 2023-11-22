@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role_keep" {
-  name = "lambda_role_keep"
+  name = "${local.sanitized_branch_name}-lambda_role_keep"
 
   assume_role_policy = jsonencode({
     Statement = [
@@ -21,7 +21,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 }
 
 resource "aws_iam_policy" "lambda_logging_policy" {
-  name   = "lambda_logging_policy_keep"
+  name   = "${local.sanitized_branch_name}-lambda_logging_policy_keep"
   policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [
@@ -44,7 +44,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
 }
 
 resource "aws_lambda_function" "aws_Lambda_keep" {
-  function_name    = "PromptDefender-Keep"
+  function_name    = "${local.sanitized_branch_name}-PromptDefender-Keep"
   handler          = "main"
   role             = aws_iam_role.lambda_role_keep.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
@@ -63,7 +63,7 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
 }
 
 resource "aws_iam_policy" "lambda_sqs_policy" {
-  name   = "lambda_sqs_policy"
+  name   = "${local.sanitized_branch_name}-lambda_sqs_policy"
   policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [

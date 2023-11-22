@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "tf-state-bucket-prompt-shield"
+    bucket = "${local.sanitized_branch_name}tf-state-bucket-prompt-shield"
     key    = "tfstate"
     region = "eu-west-1"
   }
@@ -20,10 +20,10 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Repo = "https://github.com/safetorun/PromptDefender"
+      Repo   = "https://github.com/safetorun/PromptDefender"
+      Branch = local.sanitized_branch_name
     }
   }
-
 }
 
 variable "commit_version" {

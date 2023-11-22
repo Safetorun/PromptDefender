@@ -1,19 +1,19 @@
 resource "aws_api_gateway_rest_api" "api" {
-  name        = "PromptProtect"
+  name        = "${local.sanitized_branch_name}-PromptProtect"
   description = "My API Service"
   body        = local_file.built_open_api_spec.content
   depends_on = [aws_lambda_function.aws_Lambda_keep, local_file.built_open_api_spec]
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "${local.sanitized_branch_name}-AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_Lambda_keep.arn
   principal     = "apigateway.amazonaws.com"
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_shield" {
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "${local.sanitized_branch_name}-AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_lambda_moat.arn
   principal     = "apigateway.amazonaws.com"
@@ -32,7 +32,4 @@ resource "local_file" "built_open_api_spec" {
     lambda_keep_arn = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.aws_Lambda_keep.arn}/invocations",
     lambda_moat_arn = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.aws_lambda_moat.arn}/invocations"
   })
-}
-output "api_url" {
-  value = aws_api_gateway_deployment.api.invoke_url
 }
