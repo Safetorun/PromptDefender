@@ -36,8 +36,8 @@ build: generate
 	done
 
 deploy: setup-workspace build
-	export TF_VAR_commit_version=`git rev-parse --short HEAD` || exit 1; &&\
-	cd terraform && terraform init || exit 1; && terraform apply -auto-approve || exit 1; &&\
+	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
+	cd terraform && terraform init || exit 1; && terraform apply -auto-approve &&\
 	terraform output -json > terraform_output.json
 
 install:
