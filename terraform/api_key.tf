@@ -1,5 +1,5 @@
 resource "aws_api_gateway_api_key" "api_key" {
-  name = "${local.sanitized_branch_name}-TestAPIKey"
+  name = "${terraform.workspace}-TestAPIKey"
   enabled = true
 }
 

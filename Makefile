@@ -18,6 +18,7 @@ build: generate
 	done
 
 deploy: build
+	cd terraform &&\
 	export TF_VAR_branch_name=`git rev-parse --abbrev-ref HEAD` &&\
 	workspace_exists=$$(terraform workspace list | grep -w $$TF_VAR_branch_name); \
 	if [ -z "$$workspace_exists" ]; then \

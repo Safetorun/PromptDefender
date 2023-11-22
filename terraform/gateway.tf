@@ -1,19 +1,19 @@
 resource "aws_api_gateway_rest_api" "api" {
-  name        = "${local.sanitized_branch_name}-PromptProtect"
+  name        = "${terraform.workspace}-PromptProtect"
   description = "My API Service"
   body        = local_file.built_open_api_spec.content
   depends_on = [aws_lambda_function.aws_Lambda_keep, local_file.built_open_api_spec]
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
-  statement_id  = "${local.sanitized_branch_name}-AllowAPIGatewayInvoke"
+  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_Lambda_keep.arn
   principal     = "apigateway.amazonaws.com"
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_shield" {
-  statement_id  = "${local.sanitized_branch_name}-AllowAPIGatewayInvoke"
+  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_lambda_moat.arn
   principal     = "apigateway.amazonaws.com"
