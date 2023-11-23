@@ -4,18 +4,22 @@ PROJECT_DIR := $(shell pwd)
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
+  		echo "Using branch name from GITHUB_REF_NAME env variable..." &&\
     	export TF_VAR_branch_name=$$GITHUB_REF_NAME; \
 	else \
+	  	echo "Using branch name from git rev-parse..." &&\
 		export TF_VAR_branch_name=$$(git rev-parse --abbrev-ref HEAD); \
 	fi; \
 	if [ "$$TF_VAR_branch_name" = "main" ] && [ "$$INTEGRATION_TEST" != "true" ]; then \
 		echo "On 'main' branch. Using the 'default' workspace..."; \
 		cd terraform && terraform init && terraform workspace select -or-create default; \
+		echo "Workspace $$TF_VAR_branch_name selected."; \
 		terraform workspace show; \
 		cd ..; \
 	else \
 		echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
-		cd terraform && terraform init && workspace select -or-create  $$TF_VAR_branch_name; \
+		cd terraform && terraform init && terraform workspace select -or-create  $$TF_VAR_branch_name; \
+		echo "Workspace $$TF_VAR_branch_name selected."; \
 		terraform workspace show; \
 		cd ..; \
 	fi
