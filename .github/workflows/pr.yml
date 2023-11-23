@@ -48,7 +48,7 @@ jobs:
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.3
       - name: Deploy
-        run: make setup-workspace
+        run: make deploy
         env:
           TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
           open_ai_api_key: ${{ secrets.OPENAI_API_KEY }}
