@@ -1,8 +1,13 @@
 resource "aws_api_gateway_api_key" "api_key" {
-  name = "${terraform.workspace}-TestAPIKey"
+  name    = "${terraform.workspace}-TestAPIKey"
   enabled = true
 }
 
+resource "aws_ssm_parameter" "defender_api_gateway_usage_plan_id" {
+  name  = "${terraform.workspace}-defender_api_gateway_usage_plan_id"
+  type  = "string"
+  value = aws_api_gateway_usage_plan.usage_plan.id
+}
 resource "aws_api_gateway_usage_plan" "usage_plan" {
   name = "PromptDefenderUsagePlan"
 
@@ -28,6 +33,6 @@ resource "aws_api_gateway_method_settings" "method_settings" {
 }
 
 output "api_key_value" {
-  value = aws_api_gateway_api_key.api_key.value
+  value     = aws_api_gateway_api_key.api_key.value
   sensitive = true
 }
