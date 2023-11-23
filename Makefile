@@ -93,6 +93,7 @@ integration_test:
 	go install github.com/tomwright/dasel/cmd/dasel@latest
 	export URL=`dasel select -f terraform/terraform_output.json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`dasel select -f terraform/terraform_output.json '.api_key_value.value' | tr -d '"'` &&\
+	echo "Defender API URL: $$URL" &&\
 	cd integration_test_harness && go test ./...
 
 destroy: setup-workspace
