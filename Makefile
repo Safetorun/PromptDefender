@@ -18,7 +18,8 @@ setup-workspace:
 		cd ..; \
 	else \
 		echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
-		cd terraform && terraform init && terraform workspace select -or-create  $$TF_VAR_branch_name; \
+		workspace_name=`echo $$TF_VAR_branch_name | sed 's/[^a-zA-Z0-9-]/-/g'`; \
+		cd terraform && terraform init && terraform workspace select -or-create  $$workspace_name; \
 		echo "Workspace $$TF_VAR_branch_name selected."; \
 		terraform workspace show; \
 		cd ..; \
