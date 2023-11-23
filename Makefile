@@ -91,5 +91,10 @@ integration_test:
 	cd integration_test_harness && go test ./...
 
 destroy: setup-workspace
-	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
-	cd terraform && terraform init && terraform destroy -auto-approve
+	export TF_VAR_commit_version=`git rev-parse --short HEAD`;\
+	current_workspace=`cd terraform && terraform workspace show`;\
+	if [ "$$current_workspace" = "default" ]; then \
+		echo "Skipping destruction in default workspace"; \
+	else \
+		cd terraform && terraform init && terraform destroy -auto-approve; \
+	fi
