@@ -12,7 +12,7 @@ setup-workspace:
 	fi; \
 	if [ "$$TF_VAR_branch_name" = "main" ] && [ "$$INTEGRATION_TEST" != "true" ]; then \
 		echo "On 'main' branch. Using the 'default' workspace..."; \
-		cd terraform && terraform init && terraform workspace select -or-create default; \
+		cd terraform && terraform init && terraform workspace select -or-create default || exit 1; \
 		echo "Workspace $$TF_VAR_branch_name selected."; \
 		terraform workspace show; \
 		cd ..; \
