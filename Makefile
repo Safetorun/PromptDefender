@@ -90,8 +90,7 @@ generate_jailbreak:
   	 && python3 jailbreak_embeddings.py && go build -o main && ./main
 
 integration_test:
-	go install github.com/tomwright/dasel/cmd/dasel@latest
-	cat terraform/terraform_output.json &&\
+	go install github.com/tomwright/dasel/cmd/dasel@latest &&\
 	dasel select -f terraform/terraform_output.json '.api_url.value' &&\
 	export URL=`dasel select -f terraform/terraform_output.json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`dasel select -f terraform/terraform_output.json '.api_key_value.value' | tr -d '"'` &&\
