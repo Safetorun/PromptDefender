@@ -3,19 +3,26 @@ AWS_MODULES := $(shell cd deployments/aws && find . -type f -name '*.go' -maxdep
 PROJECT_DIR := $(shell pwd)
 
 setup-workspace:
-	export TF_VAR_branch_name=$$(git rev-parse --abbrev-ref HEAD);\
-	if [ "$$TF_VAR_branch_name" = "main" ]; then \
-		echo "On 'main' branch. Using the 'default' workspace..."; \
-		terraform workspace select default; \
+	if [ -n "$$GITHUB_REF_NAME" ]; then \
+  		echo "Using branch name from GITHUB_REF_NAME env variable..." &&\
+    	export TF_VAR_branch_name=$$GITHUB_REF_NAME; \
 	else \
-		workspace_exists=$$(terraform workspace list | grep -w $$TF_VAR_branch_name); \
-		if [ -z "$$workspace_exists" ]; then \
-			echo "Workspace $$TF_VAR_branch_name does not exist. Creating it..."; \
-			terraform workspace new $$TF_VAR_branch_name; \
-		else \
-			echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
-			terraform workspace select $$TF_VAR_branch_name; \
-		fi; \
+	  	echo "Using branch name from git rev-parse..." &&\
+		export TF_VAR_branch_name=$$(git rev-parse --abbrev-ref HEAD); \
+	fi; \
+	if [ "$$TF_VAR_branch_name" = "main" ] && [ "$$INTEGRATION_TEST" != "true" ]; then \
+		echo "On 'main' branch. Using the 'default' workspace..."; \
+		cd terraform && terraform init && terraform workspace select -or-create default || exit 1; \
+		echo "Workspace $$TF_VAR_branch_name selected."; \
+		terraform workspace show; \
+		cd ..; \
+	else \
+		echo "Workspace $$TF_VAR_branch_name exists. Selecting it..."; \
+		workspace_name=`echo $$TF_VAR_branch_name | sed 's/[^a-zA-Z0-9-]/-/g'`; \
+		cd terraform && terraform init && terraform workspace select -or-create  $$workspace_name; \
+		echo "Workspace $$TF_VAR_branch_name selected."; \
+		terraform workspace show; \
+		cd ..; \
 	fi
 
 test: build
@@ -35,7 +42,8 @@ build: generate
 
 deploy: setup-workspace build
 	export TF_VAR_commit_version=`git rev-parse --short HEAD` &&\
-	cd terraform && terraform init && terraform apply -auto-approve
+	cd terraform && terraform init && terraform apply -auto-approve &&\
+	terraform output -json > terraform_output.json
 
 install:
 	for number in  $(MODULES) ; do \
@@ -82,11 +90,15 @@ generate_jailbreak:
   	 && python3 jailbreak_embeddings.py && go build -o main && ./main
 
 integration_test:
-	cd integration_test_harness && go test -p 1 ./...
+	go install github.com/tomwright/dasel/cmd/dasel@latest
+	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
+	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
+	echo "Defender API URL: $$URL" &&\
+	cd integration_test_harness && go test ./...
 
 destroy: setup-workspace
-	export TF_VAR_commit_version=$$(git rev-parse --short HEAD);\
-	current_workspace=$$(cd terraform && terraform workspace show);\
+	export TF_VAR_commit_version=`git rev-parse --short HEAD`;\
+	current_workspace=`cd terraform && terraform workspace show`;\
 	if [ "$$current_workspace" = "default" ]; then \
 		echo "Skipping destruction in default workspace"; \
 	else \
