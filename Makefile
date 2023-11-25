@@ -91,9 +91,7 @@ generate_jailbreak:
 
 integration_test:
 	go install github.com/tomwright/dasel/cmd/dasel@latest
-	cd terraform && terraform output -json  && cd ..;
-	cd terraform && terraform output -json |  dasel select -p json '.api_url.value' | tr -d '"' && cd .. &&\
-	export URL=`cd terraform && | dasel select -p json '.api_url.value' | tr -d '"'` &&\
+	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	echo "Defender API URL: $$URL" &&\
 	cd integration_test_harness && go test ./...
