@@ -128,7 +128,9 @@ components:
         scan_pii:
           type: 'boolean'
           description: 'Whether to scan for PII in the prompt.'
-
+        xml_tags:
+          type: 'string'
+          description: 'The XML tag that is used to escape user input in your prompt (this may have been generated with 'keep').'
     WallRequest:
       type: 'object'
       required:
@@ -154,6 +156,9 @@ components:
         potential_jailbreak:
           type: 'boolean'
           description: 'Whether the prompt contains a potential jailbreak.'
+        potential_xml_escaping:
+          type: 'boolean'
+          description: 'Whether the prompt contains potential XML escaping.'
 
     WallResponse:
       type: 'object'
