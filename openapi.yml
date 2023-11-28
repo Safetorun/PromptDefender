@@ -15,7 +15,7 @@ paths:
   /wall:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:4-ephemeral-environments-PromptDefender-Keep/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:10-moat-identify-xml-PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -44,7 +44,7 @@ paths:
   /keep:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:4-ephemeral-environments-PromptDefender-Keep/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:10-moat-identify-xml-PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -73,7 +73,7 @@ paths:
   /moat:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:4-ephemeral-environments-PromptDefender-Moat/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:10-moat-identify-xml-PromptDefender-Moat/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -128,7 +128,9 @@ components:
         scan_pii:
           type: 'boolean'
           description: 'Whether to scan for PII in the prompt.'
-
+        xml_tag:
+          type: 'string'
+          description: 'The XML tag that is used to escape user input in your prompt (this may have been generated with keep).'
     WallRequest:
       type: 'object'
       required:
@@ -154,6 +156,9 @@ components:
         potential_jailbreak:
           type: 'boolean'
           description: 'Whether the prompt contains a potential jailbreak.'
+        potential_xml_escaping:
+          type: 'boolean'
+          description: 'Whether the prompt contains potential XML escaping.'
 
     WallResponse:
       type: 'object'

@@ -26,6 +26,9 @@ type MoatRequest struct {
 
 	// ScanPii Whether to scan for PII in the prompt.
 	ScanPii bool `json:"scan_pii"`
+
+	// XmlTag The XML tag that is used to escape user input in your prompt (this may have been generated with keep).
+	XmlTag *string `json:"xml_tag,omitempty"`
 }
 
 // MoatResponse defines model for MoatResponse.
@@ -35,6 +38,9 @@ type MoatResponse struct {
 
 	// PotentialJailbreak Whether the prompt contains a potential jailbreak.
 	PotentialJailbreak *bool `json:"potential_jailbreak,omitempty"`
+
+	// PotentialXmlEscaping Whether the prompt contains potential XML escaping.
+	PotentialXmlEscaping *bool `json:"potential_xml_escaping,omitempty"`
 }
 
 // WallRequest defines model for WallRequest.

@@ -128,9 +128,9 @@ components:
         scan_pii:
           type: 'boolean'
           description: 'Whether to scan for PII in the prompt.'
-        xml_tags:
+        xml_tag:
           type: 'string'
-          description: 'The XML tag that is used to escape user input in your prompt (this may have been generated with 'keep').'
+          description: 'The XML tag that is used to escape user input in your prompt (this may have been generated with keep).'
     WallRequest:
       type: 'object'
       required:

@@ -97,6 +97,20 @@ func setPromptBody(ctx context.Context, prompt string) (context.Context, error) 
 	return ctx, nil
 }
 
+func validateResponseXmlTag(context context.Context, xmlTag string) error {
+	detected, err := strconv.ParseBool(xmlTag)
+	if err != nil {
+		return err
+	}
+
+	response := context.Value(ResponseKey).(*MoatResponse)
+	if *response.PotentialXmlEscaping != detected {
+		return errors.New("xml tag not set correctly")
+	}
+
+	return nil
+}
+
 func validateResponseDetectedPii(context context.Context, piiDetected string) error {
 
 	detected, err := strconv.ParseBool(piiDetected)
@@ -110,6 +124,12 @@ func validateResponseDetectedPii(context context.Context, piiDetected string) er
 	}
 
 	return nil
+}
+
+func setXmlTag(ctx context.Context, tag string) (context.Context, error) {
+	request := ctx.Value(RequestKey).(*MoatRequest)
+	request.XmlTag = &tag
+	return ctx, nil
 }
 
 func TestFeatures(t *testing.T) {
@@ -133,4 +153,6 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the request is (.*)$`, setPromptBody)
 	ctx.Step("^request is sent$", sendRequest)
 	ctx.Step(`^Response should have PII detected set to (true|false)$`, validateResponseDetectedPii)
+	ctx.Step("^I set the XML tag to (.*)$", setXmlTag)
+	ctx.Step("^Response should detect XML tag escaping: (true|false)$", validateResponseXmlTag)
 }
