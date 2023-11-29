@@ -8,5 +8,8 @@ func NewBasicXmlEscapingScaner() XmlEscapingScanner {
 }
 
 func (b BasicXmlScanner) Scan(textToScan string, tagToScanFor string) (*XmlEscapingDetectionResult, error) {
-	return nil, nil
+	re := XmlEscapingDetectionResult{
+		ContainsXmlEscaping: false,
+	}
+	return &re, nil
 }

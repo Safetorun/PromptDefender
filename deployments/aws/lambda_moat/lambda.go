@@ -20,8 +20,9 @@ type MoatLambda struct {
 
 func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 	answer, err := m.moatInstance.CheckMoat(moat.PromptToCheck{
-		Prompt:  moatRequest.Prompt,
-		ScanPii: moatRequest.ScanPii,
+		Prompt:           moatRequest.Prompt,
+		ScanPii:          moatRequest.ScanPii,
+		XmlTagToCheckFor: moatRequest.XmlTag,
 	},
 	)
 
@@ -44,11 +45,21 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")
 	}
 
+	addAllConfigurations := func(c *moat.Moat) error {
+		c.PiiScanner = pii_aws.New()
+		c.BadWordsCheck = badwords.New(badwords_embeddings.New(embeddings.New(openAIKey)))
+		c.XmlEscapingScanner = moat.NewBasicXmlEscapingScaner()
+
+		return nil
+	}
+
+	moatInstance, err := moat.New(addAllConfigurations)
 	moatLambda := MoatLambda{
-		moat.New(
-			pii_aws.New(),
-			badwords.New(badwords_embeddings.New(embeddings.New(openAIKey))),
-		),
+		moatInstance: moatInstance,
+	}
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{StatusCode: 400}, err
 	}
 
 	response, err := base_aws.BaseHandler[MoatRequest, MoatResponse](request, &moatLambda)

@@ -1,6 +1,7 @@
 package moat
 
 type XmlEscapingDetectionResult struct {
+	ContainsXmlEscaping bool
 }
 
 type XmlEscapingScanner interface {

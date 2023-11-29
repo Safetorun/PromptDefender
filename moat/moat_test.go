@@ -50,13 +50,25 @@ func (m *MockClosestMatcher) GetClosestMatch(text string) (*badwords.ClosestMatc
 	return nil, args.Error(1)
 }
 
+func newMoat(scanner pii.Scanner, badwordsCheck *badwords.BadWords) MoatOpts {
+	addAllConfigurations := func(c *Moat) error {
+		c.PiiScanner = scanner
+		c.BadWordsCheck = badwordsCheck
+
+		return nil
+	}
+
+	return addAllConfigurations
+}
 func TestCheckMoat(t *testing.T) {
 
 	t.Run("Check with bad words", func(t *testing.T) {
+
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
-		m := New(piiScanner, badWordsCheck)
+		mt := newMoat(piiScanner, badWordsCheck)
+		m, _ := New(mt)
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
@@ -70,7 +82,8 @@ func TestCheckMoat(t *testing.T) {
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
-		m := New(piiScanner, badWordsCheck)
+		mt := newMoat(piiScanner, badWordsCheck)
+		m, _ := New(mt)
 
 		piiScanner.On("Scan", "some text").Return(&pii.ScanResult{ContainingPii: true}, nil)
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
@@ -84,7 +97,9 @@ func TestCheckMoat(t *testing.T) {
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
-		m := New(piiScanner, badWordsCheck)
+
+		mt := newMoat(piiScanner, badWordsCheck)
+		m, _ := New(mt)
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(nil, errors.New("an error"))
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
@@ -97,7 +112,9 @@ func TestCheckMoat(t *testing.T) {
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
-		m := New(piiScanner, badWordsCheck)
+
+		mt := newMoat(piiScanner, badWordsCheck)
+		m, _ := New(mt)
 
 		piiScanner.On("Scan", "some text").Return(nil, errors.New("an error"))
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
