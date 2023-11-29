@@ -97,6 +97,16 @@ func setPromptBody(ctx context.Context, prompt string) (context.Context, error) 
 	return ctx, nil
 }
 
+func validateResponseXmlTagIsNil(context context.Context) error {
+
+	response := context.Value(ResponseKey).(*MoatResponse)
+	if response.PotentialXmlEscaping != nil {
+		return errors.New("xml tag  should be nil")
+	}
+
+	return nil
+}
+
 func validateResponseXmlTag(context context.Context, xmlTag string) error {
 	detected, err := strconv.ParseBool(xmlTag)
 	if err != nil {
@@ -155,4 +165,5 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^Response should have PII detected set to (true|false)$`, validateResponseDetectedPii)
 	ctx.Step("^I set the XML tag to (.*)$", setXmlTag)
 	ctx.Step("^Response should detect XML tag escaping: (true|false)$", validateResponseXmlTag)
+	ctx.Step("^Response should have XML tag escaping set to nil$", validateResponseXmlTagIsNil)
 }

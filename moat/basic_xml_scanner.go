@@ -1,5 +1,7 @@
 package moat
 
+import "strings"
+
 type BasicXmlScanner struct {
 }
 
@@ -8,8 +10,16 @@ func NewBasicXmlEscapingScaner() XmlEscapingScanner {
 }
 
 func (b BasicXmlScanner) Scan(textToScan string, tagToScanFor string) (*XmlEscapingDetectionResult, error) {
-	re := XmlEscapingDetectionResult{
-		ContainsXmlEscaping: false,
+
+	if tagToScanFor == "" {
+		return &XmlEscapingDetectionResult{
+			ContainsXmlEscaping: false,
+		}, nil
 	}
+
+	re := XmlEscapingDetectionResult{
+		ContainsXmlEscaping: strings.Contains(textToScan, tagToScanFor),
+	}
+
 	return &re, nil
 }
