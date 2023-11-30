@@ -35,7 +35,13 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 		return nil, err
 	}
 
-	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords}, nil
+	var xmlEscaping *bool = nil
+
+	if answer.XmlScannerResult != nil {
+		xmlEscaping = &answer.XmlScannerResult.ContainsXmlEscaping
+	}
+
+	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords, PotentialXmlEscaping: xmlEscaping}, nil
 }
 
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
