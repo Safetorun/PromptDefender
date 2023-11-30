@@ -9,16 +9,20 @@ func NewBasicXmlEscapingScaner() XmlEscapingScanner {
 	return &BasicXmlScanner{}
 }
 
-func (b BasicXmlScanner) Scan(textToScan string, tagToScanFor string) (*XmlEscapingDetectionResult, error) {
+func (b BasicXmlScanner) Scan(textToScan string, tagContentToScanFor string) (*XmlEscapingDetectionResult, error) {
 
-	if tagToScanFor == "" {
+	if tagContentToScanFor == "" {
 		return &XmlEscapingDetectionResult{
 			ContainsXmlEscaping: false,
 		}, nil
 	}
 
+	tagToScanFor := "<" + tagContentToScanFor + ">"
+	otherTagToScanFor := "</" + tagContentToScanFor + ">"
+
 	re := XmlEscapingDetectionResult{
-		ContainsXmlEscaping: strings.Contains(textToScan, tagToScanFor),
+		ContainsXmlEscaping: strings.Contains(textToScan, tagToScanFor) ||
+			strings.Contains(textToScan, otherTagToScanFor),
 	}
 
 	return &re, nil

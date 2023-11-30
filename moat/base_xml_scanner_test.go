@@ -14,10 +14,11 @@ func TestBasicXmlScanner_Scan(t *testing.T) {
 		tagToScanFor   string
 		expectedResult bool
 	}{
-		{"Positive Test", "Sample text with <tag>", "<tag>", true},
-		{"Negative Test", "Sample text without tag", "<tag>", false},
+		{"Positive Test", "Sample text with <tag>", "tag", true},
+		{"Negative Test", "Sample text without tag", "tag", false},
 		{"Empty Text Test", "", "<tag>", false},
 		{"Empty Tag Test", "Sample text with <tag>", "", false},
+		{"End tag test", "Sample text with end </tag>", "tag", true},
 		{"Both Empty Test", "", "", false},
 	}
 
