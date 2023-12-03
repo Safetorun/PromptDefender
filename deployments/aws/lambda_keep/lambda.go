@@ -46,7 +46,7 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 		return nil, err
 	}
 
-	return &KeepResponse{ShieldedPrompt: answer.NewPrompt}, nil
+	return &KeepResponse{ShieldedPrompt: answer.NewPrompt, XmlTag: answer.Tag}, nil
 }
 
 var sqsQueueCallback = func(prompt string, newPrompt string, userId string, version string) error {

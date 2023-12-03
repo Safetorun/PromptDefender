@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func RequestToKeep(ctx context.Context) (context.Context, error) {
@@ -31,7 +32,22 @@ func ValidateResponseXml(context context.Context, randomOrUserInput string) erro
 			return errors.New("xml tag should not be random")
 		}
 	} else if response.XmlTag != randomOrUserInput {
-		return errors.New("xml tag should be " + randomOrUserInput)
+		return errors.New("xml tag should be " + randomOrUserInput + " but was " + response.XmlTag)
+	}
+
+	return nil
+}
+
+func ShieldedPromptContains(context context.Context, containsText string) error {
+
+	response := context.Value(ResponseKey).(*KeepResponse)
+
+	if containsText == "random_tag" {
+		containsText = "<" + response.XmlTag + ">"
+	}
+
+	if strings.Contains(response.ShieldedPrompt, containsText) == false {
+		return errors.New("shielded prompt does not contain " + containsText)
 	}
 
 	return nil

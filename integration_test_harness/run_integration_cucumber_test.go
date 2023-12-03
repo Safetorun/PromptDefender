@@ -33,5 +33,6 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step("^request is sent to keep", SendRequestKeep)
 	ctx.Step("^I set randomise_xml_tag to (true|false$)", SetRandomiseXmlTag)
 	ctx.Step("^Response should have xml_tag (user_input|random)$", ValidateResponseXml)
+	ctx.Step("^Response should have shielded prompt containing (.*)$", ShieldedPromptContains)
 
 }
