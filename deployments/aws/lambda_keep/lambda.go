@@ -30,7 +30,17 @@ type KeepLambda struct {
 }
 
 func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
-	answer, err := k.keepInstance.BuildKeep(keep.StartingPrompt{Prompt: promptRequest.Prompt})
+	randomiseXmlTag := false
+	if promptRequest.RandomiseXmlTag == nil {
+		randomiseXmlTag = false
+	} else {
+		randomiseXmlTag = *promptRequest.RandomiseXmlTag
+	}
+
+	answer, err := k.keepInstance.BuildKeep(keep.StartingPrompt{
+		Prompt:       promptRequest.Prompt,
+		RandomiseTag: randomiseXmlTag,
+	})
 
 	if err != nil {
 		return nil, err
