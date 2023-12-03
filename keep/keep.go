@@ -57,7 +57,7 @@ func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 		tag = generateRandomString(10)
 	}
 
-	builtPrompt := prompt.SmartPrompt(prompt.SmartPromptRequest{BasePrompt: startingPrompt.Prompt})
+	builtPrompt := prompt.SmartPrompt(prompt.SmartPromptRequest{BasePrompt: startingPrompt.Prompt, XmlTagName: tag})
 
 	response, err := k.openAi.CheckAI(builtPrompt)
 

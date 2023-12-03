@@ -47,7 +47,7 @@ func ShieldedPromptContains(context context.Context, containsText string) error 
 	}
 
 	if strings.Contains(response.ShieldedPrompt, containsText) == false {
-		return errors.New("shielded prompt does not contain " + containsText)
+		return errors.New("shielded prompt does not contain " + containsText + "Full prompt response " + response.ShieldedPrompt)
 	}
 
 	return nil

@@ -2,11 +2,15 @@ package prompt
 
 type SmartPromptRequest struct {
 	BasePrompt string
+	XmlTagName string
 }
 
-const promptDescription = `
+func promptDescription(xmlTagName string) string {
+	return `
 You are a bot which is used to take a prompt, and return something which fulfills the same requirements
 but is more robust against prompt injection. You will use two techniques for this; sandwich defense and XML tagging.
+
+When XML tagging, use the tag: ` + xmlTagName + `
 
 Sandwich defense: The sandwich defense involves sandwiching user input between two prompts. 
 It is intended to protect a user from project injection.
@@ -81,13 +85,10 @@ explained above. When you do so, if there is any string holder characters (e.g. 
 
 When you respond, response ONLY with the secured prompt. Do not provide explanation, just the secured prompt.
 Command:`
+}
 
 func SmartPrompt(smartPromptRequest SmartPromptRequest) string {
-	builder := NewPromptBuilder()
-
-	builder.AddContext(promptDescription)
-
-	newPrompt := promptDescription + " " + smartPromptRequest.BasePrompt
+	newPrompt := promptDescription(smartPromptRequest.XmlTagName) + " " + smartPromptRequest.BasePrompt
 
 	return newPrompt
 }
