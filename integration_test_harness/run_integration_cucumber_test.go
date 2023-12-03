@@ -30,4 +30,5 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step("^I set the XML tag to (.*)$", SetXmlTag)
 	ctx.Step("^Response should detect XML tag escaping: (true|false)$", ValidateResponseXmlTag)
 	ctx.Step("^Response should have XML tag escaping set to nil$", ValidateResponseXmlTagIsNil)
+
 }

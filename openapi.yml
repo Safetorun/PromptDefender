@@ -15,7 +15,7 @@ paths:
   /wall:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:10-moat-identify-xml-PromptDefender-Keep/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:13-keep-add-ability--PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -44,7 +44,7 @@ paths:
   /keep:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:10-moat-identify-xml-PromptDefender-Keep/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:13-keep-add-ability--PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -73,7 +73,7 @@ paths:
   /moat:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:10-moat-identify-xml-PromptDefender-Moat/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:13-keep-add-ability--PromptDefender-Moat/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -112,6 +112,9 @@ components:
       required:
         - 'prompt'
       properties:
+        randomise_xml_tag:
+          type: 'boolean'
+          description: 'Whether to randomise the XML tag that is used to escape user input in your prompt.'
         prompt:
           type: 'string'
           description: 'The base prompt you want to build a keep for'
@@ -142,10 +145,16 @@ components:
 
     KeepResponse:
       type: 'object'
+      required:
+        - 'shielded_prompt'
+        - 'xml_tag'
       properties:
         shielded_prompt:
           type: 'string'
           description: 'The shielded prompt.'
+        xml_tag:
+            type: 'string'
+            description: 'The XML tag that is used to escape user input in your prompt.'
 
     MoatResponse:
       type: 'object'

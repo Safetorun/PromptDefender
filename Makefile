@@ -71,11 +71,12 @@ upgrade:
 
 clean:
 	for number in  $(MODULES) ; do \
-	   cd $$number && go clean || exit 1; cd .. ; \
+	   cd $$number && go clean -testcache || exit 1; cd .. ; \
 	done
 	for aws_module in $(AWS_MODULES) ; do \
-	   cd $$aws_module && go clean || exit 1; cd $(PROJECT_DIR) ; \
+	   cd $$aws_module && go clean -testcache || exit 1; cd $(PROJECT_DIR) ; \
 	done
+	cd integration_test_harness && go clean -testcache || exit 1; cd $(PROJECT_DIR) ;
 
 generate:
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
@@ -94,7 +95,7 @@ integration_test:
 	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
 	echo "Defender API URL: $$URL" &&\
-	cd integration_test_harness && go test ./...
+	cd integration_test_harness && go test -v ./...
 
 destroy: setup-workspace
 	export TF_VAR_commit_version=`git rev-parse --short HEAD`;\
