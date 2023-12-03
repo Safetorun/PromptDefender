@@ -10,7 +10,7 @@ replace github.com/safetorun/PromptDefender/wall => ../../../wall
 
 require (
 	github.com/aws/aws-lambda-go v1.41.0
-	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231017173944-0a5da2b1ee56
+	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231203123834-51c0ba01645f
 	github.com/safetorun/PromptDefender/aws/base_aws v0.0.0-00010101000000-000000000000
-	github.com/safetorun/PromptDefender/wall v0.0.0-20231017173944-0a5da2b1ee56
+	github.com/safetorun/PromptDefender/wall v0.0.0-20231203123834-51c0ba01645f
 )
