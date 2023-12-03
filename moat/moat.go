@@ -15,13 +15,15 @@ import (
 )
 
 type Moat struct {
-	piiScanner    pii.Scanner
-	badWordsCheck *badwords.BadWords
+	PiiScanner         pii.Scanner
+	BadWordsCheck      *badwords.BadWords
+	XmlEscapingScanner XmlEscapingScanner
 }
 
 type PromptToCheck struct {
-	Prompt  string
-	ScanPii bool
+	Prompt           string
+	ScanPii          bool
+	XmlTagToCheckFor *string
 }
 
 type PiiDetectionResult struct {
@@ -31,16 +33,29 @@ type PiiDetectionResult struct {
 type CheckResult struct {
 	PiiResult        *PiiDetectionResult
 	ContainsBadWords bool
+	XmlScannerResult *XmlEscapingDetectionResult
 }
 
-func New(piiScanner pii.Scanner, badWordsCheck *badwords.BadWords) *Moat {
-	return &Moat{piiScanner: piiScanner, badWordsCheck: badWordsCheck}
+type MoatOpts func(*Moat) error
+
+func New(opts ...MoatOpts) (*Moat, error) {
+	m := &Moat{}
+
+	for _, opt := range opts {
+		err := opt(m)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return m, nil
 }
 
 func (m *Moat) CheckMoat(check PromptToCheck) (*CheckResult, error) {
 	var piiResult *PiiDetectionResult = nil
+	var xmlResult *XmlEscapingDetectionResult = nil
 
-	containsBadWords, err := m.badWordsCheck.CheckPromptContainsBadWords(check.Prompt)
+	containsBadWords, err := m.BadWordsCheck.CheckPromptContainsBadWords(check.Prompt)
 
 	if err != nil || containsBadWords == nil {
 		return nil, fmt.Errorf("error checking bad words: %v", err)
@@ -55,11 +70,20 @@ func (m *Moat) CheckMoat(check PromptToCheck) (*CheckResult, error) {
 		}
 	}
 
-	return &CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords}, nil
+	if check.XmlTagToCheckFor != nil {
+		xmlResultInner, err := m.XmlEscapingScanner.Scan(check.Prompt, *check.XmlTagToCheckFor)
+		if err != nil {
+			return nil, err
+		}
+
+		xmlResult = xmlResultInner
+	}
+
+	return &CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}, nil
 }
 
 func (m *Moat) retrievePiiScore(basePrompt string) (*PiiDetectionResult, error) {
-	piiResult, err := m.piiScanner.Scan(basePrompt)
+	piiResult, err := m.PiiScanner.Scan(basePrompt)
 
 	if err != nil {
 		fmt.Printf("Error scanning for PII %v\n", err)
