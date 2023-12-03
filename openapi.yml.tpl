@@ -50,7 +50,7 @@ paths:
         type: "aws_proxy"
       summary: 'Verify and Analyze Prompt'
       description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
-      operationId: 'verifyPrompt'
+      operationId: 'buildKeep'
       security:
         - ApiKeyAuth: [ ]
       requestBody:

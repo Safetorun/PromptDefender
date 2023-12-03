@@ -61,8 +61,8 @@ type WallResponse struct {
 	InjectionScore *float32 `json:"injection_score,omitempty"`
 }
 
-// VerifyPromptJSONRequestBody defines body for VerifyPrompt for application/json ContentType.
-type VerifyPromptJSONRequestBody = KeepRequest
+// BuildKeepJSONRequestBody defines body for BuildKeep for application/json ContentType.
+type BuildKeepJSONRequestBody = KeepRequest
 
 // BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
 type BuildShieldJSONRequestBody = MoatRequest
