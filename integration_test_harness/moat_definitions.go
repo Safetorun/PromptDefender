@@ -4,18 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cucumber/godog"
 	"net/http"
 	"os"
 	"strconv"
-	"testing"
 )
 
 const RequestKey = "request"
 const ResponseKey = "response"
 
-func sendRequest(ctx context.Context) (context.Context, error) {
-	gClient, err := createClient()
+func SendRequestToMoat(ctx context.Context) (context.Context, error) {
+	gClient, err := CreateClient()
 
 	if err != nil {
 		return nil, err
@@ -49,11 +47,11 @@ func sendRequest(ctx context.Context) (context.Context, error) {
 
 }
 
-func requestToMoat(ctx context.Context) (context.Context, error) {
+func RequestToMoat(ctx context.Context) (context.Context, error) {
 	return context.WithValue(ctx, RequestKey, &MoatRequest{}), nil
 }
 
-func createClient() (*ClientWithResponses, error) {
+func CreateClient() (*ClientWithResponses, error) {
 
 	apiKey, exists := os.LookupEnv("DEFENDER_API_KEY")
 
@@ -80,7 +78,7 @@ func createClient() (*ClientWithResponses, error) {
 	return client, err
 }
 
-func setPiiDetection(ctx context.Context, enablePii string) (context.Context, error) {
+func SetPiiDetection(ctx context.Context, enablePii string) (context.Context, error) {
 
 	pii, err := strconv.ParseBool(enablePii)
 	if err != nil {
@@ -91,13 +89,13 @@ func setPiiDetection(ctx context.Context, enablePii string) (context.Context, er
 	return ctx, nil
 }
 
-func setPromptBody(ctx context.Context, prompt string) (context.Context, error) {
+func SetPromptBody(ctx context.Context, prompt string) (context.Context, error) {
 	request := ctx.Value(RequestKey).(*MoatRequest)
 	request.Prompt = prompt
 	return ctx, nil
 }
 
-func validateResponseXmlTagIsNil(context context.Context) error {
+func ValidateResponseXmlTagIsNil(context context.Context) error {
 
 	response := context.Value(ResponseKey).(*MoatResponse)
 	if response.PotentialXmlEscaping != nil {
@@ -107,7 +105,7 @@ func validateResponseXmlTagIsNil(context context.Context) error {
 	return nil
 }
 
-func validateResponseXmlTag(context context.Context, xmlTag string) error {
+func ValidateResponseXmlTag(context context.Context, xmlTag string) error {
 	detected, err := strconv.ParseBool(xmlTag)
 	if err != nil {
 		return err
@@ -121,7 +119,7 @@ func validateResponseXmlTag(context context.Context, xmlTag string) error {
 	return nil
 }
 
-func validateResponseDetectedPii(context context.Context, piiDetected string) error {
+func ValidateResponseDetectedPii(context context.Context, piiDetected string) error {
 
 	detected, err := strconv.ParseBool(piiDetected)
 	if err != nil {
@@ -136,34 +134,8 @@ func validateResponseDetectedPii(context context.Context, piiDetected string) er
 	return nil
 }
 
-func setXmlTag(ctx context.Context, tag string) (context.Context, error) {
+func SetXmlTag(ctx context.Context, tag string) (context.Context, error) {
 	request := ctx.Value(RequestKey).(*MoatRequest)
 	request.XmlTag = &tag
 	return ctx, nil
-}
-
-func TestFeatures(t *testing.T) {
-	suite := godog.TestSuite{
-		ScenarioInitializer: InitializeScenario,
-		Options: &godog.Options{
-			Format:   "pretty",
-			Paths:    []string{"features"},
-			TestingT: t,
-		},
-	}
-
-	if suite.Run() != 0 {
-		t.Fatal("non-zero status returned, failed to run feature tests")
-	}
-}
-
-func InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Step(`^I send a request to moat$`, requestToMoat)
-	ctx.Step(`^I set PII detection to (true|false)$`, setPiiDetection)
-	ctx.Step(`^the request is (.*)$`, setPromptBody)
-	ctx.Step("^request is sent$", sendRequest)
-	ctx.Step(`^Response should have PII detected set to (true|false)$`, validateResponseDetectedPii)
-	ctx.Step("^I set the XML tag to (.*)$", setXmlTag)
-	ctx.Step("^Response should detect XML tag escaping: (true|false)$", validateResponseXmlTag)
-	ctx.Step("^Response should have XML tag escaping set to nil$", validateResponseXmlTagIsNil)
 }
