@@ -1,3 +1,9 @@
+---
+title: Running tests 
+excerpt: Running the unit and integration tests in the project
+category: 652f7b9ea6bf5e000bb8dc94
+---
+
 # Unit tests
 
 To run all unit tests, simply run 
