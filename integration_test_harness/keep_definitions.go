@@ -77,7 +77,7 @@ func SendRequestKeep(ctx context.Context) (context.Context, error) {
 	}
 
 	if response.StatusCode() != 200 {
-		return ctx, errors.New("error processing request")
+		return ctx, errors.New(fmt.Sprintf("error processing request %v", response))
 	}
 
 	if response.JSON200 == nil {
