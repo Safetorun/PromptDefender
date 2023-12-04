@@ -3,6 +3,8 @@ package keep
 import (
 	"github.com/safetorun/PromptDefender/aiprompt"
 	"github.com/safetorun/PromptDefender/prompt"
+	"math/rand"
+	"time"
 )
 
 type Callback func(prompt string, newPrompt string) error
@@ -15,11 +17,13 @@ type Keep struct {
 }
 
 type StartingPrompt struct {
-	Prompt string
+	Prompt       string
+	RandomiseTag bool
 }
 
 type NewPrompt struct {
 	NewPrompt string
+	Tag       string
 }
 
 func New(aiPrompt aiprompt.RemoteAIChecker, options ...KeepOption) *Keep {
@@ -34,9 +38,30 @@ func New(aiPrompt aiprompt.RemoteAIChecker, options ...KeepOption) *Keep {
 	return k
 }
 
+func generateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
+}
+
 func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 
-	builtPrompt := prompt.SmartPrompt(prompt.SmartPromptRequest{BasePrompt: startingPrompt.Prompt})
+	tag := "user_input"
+
+	if startingPrompt.Prompt == "" {
+		return nil, NewPromptRequiredError()
+	}
+
+	if startingPrompt.RandomiseTag {
+		tag = generateRandomString(10)
+	}
+
+	builtPrompt := prompt.SmartPrompt(prompt.SmartPromptRequest{BasePrompt: startingPrompt.Prompt, XmlTagName: tag})
 
 	response, err := k.openAi.CheckAI(builtPrompt)
 
@@ -51,5 +76,5 @@ func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 		}
 	}
 
-	return &NewPrompt{NewPrompt: *response}, nil
+	return &NewPrompt{NewPrompt: *response, Tag: tag}, nil
 }

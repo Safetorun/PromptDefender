@@ -11,12 +11,18 @@ const (
 type KeepRequest struct {
 	// Prompt The base prompt you want to build a keep for
 	Prompt string `json:"prompt"`
+
+	// RandomiseXmlTag Whether to randomise the XML tag that is used to escape user input in your prompt.
+	RandomiseXmlTag *bool `json:"randomise_xml_tag,omitempty"`
 }
 
 // KeepResponse defines model for KeepResponse.
 type KeepResponse struct {
 	// ShieldedPrompt The shielded prompt.
-	ShieldedPrompt *string `json:"shielded_prompt,omitempty"`
+	ShieldedPrompt string `json:"shielded_prompt"`
+
+	// XmlTag The XML tag that is used to escape user input in your prompt.
+	XmlTag string `json:"xml_tag"`
 }
 
 // MoatRequest defines model for MoatRequest.
@@ -55,8 +61,8 @@ type WallResponse struct {
 	InjectionScore *float32 `json:"injection_score,omitempty"`
 }
 
-// VerifyPromptJSONRequestBody defines body for VerifyPrompt for application/json ContentType.
-type VerifyPromptJSONRequestBody = KeepRequest
+// BuildKeepJSONRequestBody defines body for BuildKeep for application/json ContentType.
+type BuildKeepJSONRequestBody = KeepRequest
 
 // BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
 type BuildShieldJSONRequestBody = MoatRequest

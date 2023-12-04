@@ -30,13 +30,27 @@ type KeepLambda struct {
 }
 
 func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
-	answer, err := k.keepInstance.BuildKeep(keep.StartingPrompt{Prompt: promptRequest.Prompt})
+	randomiseXmlTag := false
+	if promptRequest.RandomiseXmlTag == nil {
+		randomiseXmlTag = false
+	} else {
+		randomiseXmlTag = *promptRequest.RandomiseXmlTag
+	}
+
+	answer, err := k.keepInstance.BuildKeep(keep.StartingPrompt{
+		Prompt:       promptRequest.Prompt,
+		RandomiseTag: randomiseXmlTag,
+	})
 
 	if err != nil {
+		if keep.IsPromptRequiredError(err) {
+			return nil, fmt.Errorf("prompt cannot be empty")
+		}
+
 		return nil, err
 	}
 
-	return &KeepResponse{ShieldedPrompt: &answer.NewPrompt}, nil
+	return &KeepResponse{ShieldedPrompt: answer.NewPrompt, XmlTag: answer.Tag}, nil
 }
 
 var sqsQueueCallback = func(prompt string, newPrompt string, userId string, version string) error {
@@ -55,7 +69,7 @@ var sqsQueueCallback = func(prompt string, newPrompt string, userId string, vers
 		UserId:   userId,
 		Version:  version,
 		Request:  KeepRequest{Prompt: prompt},
-		Response: KeepResponse{ShieldedPrompt: &newPrompt},
+		Response: KeepResponse{ShieldedPrompt: newPrompt},
 	}
 
 	jsonMessage, err := json.Marshal(queueMessage)

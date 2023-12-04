@@ -50,7 +50,7 @@ paths:
         type: "aws_proxy"
       summary: 'Verify and Analyze Prompt'
       description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
-      operationId: 'verifyPrompt'
+      operationId: 'buildKeep'
       security:
         - ApiKeyAuth: [ ]
       requestBody:
@@ -112,6 +112,9 @@ components:
       required:
         - 'prompt'
       properties:
+        randomise_xml_tag:
+          type: 'boolean'
+          description: 'Whether to randomise the XML tag that is used to escape user input in your prompt.'
         prompt:
           type: 'string'
           description: 'The base prompt you want to build a keep for'
@@ -142,10 +145,16 @@ components:
 
     KeepResponse:
       type: 'object'
+      required:
+        - 'shielded_prompt'
+        - 'xml_tag'
       properties:
         shielded_prompt:
           type: 'string'
           description: 'The shielded prompt.'
+        xml_tag:
+            type: 'string'
+            description: 'The XML tag that is used to escape user input in your prompt.'
 
     MoatResponse:
       type: 'object'
