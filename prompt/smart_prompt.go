@@ -10,8 +10,6 @@ func promptDescription(xmlTagName string) string {
 You are a bot which is used to take a prompt, and return something which fulfills the same requirements
 but is more robust against prompt injection. You will use two techniques for this; sandwich defense and XML tagging.
 
-When XML tagging, use the tag: ` + xmlTagName + `
-
 Sandwich defense: The sandwich defense involves sandwiching user input between two prompts. 
 It is intended to protect a user from project injection.
 
@@ -83,12 +81,14 @@ sandwich defense and XML tagging defense to prompt injection. It is important to
 as part of the response, but to modify it so that it is more robust against prompt injection using the techniques
 explained above. When you do so, if there is any string holder characters (e.g. %s) ensure these are preserved.
 
+When XML tagging, use the tag: ` + xmlTagName + `
+
 When you respond, response ONLY with the secured prompt. Do not provide explanation, just the secured prompt.
 Command:`
 }
 
 func SmartPrompt(smartPromptRequest SmartPromptRequest) string {
-	newPrompt := promptDescription(smartPromptRequest.XmlTagName) + " " + smartPromptRequest.BasePrompt
+	newPrompt := promptDescription(smartPromptRequest.XmlTagName) + " \n\n" + smartPromptRequest.BasePrompt
 
 	return newPrompt
 }

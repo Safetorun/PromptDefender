@@ -14,7 +14,6 @@ func RequestToKeep(ctx context.Context) (context.Context, error) {
 }
 
 func SetRandomiseXmlTag(ctx context.Context, randomiseTag string) (context.Context, error) {
-
 	randomise, err := strconv.ParseBool(randomiseTag)
 	if err != nil {
 		return nil, err
@@ -88,4 +87,10 @@ func SendRequestKeep(ctx context.Context) (context.Context, error) {
 
 	return context.WithValue(ctx, ResponseKey, response.JSON200), nil
 
+}
+
+func SetKeepPrompt(ctx context.Context, prompt string) (context.Context, error) {
+	request := ctx.Value(RequestKey).(*KeepRequest)
+	request.Prompt = prompt
+	return ctx, nil
 }

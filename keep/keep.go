@@ -53,6 +53,10 @@ func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 
 	tag := "user_input"
 
+	if startingPrompt.Prompt == "" {
+		return nil, NewPromptRequiredError()
+	}
+
 	if startingPrompt.RandomiseTag {
 		tag = generateRandomString(10)
 	}

@@ -43,6 +43,10 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 	})
 
 	if err != nil {
+		if keep.IsPromptRequiredError(err) {
+			return nil, fmt.Errorf("prompt cannot be empty")
+		}
+
 		return nil, err
 	}
 
