@@ -15,7 +15,7 @@ resource "aws_iam_role" "lambda_role_keep" {
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group" {
+resource "aws_cloudwatch_log_group" "lambda_log_group" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
   retention_in_days = 14
 }
@@ -51,6 +51,10 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
   timeout          = 60
+
+  tracing_config {
+    mode = "Active"
+  }
 
 
   environment {

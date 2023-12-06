@@ -20,7 +20,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Repo   = "https://github.com/safetorun/PromptDefender"
+      Repo      = "https://github.com/safetorun/PromptDefender"
       Workspace = terraform.workspace
     }
   }
@@ -29,3 +29,5 @@ provider "aws" {
 variable "commit_version" {
   type = string
 }
+
+data "aws_caller_identity" "current" {}
