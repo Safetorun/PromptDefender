@@ -8,8 +8,8 @@ go 1.20
 
 require (
 	github.com/drewlanenga/govector v0.0.0-20220726163947-b958ac08bc93
-	github.com/safetorun/PromptDefender/badwords v0.0.0-20231203123834-51c0ba01645f
-	github.com/safetorun/PromptDefender/embeddings v0.0.0-20231203123834-51c0ba01645f
+	github.com/safetorun/PromptDefender/badwords v0.0.0-20231204191015-931fb010b80b
+	github.com/safetorun/PromptDefender/embeddings v0.0.0-20231204191015-931fb010b80b
 	github.com/stretchr/testify v1.8.4
 )
 

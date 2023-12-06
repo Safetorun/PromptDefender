@@ -14,7 +14,6 @@ use (
 	./moat
 	./pii
 	./pii_aws
-	./prompt
 	./wall
 	./integration_test_harness
 )
