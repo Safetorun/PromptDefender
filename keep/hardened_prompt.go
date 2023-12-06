@@ -1,4 +1,4 @@
-package prompt
+package keep
 
 type SmartPromptRequest struct {
 	BasePrompt string
@@ -81,13 +81,14 @@ sandwich defense and XML tagging defense to prompt injection. It is important to
 as part of the response, but to modify it so that it is more robust against prompt injection using the techniques
 explained above. When you do so, if there is any string holder characters (e.g. %s) ensure these are preserved.
 
-When XML tagging, use the tag: ` + xmlTagName + `
+* When XML tagging, use the tag: ` + xmlTagName + `
+* When XML tagging, be sure to specify in the prompt that user input is inside the XML tag 
 
 When you respond, response ONLY with the secured prompt. Do not provide explanation, just the secured prompt.
 Command:`
 }
 
-func SmartPrompt(smartPromptRequest SmartPromptRequest) string {
+func HardenedPrompt(smartPromptRequest SmartPromptRequest) string {
 	newPrompt := promptDescription(smartPromptRequest.XmlTagName) + " \n\n" + smartPromptRequest.BasePrompt
 
 	return newPrompt

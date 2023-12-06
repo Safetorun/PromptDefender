@@ -6,8 +6,6 @@ replace github.com/safetorun/PromptDefender/aws/base_aws => ../base_aws
 
 replace github.com/safetorun/PromptDefender/aiprompt => ../../../aiprompt
 
-replace github.com/safetorun/PromptDefender/prompt => ../../../prompt
-
 replace github.com/safetorun/PromptDefender/keep => ../../../keep
 
 require (
@@ -32,5 +30,4 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.21.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.26.2 // indirect
 	github.com/aws/smithy-go v1.18.1 // indirect
-	github.com/safetorun/PromptDefender/prompt v0.0.0-20231203123834-51c0ba01645f // indirect
 )

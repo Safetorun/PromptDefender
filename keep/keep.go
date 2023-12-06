@@ -2,7 +2,6 @@ package keep
 
 import (
 	"github.com/safetorun/PromptDefender/aiprompt"
-	"github.com/safetorun/PromptDefender/prompt"
 	"math/rand"
 	"time"
 )
@@ -61,7 +60,7 @@ func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 		tag = generateRandomString(10)
 	}
 
-	builtPrompt := prompt.SmartPrompt(prompt.SmartPromptRequest{BasePrompt: startingPrompt.Prompt, XmlTagName: tag})
+	builtPrompt := HardenedPrompt(SmartPromptRequest{BasePrompt: startingPrompt.Prompt, XmlTagName: tag})
 
 	response, err := k.openAi.CheckAI(builtPrompt)
 
