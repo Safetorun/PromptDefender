@@ -29,6 +29,10 @@ resource "aws_lambda_function" "aws_lambda_moat" {
   runtime          = "go1.x"
   source_code_hash = data.archive_file.lambda_moat_zip.output_base64sha256
 
+  tracing_config {
+    mode = "Active"
+  }
+
   environment {
     variables = {
       open_ai_api_key = var.openai_secret_key
