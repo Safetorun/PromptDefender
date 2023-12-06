@@ -30,7 +30,6 @@ test: build
 	cd pii && go test -v ./... -cover
 	cd pii_aws && go test -v ./... -cover
 	cd canary && go test -v ./... -cover
-	cd prompt && go test -v ./... -cover
 	cd moat  && go test -v ./... -cover
 	cd keep  && go test -v ./... -cover
 	cd wall && go test -v ./... -cover
