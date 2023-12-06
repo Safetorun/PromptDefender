@@ -13,9 +13,9 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.23.5
 	github.com/aws/aws-sdk-go-v2/config v1.25.11
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.29.2
-	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231203123834-51c0ba01645f
+	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231204191015-931fb010b80b
 	github.com/safetorun/PromptDefender/aws/base_aws v0.0.0-00010101000000-000000000000
-	github.com/safetorun/PromptDefender/keep v0.0.0-20231203123834-51c0ba01645f
+	github.com/safetorun/PromptDefender/keep v0.0.0-20231204191015-931fb010b80b
 )
 
 require (
