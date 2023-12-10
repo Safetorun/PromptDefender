@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/safetorun/PromptDefender/aiprompt"
-	"github.com/safetorun/PromptDefender/aws/base_aws"
+	"github.com/safetorun/PromptDefender/internal/base_aws"
 	"github.com/safetorun/PromptDefender/keep"
 	"log"
 	"os"

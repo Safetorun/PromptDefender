@@ -16,4 +16,5 @@ use (
 	./pii_aws
 	./wall
 	./integration_test_harness
+	./internal/base_aws
 )
