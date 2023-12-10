@@ -1,0 +1,25 @@
+name: Revert pushed commit
+
+on: 
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name'
+        required: true
+        default: 'master'
+
+jobs:
+  revert_commit:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout branch
+        uses: actions/checkout@v2
+        with:
+           ref: ${{ github.event.inputs.branch }}
+           fetch-depth: 0
+      - name: Revert pushed commit
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git revert --no-edit HEAD
+          git push

@@ -2,19 +2,19 @@ module github.com/safetorun/PromptDefender/deployments/aws/lambda_moat
 
 go 1.20
 
-replace github.com/safetorun/PromptDefender/aws/base_aws => ../base_aws
+replace github.com/safetorun/PromptDefender/aws/base_aws => ./../../internal/base_aws
 
-replace github.com/safetorun/PromptDefender/moat => ../../../moat
+replace github.com/safetorun/PromptDefender/moat => ./../../moat
 
-replace github.com/safetorun/PromptDefender/pii => ../../../pii
+replace github.com/safetorun/PromptDefender/pii => ./../../pii
 
-replace github.com/safetorun/PromptDefender/badwords => ../../../badwords
+replace github.com/safetorun/PromptDefender/badwords => ./../../badwords
 
-replace github.com/safetorun/PromptDefender/badwords_embeddings => ../../../badwords_embeddings
+replace github.com/safetorun/PromptDefender/badwords_embeddings => ./../../badwords_embeddings
 
-replace github.com/safetorun/PromptDefender/embeddings => ../../../embeddings
+replace github.com/safetorun/PromptDefender/embeddings => ./../../embeddings
 
-replace github.com/safetorun/PromptDefender/pii_aws => ../../../pii_aws
+replace github.com/safetorun/PromptDefender/pii_aws => ./../../pii_aws
 
 require (
 	github.com/aws/aws-lambda-go v1.41.0

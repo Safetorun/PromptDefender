@@ -1,6 +1,7 @@
 MODULES := $(shell (find .  -type f -name '*.go' -maxdepth 2 | sed -r 's|/[^/]+$$||' |cut -c 3-|sort |uniq))
-AWS_MODULES := $(shell cd deployments/aws && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|^\./|deployments/aws/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
+AWS_MODULES := $(shell cd cmd && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
 PROJECT_DIR := $(shell pwd)
+API_DIR := $(shell pwd)/api
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
@@ -80,9 +81,9 @@ clean:
 generate:
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
 	for aws_module in $(AWS_MODULES) ; do \
-	   cd $$aws_module && oapi-codegen -package main -generate types $(PROJECT_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
+	   cd $$aws_module && oapi-codegen -package main -generate types $(API_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
 	done
-	oapi-codegen -package integration_test_harness -generate types,client $(PROJECT_DIR)/openapi.yml > integration_test_harness/api.gen.go
+	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > integration_test_harness/api.gen.go
 
 generate_jailbreak:
 	cd builder\

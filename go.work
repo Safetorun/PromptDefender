@@ -6,9 +6,9 @@ use (
 	./badwords_embeddings
 	./builder
 	./canary
-	./deployments/aws/lambda_keep
-	./deployments/aws/lambda_moat
-	./deployments/aws/lambda_wall
+	./cmd/lambda_keep
+	./cmd/lambda_moat
+	./cmd/lambda_wall
 	./embeddings
 	./keep
 	./moat
