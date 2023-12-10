@@ -2,14 +2,14 @@ go 1.20
 
 use (
 	./internal/aiprompt
-	./badwords
-	./badwords_embeddings
+	./internal/badwords
+	./internal/badwords_embeddings
 	./builder
-	./canary
+	./pkg/canary
 	./cmd/lambda_keep
 	./cmd/lambda_moat
 	./cmd/lambda_wall
-	./embeddings
+	./internal/embeddings
 	./keep
 	./moat
 	./internal/pii

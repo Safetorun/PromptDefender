@@ -6,11 +6,11 @@ replace github.com/safetorun/PromptDefender/moat => ./../../moat
 
 replace github.com/safetorun/PromptDefender/pii => ./../../internal/pii
 
-replace github.com/safetorun/PromptDefender/badwords => ./../../badwords
+replace github.com/safetorun/PromptDefender/badwords => ./../../internal/badwords
 
-replace github.com/safetorun/PromptDefender/badwords_embeddings => ./../../badwords_embeddings
+replace github.com/safetorun/PromptDefender/badwords_embeddings => ./../../internal/badwords_embeddings
 
-replace github.com/safetorun/PromptDefender/embeddings => ./../../embeddings
+replace github.com/safetorun/PromptDefender/embeddings => ./../../internal/embeddings
 
 replace github.com/safetorun/PromptDefender/pii_aws => ./../../internal/pii_aws
 
