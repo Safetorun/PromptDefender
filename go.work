@@ -1,7 +1,7 @@
 go 1.20
 
 use (
-	./aiprompt
+	./internal/aiprompt
 	./badwords
 	./badwords_embeddings
 	./builder
@@ -12,9 +12,9 @@ use (
 	./embeddings
 	./keep
 	./moat
-	./pii
-	./pii_aws
+	./internal/pii
+	./internal/pii_aws
 	./wall
-	./integration_test_harness
+	./test/integration_test_harness
 	./internal/base_aws
 )

@@ -1,8 +1,8 @@
 module github.com/safetorun/PromptDefender/wall
 
-replace github.com/safetorun/PromptDefender/aiprompt => ../aiprompt
+replace github.com/safetorun/PromptDefender/aiprompt => ./../internal/aiprompt
 
-replace github.com/safetorun/PromptDefender/pii => ../pii
+replace github.com/safetorun/PromptDefender/pii => ./../internal/pii
 
 go 1.20
 

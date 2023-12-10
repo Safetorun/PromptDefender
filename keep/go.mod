@@ -1,6 +1,6 @@
 module github.com/safetorun/PromptDefender/keep
 
-replace github.com/safetorun/PromptDefender/aiprompt => ../aiprompt
+replace github.com/safetorun/PromptDefender/aiprompt => ./../internal/aiprompt
 
 require (
 	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231204191015-931fb010b80b

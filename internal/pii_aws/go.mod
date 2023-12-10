@@ -2,7 +2,7 @@ module github.com/safetorun/PromptDefender/pii_aws
 
 go 1.20
 
-replace github.com/safetorun/PromptDefender/pii => ../pii
+replace github.com/safetorun/PromptDefender/pii => ./../pii
 
 require (
 	github.com/aws/aws-sdk-go v1.48.13
