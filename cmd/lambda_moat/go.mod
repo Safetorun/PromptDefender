@@ -2,8 +2,6 @@ module github.com/safetorun/PromptDefender/deployments/aws/lambda_moat
 
 go 1.20
 
-replace github.com/safetorun/PromptDefender/aws/base_aws => ./../../internal/base_aws
-
 replace github.com/safetorun/PromptDefender/moat => ./../../moat
 
 replace github.com/safetorun/PromptDefender/pii => ./../../pii
@@ -18,7 +16,6 @@ replace github.com/safetorun/PromptDefender/pii_aws => ./../../pii_aws
 
 require (
 	github.com/aws/aws-lambda-go v1.41.0
-	github.com/safetorun/PromptDefender/aws/base_aws v0.0.0-00010101000000-000000000000
 	github.com/safetorun/PromptDefender/badwords v0.0.0-20231204191015-931fb010b80b
 	github.com/safetorun/PromptDefender/badwords_embeddings v0.0.0-20231204191015-931fb010b80b
 	github.com/safetorun/PromptDefender/embeddings v0.0.0-20231204191015-931fb010b80b

@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/safetorun/PromptDefender/aiprompt"
-	"github.com/safetorun/PromptDefender/aws/base_aws"
+	"github.com/safetorun/PromptDefender/internal/base_aws"
 	"github.com/safetorun/PromptDefender/wall"
 	"os"
 )

@@ -1,4 +1,4 @@
-module github.com/safetorun/PromptDefender/base_aws
+module github.com/safetorun/PromptDefender/internal/base_aws
 
 go 1.20
 
