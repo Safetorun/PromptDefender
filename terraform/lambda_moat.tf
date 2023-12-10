@@ -49,5 +49,5 @@ data "archive_file" "lambda_moat_zip" {
 
 variable "lambda_moat_path" {
   type    = string
-  default = "../deployments/aws/lambda_moat/main"
+  default = "../cmd/lambda_moat/main"
 }

@@ -93,5 +93,5 @@ data "archive_file" "lambda_keep_zip" {
 
 variable "lambda_keep_path" {
   type    = string
-  default = "../deployments/aws/lambda_keep/main"
+  default = "../cmd/lambda_keep/main"
 }
