@@ -1,4 +1,5 @@
 MODULES := $(shell (find .  -type f -name '*.go' -maxdepth 2 | sed -r 's|/[^/]+$$||' |cut -c 3-|sort |uniq))
+TEST_MODULES := $(shell (find . -type f -name '*.go' -maxdepth 2 | grep "_test" | sed -r 's|/[^/]+$$||' | sort | uniq))
 AWS_MODULES := $(shell cd cmd && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
 PROJECT_DIR := $(shell pwd)
 API_DIR := $(shell pwd)/api
@@ -27,13 +28,9 @@ setup-workspace:
 	fi
 
 test: build
-	cd aiprompt && go test -v ./... -cover
-	cd pii && go test -v ./... -cover
-	cd pii_aws && go test -v ./... -cover
-	cd canary && go test -v ./... -cover
-	cd moat  && go test -v ./... -cover
-	cd keep  && go test -v ./... -cover
-	cd wall && go test -v ./... -cover
+	for testable_module in $(TEST_MODULES) ; do \
+	   cd $$testable_module && go test -v ./... -cover || exit 1; cd $(PROJECT_DIR) ; \
+	done
 
 build: generate
 	for aws_module in $(AWS_MODULES) ; do \
@@ -76,14 +73,14 @@ clean:
 	for aws_module in $(AWS_MODULES) ; do \
 	   cd $$aws_module && go clean -testcache || exit 1; cd $(PROJECT_DIR) ; \
 	done
-	cd integration_test_harness && go clean -testcache || exit 1; cd $(PROJECT_DIR) ;
+	cd test/integration_test_harness && go clean -testcache || exit 1; cd $(PROJECT_DIR) ;
 
 generate:
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
 	for aws_module in $(AWS_MODULES) ; do \
 	   cd $$aws_module && oapi-codegen -package main -generate types $(API_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
 	done
-	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > integration_test_harness/api.gen.go
+	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > test/integration_test_harness/api.gen.go
 
 generate_jailbreak:
 	cd builder\
@@ -95,7 +92,7 @@ integration_test:
 	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
 	echo "Defender API URL: $$URL" &&\
-	cd integration_test_harness && go test -v ./...
+	cd test/integration_test_harness && go test -v ./...
 
 destroy: setup-workspace
 	export TF_VAR_commit_version=`git rev-parse --short HEAD`;\

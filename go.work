@@ -1,20 +1,20 @@
 go 1.20
 
 use (
-	./aiprompt
-	./badwords
-	./badwords_embeddings
+	./internal/aiprompt
+	./internal/badwords
+	./internal/badwords_embeddings
 	./builder
-	./canary
+	./pkg/canary
 	./cmd/lambda_keep
 	./cmd/lambda_moat
 	./cmd/lambda_wall
-	./embeddings
-	./keep
-	./moat
-	./pii
-	./pii_aws
-	./wall
-	./integration_test_harness
+	./internal/embeddings
+	./internal/keep
+	./internal/moat
+	./internal/pii
+	./internal/pii_aws
+	./internal/wall
+	./test/integration_test_harness
 	./internal/base_aws
 )
