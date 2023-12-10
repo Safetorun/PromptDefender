@@ -10,11 +10,11 @@ use (
 	./cmd/lambda_moat
 	./cmd/lambda_wall
 	./internal/embeddings
-	./keep
-	./moat
+	./internal/keep
+	./internal/moat
 	./internal/pii
 	./internal/pii_aws
-	./wall
+	./internal/wall
 	./test/integration_test_harness
 	./internal/base_aws
 )

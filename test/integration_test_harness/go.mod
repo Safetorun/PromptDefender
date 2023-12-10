@@ -1,7 +1,5 @@
 module github.com/safetorun/PromptDefender/integration_test_harness
 
-replace github.com/safetorun/PromptDefender/aiprompt => ./../../internal/aiprompt
-
 go 1.20
 
 require (
