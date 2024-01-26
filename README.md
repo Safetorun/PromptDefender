@@ -11,6 +11,8 @@ To use "Keep", go to: [PromptDefender Keep](https://defender.safetorun.com)
 
 To use the APIs - check out our [Developer Portal](https://promptshield.readme.io)
 
+## What is Prompt Defender? 
+
 A prompt defence is a multi-layer defence that can be used to protect your applications against prompt injection attacks. You can use this with any LLM APIs (whether Bard, LlaMa, ChatGPT - or any other LLM) These types of attack are complex, and are difficult to solve with a single layer of defence - as such, a prompt shield is made up of multiple 'rings' of defence.
 
 **Ring 1 - Moat**
