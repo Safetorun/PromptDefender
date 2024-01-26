@@ -5,6 +5,12 @@ Badge](https://app.codacy.com/project/badge/Grade/080ff8f6c80d434484249b8dbb3a5e
 
 [Documentation](https://promptshield.readme.io/)
 
+## Try out the hosted Hosted version
+
+To use "Keep", go to: [PromptDefender Keep](https://defender.safetorun.com) 
+
+To use the APIs - check out our [Developer Portal](https://promptshield.readme.io)
+
 A prompt defence is a multi-layer defence that can be used to protect your applications against prompt injection attacks. You can use this with any LLM APIs (whether Bard, LlaMa, ChatGPT - or any other LLM) These types of attack are complex, and are difficult to solve with a single layer of defence - as such, a prompt shield is made up of multiple 'rings' of defence.
 
 **Ring 1 - Moat**
