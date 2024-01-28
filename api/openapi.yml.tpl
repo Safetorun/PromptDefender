@@ -48,7 +48,7 @@ paths:
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
-      summary: 'Verify and Analyze Prompt'
+      summary: 'Improve your prompt's security with instruction defense
       description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
       operationId: 'buildKeep'
       security:
@@ -77,8 +77,8 @@ paths:
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
-      summary: 'Get your ring 3 shield prompt'
-      description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
+      summary: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
+      description: 'Moat is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
       operationId: 'buildShield'
       security:
         - ApiKeyAuth: [ ]
