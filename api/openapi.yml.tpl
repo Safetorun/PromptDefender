@@ -48,7 +48,7 @@ paths:
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
-      summary: 'Improve your prompt's security with instruction defense
+      summary: 'Improve your prompts security with instruction defense'
       description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
       operationId: 'buildKeep'
       security:
