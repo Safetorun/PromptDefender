@@ -15,6 +15,7 @@ import (
 	"github.com/safetorun/PromptDefender/keep"
 	"log"
 	"os"
+	"time"
 )
 
 type PromptBuilderResponse struct {
@@ -53,7 +54,7 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 	return &KeepResponse{ShieldedPrompt: answer.NewPrompt, XmlTag: answer.Tag}, nil
 }
 
-var sqsQueueCallback = func(prompt string, newPrompt string, userId string, version string) error {
+var sqsQueueCallback = func(prompt string, newPrompt string, userId string, version string, request events.APIGatewayProxyRequest, startTime time.Time) error {
 	cfg, err := config.LoadDefaultConfig(context.Background())
 
 	if err != nil {
@@ -61,15 +62,37 @@ var sqsQueueCallback = func(prompt string, newPrompt string, userId string, vers
 	}
 
 	queueMessage := struct {
-		Request  KeepRequest
-		Response KeepResponse
-		UserId   string
-		Version  string
+		Request             KeepRequest
+		Response            KeepResponse
+		UserId              string
+		Version             string
+		Endpoint            string
+		Domain              string
+		Headers             map[string]string
+		Method              string
+		QueryParams         map[string]string
+		HttpMethod          string
+		HttpResponse        int
+		HttpResponseHeaders map[string]string
+		StartedDateTime     string
+		Time                int
 	}{
-		UserId:   userId,
-		Version:  version,
-		Request:  KeepRequest{Prompt: prompt},
-		Response: KeepResponse{ShieldedPrompt: newPrompt},
+		Endpoint:        "/keep",
+		UserId:          userId,
+		Version:         version,
+		Request:         KeepRequest{Prompt: prompt},
+		Response:        KeepResponse{ShieldedPrompt: newPrompt},
+		Domain:          request.RequestContext.DomainName,
+		Headers:         request.Headers,
+		Method:          request.RequestContext.HTTPMethod,
+		QueryParams:     request.QueryStringParameters,
+		HttpMethod:      request.RequestContext.HTTPMethod,
+		HttpResponse:    200,
+		StartedDateTime: request.RequestContext.RequestTime,
+		HttpResponseHeaders: map[string]string{
+			"content-type": "application/json",
+		},
+		Time: int(time.Since(startTime).Milliseconds()),
 	}
 
 	jsonMessage, err := json.Marshal(queueMessage)
@@ -113,12 +136,13 @@ func retrieveQueueNameOrPanic() string {
 // version: The version of the lambda
 // keep_sqs_queue_url: The SQS queue URL to send the message to
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	startTime := time.Now()
 	openAIKey := retrieveApiKeyOrPanic()
 	version := retrieveVersionOrPanic()
 	_ = retrieveQueueNameOrPanic() // Fail early if queue name does not exist
 
 	var addCallbackWithUserId keep.Callback = func(prompt string, newPrompt string) error {
-		return sqsQueueCallback(prompt, newPrompt, request.RequestContext.Identity.APIKeyID, version)
+		return sqsQueueCallback(prompt, newPrompt, request.RequestContext.Identity.APIKeyID, version, request, startTime)
 	}
 
 	addCallback := func(k *keep.Keep) {
