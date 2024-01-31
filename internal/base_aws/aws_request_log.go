@@ -2,7 +2,7 @@ package base_aws
 
 import (
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/safetorun/PromptDefender/request_log"
+	"github.com/safetorun/PromptDefender/pkg/request_log"
 )
 
 func ToRequestLog(request events.APIGatewayProxyRequest) request_log.QueueMessage {
