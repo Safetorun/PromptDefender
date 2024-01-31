@@ -3,12 +3,12 @@ module github.com/safetorun/PromptDefender/deployments/aws/lambda_keep
 go 1.20
 
 require (
-	github.com/aws/aws-lambda-go v1.45.0
+	github.com/aws/aws-lambda-go v1.46.0
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/config v1.26.6
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.29.7
 	github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231210112259-15b98f65cf67
-	github.com/safetorun/PromptDefender/internal/base_aws v0.0.0-20240126072149-ef859bfd0a26
+	github.com/safetorun/PromptDefender/internal/base_aws v0.0.0-20240130072532-9a4bc83dc7d2
 	github.com/safetorun/PromptDefender/keep v0.0.0-20231210112259-15b98f65cf67
 )
 
