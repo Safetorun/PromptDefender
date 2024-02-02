@@ -23,7 +23,7 @@ Ring 1 is the first layer of defence, and is intended to sanitise input before i
 - Does the information reveal PII which should not be provided to your LLM (e.g. email addresses, phone numbers, etc)
 - Is this prompt from a user / ip address (or any other identifier you want to provide) which is probing or attacking your system? [Coming soon]
 
-**Ring 2 - Walls**
+**Ring 2 - Walls [Coming soon] ** 
 
 Ring 2 is a layer of defence which uses AI in order to detect attempted attacks or jailbreaks.
 
@@ -31,7 +31,7 @@ Ring 2 is a layer of defence which uses AI in order to detect attempted attacks 
 
 Ring 3 is a layer of defence on the prompt itself - it effectively wraps your prompt in an effective 'prompt defence' which provides instructions to the LLM as part of the prompt on what should happen, and what it should avoid doing (e.g. reminders not to leak a secret key)
 
-**Ring 4 - Drawbridge**
+**Ring 4 - Drawbridge [Coming soon] **
 
 Ring 4 is a final protection which looks at the returned value prior to it being provided to a client or using it for a follow-up action; this can contain defences such as:
 
