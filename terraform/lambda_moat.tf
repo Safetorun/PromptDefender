@@ -32,11 +32,17 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" {
           "logs:PutLogEvents"
         ],
         Effect   = "Allow",
-        Resource = "*"
+        Resource = aws_cloudwatch_log_group.lambda_log_group_moat.arn
       },
     ],
   })
 }
+
+resource "aws_cloudwatch_log_group" "lambda_log_group_moat" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
+  retention_in_days = 14
+}
+
 
 resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_moat" {
   role       = aws_iam_role.lambda_role_moat.name
