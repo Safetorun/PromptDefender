@@ -20,6 +20,29 @@ resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
 }
 
+resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" {
+  name   = "${terraform.workspace}-lambda_cloudwatch_logs_policy"
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
+      },
+    ],
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_moat" {
+  role       = aws_iam_role.lambda_role_moat.name
+  policy_arn = aws_iam_policy.lambda_cloudwatch_logs_policy_moat.arn
+}
+
 
 resource "aws_lambda_function" "aws_lambda_moat" {
   function_name    = "${terraform.workspace}-PromptDefender-Moat"
