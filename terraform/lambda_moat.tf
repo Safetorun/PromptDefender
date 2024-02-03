@@ -39,7 +39,7 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group_moat" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
-  name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.aws_lambda_moat.function_name}"
   retention_in_days = 14
 }
 
