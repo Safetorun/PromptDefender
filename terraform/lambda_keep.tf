@@ -15,7 +15,7 @@ resource "aws_iam_role" "lambda_role_keep" {
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_keep" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
   retention_in_days = 14
 }
@@ -32,10 +32,15 @@ resource "aws_iam_policy" "lambda_logging_policy" {
           "logs:PutLogEvents"
         ],
         Effect   = "Allow",
-        Resource = aws_cloudwatch_log_group.lambda_log_group.arn
+        Resource = aws_cloudwatch_log_group.lambda_log_group_keep.arn
       },
     ],
   })
+}
+
+resource "aws_iam_role_policy_attachment" "xray_policy_attachment_keep" {
+  role       = aws_iam_role.lambda_role_keep.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {

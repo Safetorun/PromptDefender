@@ -47,6 +47,8 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
+	println("Received request for moat lambda")
+
 	if !exists {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")
 	}
