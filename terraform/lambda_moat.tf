@@ -43,6 +43,11 @@ resource "aws_cloudwatch_log_group" "lambda_log_group_moat" { #tfsec:ignore:aws-
   retention_in_days = 14
 }
 
+resource "aws_iam_role_policy_attachment" "xray_policy_attachment_moat" {
+  role       = aws_iam_role.lambda_role_moat.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
 
 resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_moat" {
   role       = aws_iam_role.lambda_role_moat.name

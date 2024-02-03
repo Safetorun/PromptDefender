@@ -38,6 +38,11 @@ resource "aws_iam_policy" "lambda_logging_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "xray_policy_attachment_keep" {
+  role       = aws_iam_role.lambda_role_keep.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
   role       = aws_iam_role.lambda_role_keep.name
   policy_arn = aws_iam_policy.lambda_logging_policy.arn
