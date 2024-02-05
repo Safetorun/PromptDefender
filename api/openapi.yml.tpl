@@ -15,7 +15,7 @@ paths:
   /wall:
     post:
       x-amazon-apigateway-integration:
-        uri: ${lambda_keep_arn}
+        uri: ${lambda_moat_arn}
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
