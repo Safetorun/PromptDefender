@@ -18,6 +18,11 @@ import (
 	"os"
 )
 
+var (
+	tracer = otel.Tracer("moat")
+	meter  = otel.Meter("moat")
+)
+
 type MoatLambda struct {
 	moatInstance *moat.Moat
 }
@@ -48,7 +53,10 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords, PotentialXmlEscaping: xmlEscaping}, nil
 }
 
-func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
+	ctx, span := tracer.Start(ctx, "moat_setup")
+
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
 	println("Received request for moat lambda")
@@ -73,6 +81,10 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 	if err != nil {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
 	}
+
+	span.End()
+	ctx, span = tracer.Start(ctx, "moat_handler_exec")
+	defer span.End()
 
 	response, err := base_aws.BaseHandler[MoatRequest, MoatResponse](request, &moatLambda)
 
