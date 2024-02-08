@@ -50,10 +50,10 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
 
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name    = "${terraform.workspace}-PromptDefender-Keep"
-  handler          = "main"
+  handler          = "bootstrap"
   role             = aws_iam_role.lambda_role_keep.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
-  runtime          = "go1.x"
+  runtime          = "provided.al2"
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
   timeout          = 60
 
@@ -98,5 +98,5 @@ data "archive_file" "lambda_keep_zip" {
 
 variable "lambda_keep_path" {
   type    = string
-  default = "../cmd/lambda_keep/main"
+  default = "../cmd/lambda_keep/bootstrap"
 }

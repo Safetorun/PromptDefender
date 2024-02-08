@@ -11,6 +11,10 @@ import (
 	"github.com/safetorun/PromptDefender/internal/base_aws"
 	"github.com/safetorun/PromptDefender/moat"
 	"github.com/safetorun/PromptDefender/pii_aws"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
+	"go.opentelemetry.io/contrib/propagators/aws/xray"
+	"go.opentelemetry.io/otel"
 	"os"
 )
 
@@ -80,5 +84,24 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 }
 
 func main() {
-	lambda.Start(Handler)
+
+	ctx := context.Background()
+
+	tp, err := xrayconfig.NewTracerProvider(ctx)
+	if err != nil {
+		fmt.Printf("error creating tracer provider: %v", err)
+	}
+
+	defer func(ctx context.Context) {
+		err := tp.Shutdown(ctx)
+		if err != nil {
+			fmt.Printf("error shutting down tracer provider: %v", err)
+		}
+	}(ctx)
+
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(xray.Propagator{})
+
+	lambda.Start(otellambda.InstrumentHandler(Handler, xrayconfig.WithRecommendedOptions(tp)...))
+
 }
