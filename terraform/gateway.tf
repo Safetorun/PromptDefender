@@ -9,8 +9,16 @@ resource "aws_api_gateway_deployment" "api" {
   depends_on = [aws_api_gateway_rest_api.api]
 
   rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = "prod"
 }
+
+resource "aws_api_gateway_stage" "api_stage" {
+  stage_name    = "prod"
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  deployment_id = aws_api_gateway_deployment.api.id
+
+  xray_tracing_enabled = true
+}
+
 
 resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
   statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke"
