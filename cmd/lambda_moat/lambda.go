@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
+	"log"
 	"os"
 )
 
@@ -38,7 +39,7 @@ func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName st
 		tr, _ := moat_tracer.Start(t.context, functionName)
 		defer tr.Done()
 
-		return fn(args)
+		return fn(args...)
 	}
 }
 
@@ -81,7 +82,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
-	println("Received request for moat lambda")
+	log.Default().Println("Received request for moat lambda")
 
 	if !exists {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")

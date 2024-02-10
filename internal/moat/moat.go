@@ -13,12 +13,14 @@ import (
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/pii"
 	"github.com/safetorun/PromptDefender/tracer"
+	"log"
 )
 
 type Moat struct {
 	PiiScanner         pii.Scanner
 	BadWordsCheck      *badwords.BadWords
 	XmlEscapingScanner XmlEscapingScanner
+	logger             *log.Logger
 }
 
 type PromptToCheck struct {
@@ -41,6 +43,8 @@ type MoatOpts func(*Moat) error
 
 func New(opts ...MoatOpts) (*Moat, error) {
 	m := &Moat{}
+
+	m.logger = log.Default()
 
 	for _, opt := range opts {
 		err := opt(m)
@@ -99,6 +103,9 @@ func (m *Moat) checkPromptForPii(check PromptToCheck, t tracer.Tracer) (*PiiDete
 
 func (m *Moat) checkPromptContainsBadwords(check PromptToCheck, t tracer.Tracer) (*bool, error) {
 	// Wrap the method in a tracer
+
+	m.logger.Printf("Checking for bad words in prompt: %+v\n", check.Prompt)
+
 	wrappedMethod := tracer.TracerGenericsWrapper[string, *bool](m.BadWordsCheck.CheckPromptContainsBadWords)
 
 	// Execute m.BadWordsCheck.CheckPromptContainsBadWords with the wrapped method
