@@ -1,5 +1,5 @@
 output "api_url" {
-  value = aws_api_gateway_deployment.api.invoke_url
+  value = "${aws_api_gateway_deployment.api.invoke_url}${aws_api_gateway_stage.api_stage.stage_name}"
 }
 
 output "workspace" {
