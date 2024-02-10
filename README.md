@@ -37,3 +37,25 @@ Ring 4 is a final protection which looks at the returned value prior to it being
 
 - Avoid returning data containing a XSS or script tags
 - Avoid returning information which has proprietary or secret information in it
+
+## Running integration tests
+
+To run the integration tests, run the following command:
+
+```bash
+make integration_test
+```
+
+To debug in intellij, run the tests in `run_integration_cucumber_tests.go` with the following environment variables set:
+
+```bash
+URL
+DEFENDER_API_KEY
+```
+
+You can get these after a `make deploy` with the following commands:
+
+```bash
+	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'`
+	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'`
+```

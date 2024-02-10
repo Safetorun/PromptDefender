@@ -91,7 +91,7 @@ func (m *Moat) CheckMoat(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 
 func (m *Moat) checkForXmlEscaping(check PromptToCheck, t tracer.Tracer) (*XmlEscapingDetectionResult, error) {
 	wrappedMethod := tracer.TracerGenericsWrapper2[string, string, *XmlEscapingDetectionResult](m.XmlEscapingScanner.Scan)
-	xmlResultInner, err := t.TraceDecorator(wrappedMethod, "xml_check")(check.Prompt)
+	xmlResultInner, err := t.TraceDecorator(wrappedMethod, "xml_check")(check.Prompt, *check.XmlTagToCheckFor)
 	return xmlResultInner.(*XmlEscapingDetectionResult), err
 }
 
