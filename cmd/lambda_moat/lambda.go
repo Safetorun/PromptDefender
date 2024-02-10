@@ -32,12 +32,21 @@ type MoatLambda struct {
 
 type TracerStruct struct {
 	context context.Context
+	logger  *log.Logger
+}
+
+func NewTracer(context context.Context) *TracerStruct {
+	return &TracerStruct{
+		context: context,
+		logger:  log.Default(),
+	}
 }
 
 func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName string) tracer.GenericFuncType {
 	return func(args ...interface{}) (interface{}, error) {
-		tr, _ := moat_tracer.Start(t.context, functionName)
-		defer tr.Done()
+		t.logger.Printf("Tracing function call, args: %s\n", functionName)
+		_, tr := moat_tracer.Start(t.context, functionName)
+		defer tr.End()
 
 		return fn(args...)
 	}
@@ -45,16 +54,14 @@ func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName st
 
 func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 
-	t := TracerStruct{
-		context: m.context,
-	}
+	t := NewTracer(m.context)
 
 	answer, err := m.moatInstance.CheckMoat(moat.PromptToCheck{
 		Prompt:           moatRequest.Prompt,
 		ScanPii:          moatRequest.ScanPii,
 		XmlTagToCheckFor: moatRequest.XmlTag,
 	},
-		&t,
+		t,
 	)
 
 	containsPii := false

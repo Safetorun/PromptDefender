@@ -102,3 +102,8 @@ destroy: setup-workspace
 	else \
 		cd terraform && terraform init && terraform destroy -auto-approve; \
 	fi
+
+load_test:
+	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
+	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
+	cd test/load && k6 run moat_load.js
