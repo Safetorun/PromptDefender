@@ -64,6 +64,8 @@ resource "aws_lambda_function" "aws_lambda_moat" {
   runtime          = "provided.al2"
   source_code_hash = data.archive_file.lambda_moat_zip.output_base64sha256
 
+  timeout = 60
+
   layers = ["arn:aws:lambda:${var.aws_region}:901920570463:layer:aws-otel-collector-amd64-ver-0-90-1:1"]
 
   tracing_config {
