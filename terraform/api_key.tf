@@ -26,11 +26,15 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
-resource "aws_api_gateway_method_settings" "method_settings" {
+resource "aws_api_gateway_method_settings" "method_settings" { #tfsec:ignore:aws-api-gateway-enable-cache
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = aws_api_gateway_stage.api_stage.stage_name
   method_path = "*/*"
 
   settings {
+    logging_level      = "ERROR"
+    metrics_enabled    = true
+    data_trace_enabled = false
+    caching_enabled    = false
   }
 }

@@ -11,12 +11,22 @@ resource "aws_api_gateway_deployment" "api" {
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
 
+resource "aws_cloudwatch_log_group" "api_logs" {  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  name              = "/aws/api_gateway/${aws_api_gateway_rest_api.api.name}"
+  retention_in_days = 14
+}
+
 resource "aws_api_gateway_stage" "api_stage" {
   stage_name    = "prod"
   rest_api_id   = aws_api_gateway_rest_api.api.id
   deployment_id = aws_api_gateway_deployment.api.id
 
   xray_tracing_enabled = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_logs.arn
+    format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
+  }
 }
 
 
