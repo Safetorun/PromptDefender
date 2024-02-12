@@ -20,7 +20,7 @@ resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
 }
 
-resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" {
+resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${terraform.workspace}-lambda_cloudwatch_logs_policy"
   policy = jsonencode({
     Version   = "2012-10-17",
@@ -32,13 +32,13 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" {
           "logs:PutLogEvents"
         ],
         Effect   = "Allow",
-        Resource = aws_cloudwatch_log_group.lambda_log_group_moat.arn
+        Resource = "${aws_cloudwatch_log_group.lambda_log_group_moat.arn}:*"
       },
     ],
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_moat" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_moat" {  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_lambda_moat.function_name}"
   retention_in_days = 14
 }
@@ -57,11 +57,15 @@ resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_moat" {
 
 resource "aws_lambda_function" "aws_lambda_moat" {
   function_name    = "${terraform.workspace}-PromptDefender-Moat"
-  handler          = "main"
+  handler          = "bootstrap"
   role             = aws_iam_role.lambda_role_moat.arn
   filename         = data.archive_file.lambda_moat_zip.output_path
-  runtime          = "go1.x"
+  runtime          = "provided.al2"
   source_code_hash = data.archive_file.lambda_moat_zip.output_base64sha256
+
+  timeout = 60
+
+  layers = ["arn:aws:lambda:${var.aws_region}:901920570463:layer:aws-otel-collector-amd64-ver-0-90-1:1"]
 
   tracing_config {
     mode = "Active"
@@ -83,5 +87,5 @@ data "archive_file" "lambda_moat_zip" {
 
 variable "lambda_moat_path" {
   type    = string
-  default = "../cmd/lambda_moat/main"
+  default = "../cmd/lambda_moat/bootstrap"
 }

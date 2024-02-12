@@ -34,7 +34,7 @@ test: build
 
 build: generate
 	for aws_module in $(AWS_MODULES) ; do \
-	   cd $$aws_module && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main || exit 1; cd $(PROJECT_DIR) ; \
+	   cd $$aws_module && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap || exit 1; cd $(PROJECT_DIR) ; \
 	done
 
 deploy: setup-workspace build
@@ -92,7 +92,7 @@ integration_test:
 	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
 	echo "Defender API URL: $$URL" &&\
-	cd test/integration_test_harness && go test -v ./...
+	cd test/integration_test_harness && go test -count=1 -v ./...
 
 destroy: setup-workspace
 	export TF_VAR_commit_version=`git rev-parse --short HEAD`;\
@@ -102,3 +102,8 @@ destroy: setup-workspace
 	else \
 		cd terraform && terraform init && terraform destroy -auto-approve; \
 	fi
+
+load_test:
+	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
+	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
+	cd test/load && k6 run moat_load.js

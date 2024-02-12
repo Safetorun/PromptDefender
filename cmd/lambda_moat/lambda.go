@@ -11,22 +11,61 @@ import (
 	"github.com/safetorun/PromptDefender/internal/base_aws"
 	"github.com/safetorun/PromptDefender/moat"
 	"github.com/safetorun/PromptDefender/pii_aws"
+	"github.com/safetorun/PromptDefender/tracer"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
+	"go.opentelemetry.io/contrib/propagators/aws/xray"
+	"go.opentelemetry.io/otel"
+	"log"
 	"os"
+)
+
+var (
+	moat_tracer = otel.Tracer("moat")
+	meter       = otel.Meter("moat")
 )
 
 type MoatLambda struct {
 	moatInstance *moat.Moat
+	context      context.Context
+}
+
+type TracerStruct struct {
+	context context.Context
+	logger  *log.Logger
+}
+
+func NewTracer(context context.Context) *TracerStruct {
+	return &TracerStruct{
+		context: context,
+		logger:  log.Default(),
+	}
+}
+
+func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName string) tracer.GenericFuncType {
+	return func(args ...interface{}) (interface{}, error) {
+		t.logger.Printf("Tracing function call, args: %s\n", functionName)
+		_, tr := moat_tracer.Start(t.context, functionName)
+		defer tr.End()
+
+		return fn(args...)
+	}
 }
 
 func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
+
+	t := NewTracer(m.context)
+
 	answer, err := m.moatInstance.CheckMoat(moat.PromptToCheck{
 		Prompt:           moatRequest.Prompt,
 		ScanPii:          moatRequest.ScanPii,
 		XmlTagToCheckFor: moatRequest.XmlTag,
 	},
+		t,
 	)
 
 	containsPii := false
+
 	if answer != nil && answer.PiiResult != nil {
 		containsPii = answer.PiiResult.ContainsPii
 	}
@@ -44,10 +83,13 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords, PotentialXmlEscaping: xmlEscaping}, nil
 }
 
-func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
+	ctx, span := moat_tracer.Start(ctx, "moat_setup")
+
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
-	println("Received request for moat lambda")
+	log.Default().Println("Received request for moat lambda")
 
 	if !exists {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")
@@ -64,11 +106,16 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 	moatInstance, err := moat.New(addAllConfigurations)
 	moatLambda := MoatLambda{
 		moatInstance: moatInstance,
+		context:      ctx,
 	}
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
 	}
+
+	span.End()
+	ctx, span = moat_tracer.Start(ctx, "moat_handler_exec")
+	defer span.End()
 
 	response, err := base_aws.BaseHandler[MoatRequest, MoatResponse](request, &moatLambda)
 
@@ -80,5 +127,24 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 }
 
 func main() {
-	lambda.Start(Handler)
+
+	ctx := context.Background()
+
+	tp, err := xrayconfig.NewTracerProvider(ctx)
+	if err != nil {
+		fmt.Printf("error creating tracer provider: %v", err)
+	}
+
+	defer func(ctx context.Context) {
+		err := tp.Shutdown(ctx)
+		if err != nil {
+			fmt.Printf("error shutting down tracer provider: %v", err)
+		}
+	}(ctx)
+
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(xray.Propagator{})
+
+	lambda.Start(otellambda.InstrumentHandler(Handler, xrayconfig.WithRecommendedOptions(tp)...))
+
 }

@@ -18,4 +18,5 @@ use (
 	./test/integration_test_harness
 	./internal/base_aws
 	./pkg/request_log
+	./internal/tracer
 )

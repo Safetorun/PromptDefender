@@ -12,12 +12,15 @@ import (
 	"fmt"
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/pii"
+	"github.com/safetorun/PromptDefender/tracer"
+	"log"
 )
 
 type Moat struct {
 	PiiScanner         pii.Scanner
 	BadWordsCheck      *badwords.BadWords
 	XmlEscapingScanner XmlEscapingScanner
+	logger             *log.Logger
 }
 
 type PromptToCheck struct {
@@ -41,6 +44,8 @@ type MoatOpts func(*Moat) error
 func New(opts ...MoatOpts) (*Moat, error) {
 	m := &Moat{}
 
+	m.logger = log.Default()
+
 	for _, opt := range opts {
 		err := opt(m)
 		if err != nil {
@@ -51,18 +56,19 @@ func New(opts ...MoatOpts) (*Moat, error) {
 	return m, nil
 }
 
-func (m *Moat) CheckMoat(check PromptToCheck) (*CheckResult, error) {
+func (m *Moat) CheckMoat(check PromptToCheck, t tracer.Tracer) (*CheckResult, error) {
+
 	var piiResult *PiiDetectionResult = nil
 	var xmlResult *XmlEscapingDetectionResult = nil
 
-	containsBadWords, err := m.BadWordsCheck.CheckPromptContainsBadWords(check.Prompt)
+	containsBadWords, err := m.checkPromptContainsBadwords(check, t)
 
-	if err != nil || containsBadWords == nil {
-		return nil, fmt.Errorf("error checking bad words: %v", err)
+	if err != nil {
+		return nil, err
 	}
 
 	if check.ScanPii {
-		piiRe, err := m.retrievePiiScore(check.Prompt)
+		piiRe, err := m.checkPromptForPii(check, t)
 		piiResult = piiRe
 
 		if err != nil {
@@ -71,15 +77,45 @@ func (m *Moat) CheckMoat(check PromptToCheck) (*CheckResult, error) {
 	}
 
 	if check.XmlTagToCheckFor != nil {
-		xmlResultInner, err := m.XmlEscapingScanner.Scan(check.Prompt, *check.XmlTagToCheckFor)
+		xmlResultInner, err := m.checkForXmlEscaping(check, t)
 		if err != nil {
 			return nil, err
 		}
 
 		xmlResult = xmlResultInner
+
 	}
 
 	return &CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}, nil
+}
+
+func (m *Moat) checkForXmlEscaping(check PromptToCheck, t tracer.Tracer) (*XmlEscapingDetectionResult, error) {
+	wrappedMethod := tracer.TracerGenericsWrapper2[string, string, *XmlEscapingDetectionResult](m.XmlEscapingScanner.Scan)
+	xmlResultInner, err := t.TraceDecorator(wrappedMethod, "xml_check")(check.Prompt, *check.XmlTagToCheckFor)
+	return xmlResultInner.(*XmlEscapingDetectionResult), err
+}
+
+func (m *Moat) checkPromptForPii(check PromptToCheck, t tracer.Tracer) (*PiiDetectionResult, error) {
+	wrappedMethod := tracer.TracerGenericsWrapper[string, *PiiDetectionResult](m.retrievePiiScore)
+	piiRe, err := t.TraceDecorator(wrappedMethod, "scanning_pii")(check.Prompt)
+	return piiRe.(*PiiDetectionResult), err
+}
+
+func (m *Moat) checkPromptContainsBadwords(check PromptToCheck, t tracer.Tracer) (*bool, error) {
+	// Wrap the method in a tracer
+
+	m.logger.Printf("Checking for bad words in prompt: %+v\n", check.Prompt)
+
+	wrappedMethod := tracer.TracerGenericsWrapper[string, *bool](m.BadWordsCheck.CheckPromptContainsBadWords)
+
+	// Execute m.BadWordsCheck.CheckPromptContainsBadWords with the wrapped method
+	containsBadWords, err := t.TraceDecorator(wrappedMethod, "scanning_bad_words")(check.Prompt)
+
+	if err != nil || containsBadWords == nil {
+		return nil, fmt.Errorf("error checking bad words: %v", err)
+	}
+
+	return containsBadWords.(*bool), nil
 }
 
 func (m *Moat) retrievePiiScore(basePrompt string) (*PiiDetectionResult, error) {

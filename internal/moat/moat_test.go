@@ -72,7 +72,7 @@ func TestCheckMoat(t *testing.T) {
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
-		result, err := m.CheckMoat(check)
+		result, err := m.CheckMoat(check, nil, nil)
 		assert.Nil(t, err)
 		assert.NotNil(t, result.ContainsBadWords)
 	})
@@ -88,7 +88,7 @@ func TestCheckMoat(t *testing.T) {
 		piiScanner.On("Scan", "some text").Return(&pii.ScanResult{ContainingPii: true}, nil)
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: true}
-		result, err := m.CheckMoat(check)
+		result, err := m.CheckMoat(check, nil, nil)
 		assert.Nil(t, err)
 		assert.True(t, result.PiiResult.ContainsPii)
 	})
@@ -103,7 +103,7 @@ func TestCheckMoat(t *testing.T) {
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(nil, errors.New("an error"))
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
-		result, err := m.CheckMoat(check)
+		result, err := m.CheckMoat(check, nil, nil)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})
@@ -119,7 +119,7 @@ func TestCheckMoat(t *testing.T) {
 		piiScanner.On("Scan", "some text").Return(nil, errors.New("an error"))
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: true}
-		result, err := m.CheckMoat(check)
+		result, err := m.CheckMoat(check, nil, nil)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})
