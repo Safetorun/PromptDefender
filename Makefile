@@ -60,9 +60,11 @@ tidy:
 
 upgrade:
 	for number in  $(MODULES) ; do \
+  		printf "Upgrading dependencies for module: %s\n" $$number; \
 	   cd $$number && go get -u all  || exit 1; cd .. ; \
 	done
 	for aws_module in $(AWS_MODULES) ; do \
+  		printf "Upgrading dependencies for module: %s\n" $$aws_module; \
 	   cd $$aws_module && go get -u all || exit 1; cd $(PROJECT_DIR) ; \
 	done
 

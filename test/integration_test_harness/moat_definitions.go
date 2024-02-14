@@ -134,8 +134,50 @@ func ValidateResponseDetectedPii(context context.Context, piiDetected string) er
 	return nil
 }
 
+func ValidateSuspicousSessionInput(context context.Context, suspiciousSessionInput string) error {
+
+	detected, err := strconv.ParseBool(suspiciousSessionInput)
+	if err != nil {
+		return err
+	}
+
+	response := context.Value(ResponseKey).(*MoatResponse)
+	if *response.SuspiciousSession != detected {
+		return errors.New("suspicious session input not set correctly")
+	}
+
+	return nil
+}
+
+func ValidateSuspicousUserInput(context context.Context, suspiciousUserInput string) error {
+
+	detected, err := strconv.ParseBool(suspiciousUserInput)
+	if err != nil {
+		return err
+	}
+
+	response := context.Value(ResponseKey).(*MoatResponse)
+	if *response.SuspiciousUser != detected {
+		return errors.New("suspicious user input not set correctly")
+	}
+
+	return nil
+}
+
 func SetXmlTag(ctx context.Context, tag string) (context.Context, error) {
 	request := ctx.Value(RequestKey).(*MoatRequest)
 	request.XmlTag = &tag
+	return ctx, nil
+}
+
+func SetUserId(ctx context.Context, userId string) (context.Context, error) {
+	request := ctx.Value(RequestKey).(*MoatRequest)
+	request.UserId = &userId
+	return ctx, nil
+}
+
+func SetSessionId(ctx context.Context, sessionId string) (context.Context, error) {
+	request := ctx.Value(RequestKey).(*MoatRequest)
+	request.SessionId = &sessionId
 	return ctx, nil
 }

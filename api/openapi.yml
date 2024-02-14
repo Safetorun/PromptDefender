@@ -15,7 +15,7 @@ paths:
   /wall:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:29-improve-monitorin-PromptDefender-Moat/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:31-user-and-session--PromptDefender-Moat/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -44,7 +44,7 @@ paths:
   /keep:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:29-improve-monitorin-PromptDefender-Keep/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:31-user-and-session--PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -73,7 +73,7 @@ paths:
   /moat:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:29-improve-monitorin-PromptDefender-Moat/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:31-user-and-session--PromptDefender-Moat/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -99,6 +99,57 @@ paths:
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
           description: 'Internal server error.'
+  /user:
+    get:
+      summary: 'List Suspicious Users'
+      description: 'This endpoint returns a list of suspicious users.'
+      operationId: 'listUsers'
+      responses:
+        '200':
+          description: 'Successful operation.'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: 'Internal server error.'
+    post:
+      summary: 'Add Suspicious User'
+      description: 'This endpoint adds a user to the list of suspicious users.'
+      operationId: 'addUser'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: 'User successfully added.'
+        '400':
+          description: 'Bad request. The user data is missing or invalid.'
+        '500':
+          description: 'Internal server error.'
+    delete:
+      summary: 'Remove Suspicious User'
+      description: 'This endpoint removes a user from the list of suspicious users.'
+      operationId: 'removeUser'
+      parameters:
+        - name: 'userId'
+          in: 'query'
+          required: true
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: 'User successfully removed.'
+        '400':
+          description: 'Bad request. The userId is missing or invalid.'
+        '500':
+          description: 'Internal server error.'
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -107,6 +158,12 @@ components:
       name: 'x-api-key'
       description: 'API key required for AWS API Gateway'
   schemas:
+    User:
+      type: 'object'
+      properties:
+        userId:
+          type: 'string'
+          description: 'The user ID of the suspicious user.'
     KeepRequest:
       type: 'object'
       required:
@@ -125,6 +182,12 @@ components:
         - 'prompt'
         - 'scan_pii'
       properties:
+        user_id:
+          type: 'string'
+          description: 'The user ID of the user who is submitting the prompt. This is used to flag suspicious users'
+        session_id:
+            type: 'string'
+            description: 'The session ID of the user who is submitting the prompt. This is used to flag suspicious sessions'
         prompt:
           type: 'string'
           description: 'The text prompt to be verified.'
@@ -168,6 +231,12 @@ components:
         potential_xml_escaping:
           type: 'boolean'
           description: 'Whether the prompt contains potential XML escaping.'
+        suspicious_user:
+          type: 'boolean'
+          description: 'Whether the user is suspicious.'
+        suspicious_session:
+            type: 'boolean'
+            description: 'Whether the session is suspicious.'
 
     WallResponse:
       type: 'object'
