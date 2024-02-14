@@ -101,9 +101,16 @@ paths:
           description: 'Internal server error.'
   /user:
     get:
+      x-amazon-apigateway-integration:
+        uri:  ${lambda_user_arn}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        type: "aws_proxy"
       summary: 'List Suspicious Users'
       description: 'This endpoint returns a list of suspicious users.'
       operationId: 'listUsers'
+      security:
+        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: 'Successful operation.'
@@ -116,9 +123,16 @@ paths:
         '500':
           description: 'Internal server error.'
     post:
+      x-amazon-apigateway-integration:
+        uri:  ${lambda_user_arn}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
       summary: 'Add Suspicious User'
       description: 'This endpoint adds a user to the list of suspicious users.'
       operationId: 'addUser'
+      security:
+        - ApiKeyAuth: [ ]
       requestBody:
         required: true
         content:
@@ -133,9 +147,16 @@ paths:
         '500':
           description: 'Internal server error.'
     delete:
+      x-amazon-apigateway-integration:
+        uri:  ${lambda_user_arn}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "DELETE"
+        type: "aws_proxy"
       summary: 'Remove Suspicious User'
       description: 'This endpoint removes a user from the list of suspicious users.'
       operationId: 'removeUser'
+      security:
+        - ApiKeyAuth: [ ]
       parameters:
         - name: 'userId'
           in: 'query'

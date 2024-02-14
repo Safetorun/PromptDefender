@@ -34,8 +34,7 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_user" { #tfsec:ignore:a
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_user" {
-  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_user" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_lambda_user.function_name}"
   retention_in_days = 14
 }
@@ -68,9 +67,35 @@ resource "aws_lambda_function" "aws_lambda_user" {
 
   environment {
     variables = {
-      open_ai_api_key = var.openai_secret_key
+      USERS_TABLE = aws_dynamodb_table.UserAndSessionDb.name
     }
   }
+}
+
+resource "aws_iam_policy" "lambda_dynamodb_access" {
+  name   = "${terraform.workspace}-lambda_dynamodb_access"
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ],
+        Effect   = "Allow",
+        Resource = aws_dynamodb_table.UserAndSessionDb.arn
+      },
+    ],
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach" {
+  role       = aws_iam_role.lambda_role_user.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
 }
 
 data "archive_file" "lambda_user_zip" {

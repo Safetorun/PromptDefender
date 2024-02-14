@@ -24,7 +24,8 @@ func New() *UserRepositoryDdb {
 		tableName: os.Getenv("USERS_TABLE"),
 	}
 }
-func (ddb *UserRepositoryDdb) GetUserByID(id string) (user_repository.UserCore, error) {
+
+func (ddb *UserRepositoryDdb) GetUserByID(id string) (*user_repository.UserCore, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(ddb.tableName),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -36,17 +37,20 @@ func (ddb *UserRepositoryDdb) GetUserByID(id string) (user_repository.UserCore, 
 
 	result, err := ddb.db.GetItem(input)
 	if err != nil {
-		return user_repository.UserCore{}, err
+		return nil, err
 	}
 
-	// Unmarshal the result into a UserCore object
+	if result.Item == nil {
+		return nil, user_repository.ErrUserIDNotFound
+	}
+
 	user := user_repository.UserCore{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, &user)
 	if err != nil {
-		return user_repository.UserCore{}, err
+		return nil, err
 	}
 
-	return user, nil
+	return &user, nil
 }
 
 func (ddb *UserRepositoryDdb) GetUsers() ([]user_repository.UserCore, error) {
