@@ -43,7 +43,7 @@ func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName st
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
+	fmt.Println("Received a request")
 	ctx, span := user_tracer.Start(ctx, "lambda_users")
 	defer span.End()
 

@@ -104,7 +104,7 @@ paths:
       x-amazon-apigateway-integration:
         uri:  ${lambda_user_arn}
         passthroughBehavior: "when_no_match"
-        httpMethod: "GET"
+        httpMethod: "POST"
         type: "aws_proxy"
       summary: 'List Suspicious Users'
       description: 'This endpoint returns a list of suspicious users.'
@@ -150,7 +150,7 @@ paths:
       x-amazon-apigateway-integration:
         uri:  ${lambda_user_arn}
         passthroughBehavior: "when_no_match"
-        httpMethod: "DELETE"
+        httpMethod: "POST"
         type: "aws_proxy"
       summary: 'Remove Suspicious User'
       description: 'This endpoint removes a user from the list of suspicious users.'

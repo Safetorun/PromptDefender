@@ -31,7 +31,7 @@ resource "aws_api_gateway_stage" "api_stage" {
 
 
 resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
-  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke"
+  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke-keep"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_Lambda_keep.arn
   principal     = "apigateway.amazonaws.com"
@@ -39,7 +39,7 @@ resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_shield" {
-  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke"
+  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke-moat"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_lambda_moat.arn
   principal     = "apigateway.amazonaws.com"
@@ -47,7 +47,7 @@ resource "aws_lambda_permission" "apigw_lambda_permission_shield" {
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_user" {
-  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke"
+  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke-user"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_lambda_user.arn
   principal     = "apigateway.amazonaws.com"
