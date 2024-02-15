@@ -79,11 +79,19 @@ type WallResponse struct {
 	InjectionScore *float32 `json:"injection_score,omitempty"`
 }
 
+// RemoveUserParams defines parameters for RemoveUser.
+type RemoveUserParams struct {
+	UserId string `form:"userId" json:"userId"`
+}
+
 // BuildKeepJSONRequestBody defines body for BuildKeep for application/json ContentType.
 type BuildKeepJSONRequestBody = KeepRequest
 
 // BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
 type BuildShieldJSONRequestBody = MoatRequest
+
+// AddUserJSONRequestBody defines body for AddUser for application/json ContentType.
+type AddUserJSONRequestBody = User
 
 // WallPromptJSONRequestBody defines body for WallPrompt for application/json ContentType.
 type WallPromptJSONRequestBody = WallRequest
