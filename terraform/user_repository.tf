@@ -3,6 +3,7 @@ resource "aws_dynamodb_table" "UserAndSessionDb" { #tfsec:ignore:aws-dynamodb-ta
   read_capacity  = 10
   write_capacity = 5
   hash_key       = "UserOrSessionId"
+  range_key      = "ApiKeyId"
 
   server_side_encryption {
     enabled = true
@@ -10,6 +11,11 @@ resource "aws_dynamodb_table" "UserAndSessionDb" { #tfsec:ignore:aws-dynamodb-ta
 
   attribute {
     name = "UserOrSessionId"
+    type = "S"
+  }
+
+  attribute {
+    name = "ApiKeyId"
     type = "S"
   }
 

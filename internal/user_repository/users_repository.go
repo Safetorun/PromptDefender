@@ -3,7 +3,8 @@ package user_repository
 import "errors"
 
 type UserCore struct {
-	UserId string
+	UserOrSessionId string
+	ApiKeyId        string
 }
 
 var ErrUserIDNotFound = errors.New("userId not found")

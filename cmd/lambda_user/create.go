@@ -7,11 +7,12 @@ import (
 
 type CreateUserHandler struct {
 	userInstance *user_repository_ddb.UserRepositoryDdb
+	apiKey       string
 }
 
 func (h *CreateUserHandler) Handle(user User) (*User, error) {
 	err := h.userInstance.CreateUser(user_repository.UserCore{
-		UserId: *user.UserId,
+		UserOrSessionId: *user.UserId,
 	})
 
 	if err != nil {

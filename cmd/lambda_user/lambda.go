@@ -49,7 +49,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	if request.HTTPMethod == "POST" {
 		fmt.Println("Received a POST request")
-		handler := CreateUserHandler{user_repository_ddb.New()}
+		handler := CreateUserHandler{user_repository_ddb.New(), request.RequestContext.Identity.APIKeyID}
 		return base_aws.BaseHandler[User, User](request, &handler)
 
 	} else if request.HTTPMethod == "GET" {
