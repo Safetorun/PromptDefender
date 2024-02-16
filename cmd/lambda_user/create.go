@@ -13,6 +13,7 @@ type CreateUserHandler struct {
 func (h *CreateUserHandler) Handle(user User) (*User, error) {
 	err := h.userInstance.CreateUser(user_repository.UserCore{
 		UserOrSessionId: *user.UserId,
+		ApiKeyId:        h.apiKey,
 	})
 
 	if err != nil {
