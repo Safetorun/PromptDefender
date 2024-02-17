@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -43,7 +44,8 @@ func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName st
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Println("Received a request")
+	fmt.Println(fmt.Sprintf("Received a request %+v", request))
+
 	ctx, span := user_tracer.Start(ctx, "lambda_users")
 	defer span.End()
 
@@ -59,7 +61,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			handler := RetrieveUserHandlerSingle{user_repository_ddb.New()}
 			return handler.Handle(request.PathParameters["id"]), nil
 		} else {
-			userHandler := RetrieveUserHandler{user_repository_ddb.New(), request.RequestContext.Identity.APIKeyID}
+			fmt.Println("Received a GET request with no id")
+			userHandler := NewRetrieveHandler(request.RequestContext.Identity.APIKeyID)
 			return userHandler.Handle(), nil
 		}
 	} else if request.HTTPMethod == "DELETE" {
@@ -68,7 +71,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		return handler.Handle(request.PathParameters["id"]), nil
 	} else {
 		fmt.Println("Received a request with an unsupported method")
-		return events.APIGatewayProxyResponse{StatusCode: 400}, nil
+		return events.APIGatewayProxyResponse{StatusCode: 400}, errors.New("unsupported method")
 	}
 }
 

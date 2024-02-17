@@ -23,7 +23,7 @@ func CreateSuspiciousUser(ctx context.Context, userId string) (context.Context, 
 		return ctx, fmt.Errorf("got error (%s) when building shield", err)
 	}
 
-	if response.StatusCode() != 201 {
+	if response.StatusCode() != 200 {
 		return ctx, errors.New("error processing request")
 	}
 
@@ -43,7 +43,7 @@ func RetrieveSuspiciousUsers(ctx context.Context) (context.Context, error) {
 	}
 
 	if response.StatusCode() != 200 {
-		return ctx, errors.New("error processing request")
+		return ctx, errors.New(fmt.Sprintf("error processing request response (%s) is %s", response.Status(), string(response.Body)))
 	}
 
 	return context.WithValue(ctx, UsersKey, response.JSON200), nil

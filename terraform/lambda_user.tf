@@ -93,9 +93,30 @@ resource "aws_iam_policy" "lambda_dynamodb_access" {
   })
 }
 
+resource "aws_iam_policy" "lambda_dynamodb_access-index" {
+  name   = "${terraform.workspace}-lambda_dynamodb_access--index"
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "dynamodb:Query"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.UserAndSessionDb.name}/index/ApiKeyId-index"
+      },
+    ],
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach" {
   role       = aws_iam_role.lambda_role_user.name
   policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach--index" {
+  role       = aws_iam_role.lambda_role_user.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_access-index.arn
 }
 
 data "archive_file" "lambda_user_zip" {
