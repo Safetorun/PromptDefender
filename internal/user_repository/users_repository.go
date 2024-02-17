@@ -11,7 +11,7 @@ var ErrUserIDNotFound = errors.New("userId not found")
 
 type UserRepository interface {
 	GetUserByID(id string) (*UserCore, error)
-	GetUsers() ([]UserCore, error)
+	GetUsers(string) ([]UserCore, error)
 	CreateUser(user UserCore) error
 	DeleteUser(id string) error
 }

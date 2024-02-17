@@ -53,12 +53,23 @@ func (ddb *UserRepositoryDdb) GetUserByID(id string) (*user_repository.UserCore,
 	return &user, nil
 }
 
-func (ddb *UserRepositoryDdb) GetUsers() ([]user_repository.UserCore, error) {
-	input := &dynamodb.ScanInput{
+func (ddb *UserRepositoryDdb) GetUsers(apikeyId string) ([]user_repository.UserCore, error) {
+	input := &dynamodb.QueryInput{
 		TableName: aws.String(ddb.tableName),
+		IndexName: aws.String("ApiKeyId-index"),
+		KeyConditions: map[string]*dynamodb.Condition{
+			"ApiKeyId": {
+				ComparisonOperator: aws.String("EQ"),
+				AttributeValueList: []*dynamodb.AttributeValue{
+					{
+						S: aws.String(apikeyId),
+					},
+				},
+			},
+		},
 	}
 
-	result, err := ddb.db.Scan(input)
+	result, err := ddb.db.Query(input)
 	if err != nil {
 		return nil, err
 	}

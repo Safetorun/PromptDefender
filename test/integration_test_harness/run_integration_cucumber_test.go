@@ -41,4 +41,8 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step("^the session_id is (.*)$", SetSessionId)
 	ctx.Step("^Response should have shielded prompt containing (.*)$", ShieldedPromptContains)
 	ctx.Step("^I create a suspicious user with the user_id (.*)$", CreateSuspiciousUser)
+	ctx.Step("^I retrieve a list of all users$", RetrieveSuspiciousUsers)
+	ctx.Step("^The list should contain the user_id (.*)$", ValidateUserIdContains)
+	ctx.Step("^The list should not contain the user_id (.*)$", ValidateUserNotInList)
+	ctx.Step("^I delete the user with the user_id (.*)$", DeleteSuspiciousUser)
 }

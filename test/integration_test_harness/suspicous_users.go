@@ -6,24 +6,18 @@ import (
 	"fmt"
 )
 
-func CreateSuspiciousUser(ctx context.Context) (context.Context, error) {
+const UsersKey = "users"
+
+func CreateSuspiciousUser(ctx context.Context, userId string) (context.Context, error) {
 	gClient, err := CreateClient()
 
 	if err != nil {
 		return nil, err
 	}
 
-	if ctx.Value(RequestKey) == nil {
-		return ctx, errors.New("request is nil")
-	}
+	user := User{UserId: &userId}
 
-	request, ok := ctx.Value(RequestKey).(*User)
-
-	if ok == false {
-		return ctx, errors.New("request is not castable to MoatRequest")
-	}
-
-	response, err := gClient.AddUserWithResponse(context.Background(), *request)
+	response, err := gClient.AddUserWithResponse(context.Background(), user)
 
 	if err != nil {
 		return ctx, fmt.Errorf("got error (%s) when building shield", err)
@@ -34,4 +28,68 @@ func CreateSuspiciousUser(ctx context.Context) (context.Context, error) {
 	}
 
 	return ctx, nil
+}
+
+func RetrieveSuspiciousUsers(ctx context.Context) (context.Context, error) {
+	gClient, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := gClient.ListUsersWithResponse(ctx)
+
+	if err != nil {
+		return ctx, fmt.Errorf("got error (%s) when listing users", err)
+	}
+
+	if response.StatusCode() != 200 {
+		return ctx, errors.New("error processing request")
+	}
+
+	return context.WithValue(ctx, UsersKey, response.JSON200), nil
+}
+
+func DeleteSuspiciousUser(ctx context.Context, userId string) (context.Context, error) {
+	gClient, err := CreateClient()
+
+	if err != nil {
+		return nil, err
+	}
+
+	deleteUserRequest := RemoveUserParams{UserId: userId}
+	response, err := gClient.RemoveUserWithResponse(context.Background(), &deleteUserRequest)
+
+	if err != nil {
+		return ctx, fmt.Errorf("got error (%s) when building shield", err)
+	}
+
+	if response.StatusCode() != 201 {
+		return ctx, errors.New("error processing request")
+	}
+
+	return ctx, nil
+}
+
+func ValidateUserIdContains(ctx context.Context, userId string) error {
+	users := ctx.Value(UsersKey).(*[]User)
+
+	for _, user := range *users {
+		if *user.UserId == userId {
+			return nil
+		}
+	}
+
+	return errors.New("user id not found")
+}
+
+func ValidateUserNotInList(ctx context.Context, userId string) error {
+	users := ctx.Value(UsersKey).(*[]User)
+
+	for _, user := range *users {
+		if *user.UserId == userId {
+			return errors.New("user id found")
+		}
+	}
+
+	return nil
 }

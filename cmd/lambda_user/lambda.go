@@ -59,7 +59,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			handler := RetrieveUserHandlerSingle{user_repository_ddb.New()}
 			return handler.Handle(request.PathParameters["id"]), nil
 		} else {
-			userHandler := RetrieveUserHandler{user_repository_ddb.New()}
+			userHandler := RetrieveUserHandler{user_repository_ddb.New(), request.RequestContext.Identity.APIKeyID}
 			return userHandler.Handle(), nil
 		}
 	} else if request.HTTPMethod == "DELETE" {
