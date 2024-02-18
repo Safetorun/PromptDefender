@@ -31,5 +31,5 @@ func (h *DeleteUserHandler) Handle(userId string) events.APIGatewayProxyResponse
 		return events.APIGatewayProxyResponse{StatusCode: 400}
 	}
 
-	return events.APIGatewayProxyResponse{StatusCode: 201}
+	return events.APIGatewayProxyResponse{StatusCode: 204}
 }

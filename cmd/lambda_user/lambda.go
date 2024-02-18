@@ -26,14 +26,17 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	if request.HTTPMethod == "POST" {
 		fmt.Println("Received a POST request")
 		handler := NewCreateUserHandler(request.RequestContext.Identity.APIKeyID)
-		return base_aws.BaseHandler[User, User](request, handler)
+		response, err := base_aws.BaseHandler[User, User](request, handler)
+		response.StatusCode = 201
+		return response, err
 
 	} else if request.HTTPMethod == "GET" {
 		fmt.Println("Received a GET request")
 		if request.PathParameters["id"] != "" {
 			fmt.Println("Received a GET request with id: ", request.PathParameters["id"])
 			handler := NewRetrieverHandlerSingle()
-			return handler.Handle(request.PathParameters["userId"]), nil
+			response := handler.Handle(request.PathParameters["userId"])
+			return response, nil
 		} else {
 			fmt.Println("Received a GET request with no id")
 			userHandler := NewRetrieveHandler(request.RequestContext.Identity.APIKeyID)

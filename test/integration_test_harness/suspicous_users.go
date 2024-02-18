@@ -23,8 +23,8 @@ func CreateSuspiciousUser(ctx context.Context, userId string) (context.Context, 
 		return ctx, fmt.Errorf("got error (%s) when building shield", err)
 	}
 
-	if response.StatusCode() != 200 {
-		return ctx, errors.New("error processing request")
+	if response.StatusCode() != 201 {
+		return ctx, errors.New(fmt.Sprintf("error processing request response is: %s", response.Status()))
 	}
 
 	return ctx, nil
@@ -62,7 +62,7 @@ func DeleteSuspiciousUser(ctx context.Context, userId string) (context.Context, 
 		return ctx, fmt.Errorf("got error (%s) when building shield", err)
 	}
 
-	if response.StatusCode() != 200 {
+	if response.StatusCode() != 204 {
 		return ctx, errors.New(fmt.Sprintf("error processing request response (%s) is %s", response.Status(), string(response.Body)))
 	}
 
@@ -82,9 +82,9 @@ func ValidateUserIdContains(ctx context.Context, userId string) error {
 }
 
 func ValidateUserNotInList(ctx context.Context, userId string) error {
-	users := ctx.Value(UsersKey).(*[]User)
+	users := ctx.Value(UsersKey).([]User)
 
-	for _, user := range *users {
+	for _, user := range users {
 		if *user.UserId == userId {
 			return errors.New("user id found")
 		}
