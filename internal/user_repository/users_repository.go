@@ -13,5 +13,5 @@ type UserRepository interface {
 	GetUserByID(id string) (*UserCore, error)
 	GetUsers(string) ([]UserCore, error)
 	CreateUser(user UserCore) error
-	DeleteUser(id string) error
+	DeleteUser(id string, apiKeyId string) error
 }

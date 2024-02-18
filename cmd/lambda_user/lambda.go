@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/safetorun/PromptDefender/internal/base_aws"
-	"github.com/safetorun/PromptDefender/user_repository_ddb"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -34,7 +33,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		if request.PathParameters["id"] != "" {
 			fmt.Println("Received a GET request with id: ", request.PathParameters["id"])
 			handler := NewRetrieverHandlerSingle()
-			return handler.Handle(request.PathParameters["id"]), nil
+			return handler.Handle(request.PathParameters["userId"]), nil
 		} else {
 			fmt.Println("Received a GET request with no id")
 			userHandler := NewRetrieveHandler(request.RequestContext.Identity.APIKeyID)
@@ -42,8 +41,12 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}
 	} else if request.HTTPMethod == "DELETE" {
 		fmt.Println("Received a DELETE request")
-		handler := DeleteUserHandler{user_repository_ddb.New()}
-		return handler.Handle(request.PathParameters["id"]), nil
+		handler := NewDeleteUserHandler(request.RequestContext.Identity.APIKeyID)
+
+		if request.PathParameters["userId"] == "" {
+			return events.APIGatewayProxyResponse{StatusCode: 400}, errors.New(fmt.Sprintf("userId is required and was not found in %v", request.PathParameters))
+		}
+		return handler.Handle(request.PathParameters["userId"]), nil
 	} else {
 		fmt.Println("Received a request with an unsupported method")
 		return events.APIGatewayProxyResponse{StatusCode: 400}, errors.New("unsupported method")

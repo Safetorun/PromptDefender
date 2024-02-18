@@ -56,15 +56,14 @@ func DeleteSuspiciousUser(ctx context.Context, userId string) (context.Context, 
 		return nil, err
 	}
 
-	deleteUserRequest := RemoveUserParams{UserId: userId}
-	response, err := gClient.RemoveUserWithResponse(context.Background(), &deleteUserRequest)
+	response, err := gClient.RemoveUserWithResponse(context.Background(), userId)
 
 	if err != nil {
 		return ctx, fmt.Errorf("got error (%s) when building shield", err)
 	}
 
-	if response.StatusCode() != 201 {
-		return ctx, errors.New("error processing request")
+	if response.StatusCode() != 200 {
+		return ctx, errors.New(fmt.Sprintf("error processing request response (%s) is %s", response.Status(), string(response.Body)))
 	}
 
 	return ctx, nil

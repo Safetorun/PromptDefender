@@ -94,7 +94,7 @@ resource "aws_iam_policy" "lambda_dynamodb_access" {
 }
 
 resource "aws_iam_policy" "lambda_dynamodb_access-index" {
-  name   = "${terraform.workspace}-lambda_dynamodb_access--index"
+  name   = "${terraform.workspace}-lambda_dynamodb_access-index"
   policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [

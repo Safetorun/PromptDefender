@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+const IndexKey = "ApiKeyId"
+
 type UserRepositoryDdb struct {
 	db        *dynamodb.DynamoDB
 	tableName string
@@ -58,7 +60,7 @@ func (ddb *UserRepositoryDdb) GetUsers(apikeyId string) ([]user_repository.UserC
 		TableName: aws.String(ddb.tableName),
 		IndexName: aws.String("ApiKeyId-index"),
 		KeyConditions: map[string]*dynamodb.Condition{
-			"ApiKeyId": {
+			IndexKey: {
 				ComparisonOperator: aws.String("EQ"),
 				AttributeValueList: []*dynamodb.AttributeValue{
 					{
@@ -99,12 +101,15 @@ func (ddb *UserRepositoryDdb) CreateUser(user user_repository.UserCore) error {
 	return err
 }
 
-func (ddb *UserRepositoryDdb) DeleteUser(id string) error {
+func (ddb *UserRepositoryDdb) DeleteUser(userOrSessionId string, apiKeyId string) error {
 	input := &dynamodb.DeleteItemInput{
 		TableName: aws.String(ddb.tableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"UserId": {
-				S: aws.String(id),
+			"UserOrSessionId": {
+				S: aws.String(userOrSessionId),
+			},
+			"ApiKeyId": {
+				S: aws.String(apiKeyId),
 			},
 		},
 	}

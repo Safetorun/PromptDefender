@@ -7,7 +7,6 @@ resource "aws_api_gateway_rest_api" "api" {
 
 resource "aws_api_gateway_deployment" "api" {
   depends_on = [aws_api_gateway_rest_api.api]
-
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
 
@@ -25,7 +24,7 @@ resource "aws_api_gateway_stage" "api_stage" {
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
-    format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
+    format          = "$context.identity.sourceIp - [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
   }
 }
 
