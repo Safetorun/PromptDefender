@@ -7,6 +7,29 @@ import (
 )
 
 const UsersKey = "users"
+const ResponseStatus = "ResponseStatus"
+
+func RetrieveSuspiciousUser(ctx context.Context, userId string) (context.Context, error) {
+	gClient, err := CreateClient()
+
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := gClient.GetUserWithResponse(ctx, userId)
+	if err != nil {
+		return ctx, fmt.Errorf("got error (%s) when building shield", err)
+	}
+	return context.WithValue(ctx, ResponseStatus, response.StatusCode()), nil
+}
+
+func Validate404Error(ctx context.Context) error {
+	if ctx.Value(ResponseStatus) != 404 {
+		return errors.New("response status is not 404 it is " + fmt.Sprint(ctx.Value(ResponseStatus)))
+	}
+
+	return nil
+}
 
 func CreateSuspiciousUser(ctx context.Context, userId string) (context.Context, error) {
 	gClient, err := CreateClient()

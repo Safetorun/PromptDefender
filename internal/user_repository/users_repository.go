@@ -10,7 +10,7 @@ type UserCore struct {
 var ErrUserIDNotFound = errors.New("userId not found")
 
 type UserRepository interface {
-	GetUserByID(id string) (*UserCore, error)
+	GetUserByID(id string, apiKeyId string) (*UserCore, error)
 	GetUsers(string) ([]UserCore, error)
 	CreateUser(user UserCore) error
 	DeleteUser(id string, apiKeyId string) error

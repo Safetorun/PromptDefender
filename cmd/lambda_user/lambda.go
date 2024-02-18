@@ -32,9 +32,9 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	} else if request.HTTPMethod == "GET" {
 		fmt.Println("Received a GET request")
-		if request.PathParameters["id"] != "" {
-			fmt.Println("Received a GET request with id: ", request.PathParameters["id"])
-			handler := NewRetrieverHandlerSingle()
+		if request.PathParameters["userId"] != "" {
+			fmt.Println("Received a GET request with id: ", request.PathParameters["userId"])
+			handler := NewRetrieverHandlerSingle(request.RequestContext.Identity.APIKeyID)
 			response := handler.Handle(request.PathParameters["userId"])
 			return response, nil
 		} else {

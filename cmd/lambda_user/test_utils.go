@@ -18,11 +18,11 @@ func (m MockUserRepository) CreateUser(user user_repository.UserCore) error {
 	return nil
 }
 
-func (m MockUserRepository) DeleteUser(id string) error {
+func (m MockUserRepository) DeleteUser(id string, apikey string) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m MockUserRepository) GetUserByID(id string) (*user_repository.UserCore, error) {
+func (m MockUserRepository) GetUserByID(id string, apikey string) (*user_repository.UserCore, error) {
 	return &user_repository.UserCore{UserOrSessionId: id}, nil
 }

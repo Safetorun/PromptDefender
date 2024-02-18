@@ -27,12 +27,15 @@ func New() *UserRepositoryDdb {
 	}
 }
 
-func (ddb *UserRepositoryDdb) GetUserByID(id string) (*user_repository.UserCore, error) {
+func (ddb *UserRepositoryDdb) GetUserByID(id string, apiKeyId string) (*user_repository.UserCore, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(ddb.tableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"UserId": {
+			"UserOrSessionId": {
 				S: aws.String(id),
+			},
+			"ApiKeyId": {
+				S: aws.String(apiKeyId),
 			},
 		},
 	}

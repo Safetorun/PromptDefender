@@ -45,4 +45,6 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step("^The list should contain the user_id (.*)$", ValidateUserIdContains)
 	ctx.Step("^The list should not contain the user_id (.*)$", ValidateUserNotInList)
 	ctx.Step("^I delete the user with the user_id (.*)$", DeleteSuspiciousUser)
+	ctx.Step("^I retrieve the user with the user_id (.*)$", RetrieveSuspiciousUser)
+	ctx.Step("^I should get a 404 error", Validate404Error)
 }

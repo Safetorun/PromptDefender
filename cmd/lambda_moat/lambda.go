@@ -30,31 +30,9 @@ type MoatLambda struct {
 	context      context.Context
 }
 
-type TracerStruct struct {
-	context context.Context
-	logger  *log.Logger
-}
-
-func NewTracer(context context.Context) *TracerStruct {
-	return &TracerStruct{
-		context: context,
-		logger:  log.Default(),
-	}
-}
-
-func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName string) tracer.GenericFuncType {
-	return func(args ...interface{}) (interface{}, error) {
-		t.logger.Printf("Tracing function call, args: %s\n", functionName)
-		_, tr := moat_tracer.Start(t.context, functionName)
-		defer tr.End()
-
-		return fn(args...)
-	}
-}
-
 func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 
-	t := NewTracer(m.context)
+	t := tracer.NewTracer(m.context, moat_tracer)
 
 	answer, err := m.moatInstance.CheckMoat(moat.PromptToCheck{
 		Prompt:           moatRequest.Prompt,
@@ -81,6 +59,20 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 	}
 
 	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords, PotentialXmlEscaping: xmlEscaping}, nil
+}
+
+func CheckSuspiciousUser(ctx context.Context, userId string, request events.APIGatewayProxyRequest) (*bool, error) {
+	_, span := moat_tracer.Start(ctx, "check_suspicious_user")
+	defer span.End()
+
+	suspiciousUser := NewRemote(request.RequestContext.Identity.APIKey)
+	isSuspicous, err := suspiciousUser.CheckSuspiciousUser(ctx, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return isSuspicous, nil
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
