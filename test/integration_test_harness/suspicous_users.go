@@ -46,7 +46,7 @@ func RetrieveSuspiciousUsers(ctx context.Context) (context.Context, error) {
 		return ctx, errors.New(fmt.Sprintf("error processing request response (%s) is %s", response.Status(), string(response.Body)))
 	}
 
-	return context.WithValue(ctx, UsersKey, response.JSON200), nil
+	return context.WithValue(ctx, UsersKey, *response.JSON200), nil
 }
 
 func DeleteSuspiciousUser(ctx context.Context, userId string) (context.Context, error) {
@@ -71,9 +71,9 @@ func DeleteSuspiciousUser(ctx context.Context, userId string) (context.Context, 
 }
 
 func ValidateUserIdContains(ctx context.Context, userId string) error {
-	users := ctx.Value(UsersKey).(*[]User)
+	users := ctx.Value(UsersKey).([]User)
 
-	for _, user := range *users {
+	for _, user := range users {
 		if *user.UserId == userId {
 			return nil
 		}

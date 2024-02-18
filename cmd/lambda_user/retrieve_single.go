@@ -9,7 +9,13 @@ import (
 )
 
 type RetrieveUserHandlerSingle struct {
-	userInstance *user_repository_ddb.UserRepositoryDdb
+	userInstance user_repository.UserRepository
+}
+
+func NewRetrieverHandlerSingle() *RetrieveUserHandlerSingle {
+	return &RetrieveUserHandlerSingle{
+		userInstance: user_repository_ddb.New(),
+	}
 }
 
 func (h *RetrieveUserHandlerSingle) Handle(userId string) events.APIGatewayProxyResponse {
@@ -23,7 +29,11 @@ func (h *RetrieveUserHandlerSingle) Handle(userId string) events.APIGatewayProxy
 		return events.APIGatewayProxyResponse{StatusCode: 400}
 	}
 
-	result, err := json.Marshal(user)
+	userResponse := User{
+		UserId: &user.UserOrSessionId,
+	}
+
+	result, err := json.Marshal(userResponse)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{StatusCode: 400}

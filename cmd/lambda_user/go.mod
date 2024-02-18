@@ -23,6 +23,7 @@ require (
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/safetorun/PromptDefender/pii v0.0.0-20231210081706-40db07878111 // indirect
 	github.com/sashabaranov/go-openai v1.19.2 // indirect
+	github.com/thoas/go-funk v0.9.3 // indirect
 	go.opentelemetry.io/contrib/detectors/aws/lambda v0.48.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.23.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.23.0 // indirect

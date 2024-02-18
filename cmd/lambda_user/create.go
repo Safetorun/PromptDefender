@@ -6,8 +6,15 @@ import (
 )
 
 type CreateUserHandler struct {
-	userInstance *user_repository_ddb.UserRepositoryDdb
+	userInstance user_repository.UserRepository
 	apiKey       string
+}
+
+func NewCreateUserHandler(apiKey string) *CreateUserHandler {
+	return &CreateUserHandler{
+		userInstance: user_repository_ddb.New(),
+		apiKey:       apiKey,
+	}
 }
 
 func (h *CreateUserHandler) Handle(user User) (*User, error) {

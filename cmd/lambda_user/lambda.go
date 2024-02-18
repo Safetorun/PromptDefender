@@ -7,58 +7,33 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/safetorun/PromptDefender/internal/base_aws"
-	"github.com/safetorun/PromptDefender/tracer"
 	"github.com/safetorun/PromptDefender/user_repository_ddb"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
-	"log"
 )
 
 var (
-	user_tracer = otel.Tracer("users")
-	meter       = otel.Meter("users")
+	userTracer = otel.Tracer("users")
 )
-
-type TracerStruct struct {
-	context context.Context
-	logger  *log.Logger
-}
-
-func NewTracer(context context.Context) *TracerStruct {
-	return &TracerStruct{
-		context: context,
-		logger:  log.Default(),
-	}
-}
-
-func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName string) tracer.GenericFuncType {
-	return func(args ...interface{}) (interface{}, error) {
-		t.logger.Printf("Tracing function call, args: %s\n", functionName)
-		_, tr := user_tracer.Start(t.context, functionName)
-		defer tr.End()
-
-		return fn(args...)
-	}
-}
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println(fmt.Sprintf("Received a request %+v", request))
 
-	ctx, span := user_tracer.Start(ctx, "lambda_users")
+	ctx, span := userTracer.Start(ctx, "lambda_users")
 	defer span.End()
 
 	if request.HTTPMethod == "POST" {
 		fmt.Println("Received a POST request")
-		handler := CreateUserHandler{user_repository_ddb.New(), request.RequestContext.Identity.APIKeyID}
-		return base_aws.BaseHandler[User, User](request, &handler)
+		handler := NewCreateUserHandler(request.RequestContext.Identity.APIKeyID)
+		return base_aws.BaseHandler[User, User](request, handler)
 
 	} else if request.HTTPMethod == "GET" {
 		fmt.Println("Received a GET request")
 		if request.PathParameters["id"] != "" {
 			fmt.Println("Received a GET request with id: ", request.PathParameters["id"])
-			handler := RetrieveUserHandlerSingle{user_repository_ddb.New()}
+			handler := NewRetrieverHandlerSingle()
 			return handler.Handle(request.PathParameters["id"]), nil
 		} else {
 			fmt.Println("Received a GET request with no id")
