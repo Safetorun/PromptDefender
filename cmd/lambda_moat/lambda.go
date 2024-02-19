@@ -18,43 +18,23 @@ import (
 	"go.opentelemetry.io/otel"
 	"log"
 	"os"
+	"strings"
 )
 
 var (
-	moat_tracer = otel.Tracer("moat")
-	meter       = otel.Meter("moat")
+	moatTracer = otel.Tracer("moat")
 )
 
 type MoatLambda struct {
 	moatInstance *moat.Moat
 	context      context.Context
-}
-
-type TracerStruct struct {
-	context context.Context
-	logger  *log.Logger
-}
-
-func NewTracer(context context.Context) *TracerStruct {
-	return &TracerStruct{
-		context: context,
-		logger:  log.Default(),
-	}
-}
-
-func (t *TracerStruct) TraceDecorator(fn tracer.GenericFuncType, functionName string) tracer.GenericFuncType {
-	return func(args ...interface{}) (interface{}, error) {
-		t.logger.Printf("Tracing function call, args: %s\n", functionName)
-		_, tr := moat_tracer.Start(t.context, functionName)
-		defer tr.End()
-
-		return fn(args...)
-	}
+	apiKey       string
+	url          string
 }
 
 func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 
-	t := NewTracer(m.context)
+	t := tracer.NewTracer(m.context, moatTracer)
 
 	answer, err := m.moatInstance.CheckMoat(moat.PromptToCheck{
 		Prompt:           moatRequest.Prompt,
@@ -63,6 +43,24 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 	},
 		t,
 	)
+
+	_, span := moatTracer.Start(m.context, "check_suspicious_user")
+	suspiciousUser, err := CheckSuspiciousUser(m.context, m.url, moatRequest.UserId, m.apiKey)
+
+	if err != nil {
+		return nil, err
+	}
+
+	span.End()
+
+	_, span = moatTracer.Start(m.context, "check_suspicious_session")
+	suspiciousSession, err := CheckSuspiciousUser(m.context, m.url, moatRequest.SessionId, m.apiKey)
+
+	if err != nil {
+		return nil, err
+	}
+
+	span.End()
 
 	containsPii := false
 
@@ -80,12 +78,39 @@ func (m *MoatLambda) Handle(moatRequest MoatRequest) (*MoatResponse, error) {
 		xmlEscaping = &answer.XmlScannerResult.ContainsXmlEscaping
 	}
 
-	return &MoatResponse{ContainsPii: &containsPii, PotentialJailbreak: &answer.ContainsBadWords, PotentialXmlEscaping: xmlEscaping}, nil
+	return &MoatResponse{
+		ContainsPii:          &containsPii,
+		PotentialJailbreak:   &answer.ContainsBadWords,
+		PotentialXmlEscaping: xmlEscaping,
+		SuspiciousUser:       suspiciousUser,
+		SuspiciousSession:    suspiciousSession,
+	}, nil
+}
+
+func CheckSuspiciousUser(ctx context.Context, url string, userId *string, apiKey string) (*bool, error) {
+	if userId == nil {
+		return nil, nil
+	}
+
+	_, span := moatTracer.Start(ctx, "check_suspicious_user")
+	defer span.End()
+
+	suspiciousUser := NewRemote(url, apiKey)
+
+	log.Default().Println("Checking suspicious user with id: ", *userId)
+	isSuspicous, err := suspiciousUser.CheckSuspiciousUser(ctx, *userId)
+
+	if err != nil {
+		log.Default().Println("Error checking suspicious user: ", err)
+		return nil, err
+	}
+
+	return isSuspicous, nil
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	ctx, span := moat_tracer.Start(ctx, "moat_setup")
+	ctx, span := moatTracer.Start(ctx, "moat_setup")
 
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
@@ -99,14 +124,19 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		c.PiiScanner = pii_aws.New()
 		c.BadWordsCheck = badwords.New(badwords_embeddings.New(embeddings.New(openAIKey)))
 		c.XmlEscapingScanner = moat.NewBasicXmlEscapingScaner()
-
 		return nil
 	}
 
 	moatInstance, err := moat.New(addAllConfigurations)
+
+	url := retrieveUrl(request)
+	log.Default().Println("Received request for moat lambda with url: ", url)
+
 	moatLambda := MoatLambda{
 		moatInstance: moatInstance,
 		context:      ctx,
+		apiKey:       request.RequestContext.Identity.APIKey,
+		url:          url,
 	}
 
 	if err != nil {
@@ -114,7 +144,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	span.End()
-	ctx, span = moat_tracer.Start(ctx, "moat_handler_exec")
+	ctx, span = moatTracer.Start(ctx, "moat_handler_exec")
 	defer span.End()
 
 	response, err := base_aws.BaseHandler[MoatRequest, MoatResponse](request, &moatLambda)
@@ -124,6 +154,18 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	return response, nil
+}
+
+func retrieveUrl(request events.APIGatewayProxyRequest) string {
+	scheme := request.Headers["X-Forwarded-Proto"]
+	host := request.Headers["Host"]
+
+	if !strings.Contains("safetorun.com", host) {
+		host = host + "/" + request.RequestContext.Stage
+	}
+
+	url := fmt.Sprintf("%s://%s", scheme, host)
+	return url
 }
 
 func main() {

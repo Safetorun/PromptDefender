@@ -100,7 +100,7 @@ var sqsQueueCallback = func(prompt string, newPrompt string, version string, req
 		QueueUrl:    &queueName,
 	}
 
-	result, err := svc.SendMessage(context.TODO(), input)
+	result, err := svc.SendMessage(context.Background(), input)
 	if err != nil {
 		log.Fatalf("Error sending message: %v", err)
 	}

@@ -33,6 +33,12 @@ type MoatRequest struct {
 	// ScanPii Whether to scan for PII in the prompt.
 	ScanPii bool `json:"scan_pii"`
 
+	// SessionId The session ID of the user who is submitting the prompt. This is used to flag suspicious sessions
+	SessionId *string `json:"session_id,omitempty"`
+
+	// UserId The user ID of the user who is submitting the prompt. This is used to flag suspicious users
+	UserId *string `json:"user_id,omitempty"`
+
 	// XmlTag The XML tag that is used to escape user input in your prompt (this may have been generated with keep).
 	XmlTag *string `json:"xml_tag,omitempty"`
 }
@@ -47,6 +53,18 @@ type MoatResponse struct {
 
 	// PotentialXmlEscaping Whether the prompt contains potential XML escaping.
 	PotentialXmlEscaping *bool `json:"potential_xml_escaping,omitempty"`
+
+	// SuspiciousSession Whether the session is suspicious.
+	SuspiciousSession *bool `json:"suspicious_session,omitempty"`
+
+	// SuspiciousUser Whether the user is suspicious.
+	SuspiciousUser *bool `json:"suspicious_user,omitempty"`
+}
+
+// User defines model for User.
+type User struct {
+	// UserId The user ID of the suspicious user.
+	UserId *string `json:"userId,omitempty"`
 }
 
 // WallRequest defines model for WallRequest.
@@ -66,6 +84,9 @@ type BuildKeepJSONRequestBody = KeepRequest
 
 // BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
 type BuildShieldJSONRequestBody = MoatRequest
+
+// AddUserJSONRequestBody defines body for AddUser for application/json ContentType.
+type AddUserJSONRequestBody = User
 
 // WallPromptJSONRequestBody defines body for WallPrompt for application/json ContentType.
 type WallPromptJSONRequestBody = WallRequest

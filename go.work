@@ -9,14 +9,17 @@ use (
 	./cmd/lambda_keep
 	./cmd/lambda_moat
 	./cmd/lambda_wall
+	./cmd/lambda_user
 	./internal/embeddings
 	./internal/keep
 	./internal/moat
 	./internal/pii
 	./internal/pii_aws
 	./internal/wall
+	./internal/tracer
 	./test/integration_test_harness
 	./internal/base_aws
 	./pkg/request_log
-	./internal/tracer
+	./internal/user_repository
+	internal/user_repository_ddb
 )

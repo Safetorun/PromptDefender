@@ -60,9 +60,11 @@ tidy:
 
 upgrade:
 	for number in  $(MODULES) ; do \
+  		printf "Upgrading dependencies for module: %s\n" $$number; \
 	   cd $$number && go get -u all  || exit 1; cd .. ; \
 	done
 	for aws_module in $(AWS_MODULES) ; do \
+  		printf "Upgrading dependencies for module: %s\n" $$aws_module; \
 	   cd $$aws_module && go get -u all || exit 1; cd $(PROJECT_DIR) ; \
 	done
 
@@ -81,6 +83,7 @@ generate:
 	   cd $$aws_module && oapi-codegen -package main -generate types $(API_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
 	done
 	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > test/integration_test_harness/api.gen.go
+	oapi-codegen -package main -generate types,client $(API_DIR)/openapi.yml > cmd/lambda_moat/api.gen.go
 
 generate_jailbreak:
 	cd builder\
