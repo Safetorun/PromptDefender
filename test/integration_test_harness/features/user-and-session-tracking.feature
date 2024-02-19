@@ -7,3 +7,10 @@ Feature: Keep tests
     And the request is hello world
     And request is sent to moat
     And Suspicious user response should be true
+
+Scenario: Sending a request for a suspicious user should be false for suspicious response if doesnt exist
+  Given I send a request to moat
+  And the user_id is this-is-a-blah-blah-user
+  And the request is hello world
+  And request is sent to moat
+  And Suspicious user response should be false
