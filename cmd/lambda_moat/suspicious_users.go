@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 )
 
@@ -12,12 +13,15 @@ type SuspiciousUser interface {
 type RemoteSuspiciousUser struct {
 	url    string
 	apiKey string
+	logger *log.Logger
 }
 
-func NewRemote(apiKey string) RemoteSuspiciousUser {
+func NewRemote(url string, apiKey string) RemoteSuspiciousUser {
+
 	return RemoteSuspiciousUser{
-		url:    "https://prompt.safetorun.com",
+		url:    url,
 		apiKey: apiKey,
+		logger: log.Default(),
 	}
 }
 
@@ -38,16 +42,27 @@ func (r *RemoteSuspiciousUser) CreateClient() (*ClientWithResponses, error) {
 // CheckSuspiciousUser checks if a user is suspicious
 func (r *RemoteSuspiciousUser) CheckSuspiciousUser(ctx context.Context, userId string) (*bool, error) {
 	client, err := r.CreateClient()
+
 	if err != nil {
+		r.logger.Println("Error getting user: ", err)
 		return nil, err
 	}
 
 	response, err := client.GetUserWithResponse(ctx, userId)
 
 	if err != nil {
+		r.logger.Println("Error getting user: ", err)
 		return nil, err
 	}
 
-	isUserSuspicious := response.StatusCode() == 404
+	r.logger.Println("Response for ID response: ", response.StatusCode(), " Id: ", userId)
+
+	isUserSuspicious := response.StatusCode() != 404
+
+	if response.StatusCode() != 404 && (response.StatusCode() > 400) {
+		r.logger.Println("Error getting user: ", response.StatusCode())
+		return nil, err
+	}
+
 	return &isUserSuspicious, nil
 }
