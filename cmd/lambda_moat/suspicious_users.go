@@ -59,7 +59,8 @@ func (r *RemoteSuspiciousUser) CheckSuspiciousUser(ctx context.Context, userId s
 
 	isUserSuspicious := response.StatusCode() != 404
 
-	if response.StatusCode() != 404 && (response.StatusCode() > 400) {
+	// 404 is ok - anything else is an error condition
+	if response.StatusCode() != 404 && (response.StatusCode() >= 300 || response.StatusCode() < 200) {
 		r.logger.Println("Error getting user: ", response.StatusCode())
 		return nil, err
 	}
