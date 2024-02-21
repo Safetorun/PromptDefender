@@ -25,8 +25,14 @@ type KeepResponse struct {
 	XmlTag string `json:"xml_tag"`
 }
 
-// MoatRequest defines model for MoatRequest.
-type MoatRequest struct {
+// User defines model for User.
+type User struct {
+	// UserId The user ID of the suspicious user.
+	UserId *string `json:"userId,omitempty"`
+}
+
+// WallRequest defines model for WallRequest.
+type WallRequest struct {
 	// Prompt The text prompt to be verified.
 	Prompt string `json:"prompt"`
 
@@ -43,8 +49,8 @@ type MoatRequest struct {
 	XmlTag *string `json:"xml_tag,omitempty"`
 }
 
-// MoatResponse defines model for MoatResponse.
-type MoatResponse struct {
+// WallResponse defines model for WallResponse.
+type WallResponse struct {
 	// ContainsPii Whether the prompt contains PII.
 	ContainsPii *bool `json:"contains_pii,omitempty"`
 
@@ -61,32 +67,11 @@ type MoatResponse struct {
 	SuspiciousUser *bool `json:"suspicious_user,omitempty"`
 }
 
-// User defines model for User.
-type User struct {
-	// UserId The user ID of the suspicious user.
-	UserId *string `json:"userId,omitempty"`
-}
-
-// WallRequest defines model for WallRequest.
-type WallRequest struct {
-	// Prompt The text prompt to be verified.
-	Prompt string `json:"prompt"`
-}
-
-// WallResponse defines model for WallResponse.
-type WallResponse struct {
-	// InjectionScore The score indicating the likelihood of prompt injection.
-	InjectionScore *float32 `json:"injection_score,omitempty"`
-}
-
 // BuildKeepJSONRequestBody defines body for BuildKeep for application/json ContentType.
 type BuildKeepJSONRequestBody = KeepRequest
-
-// BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
-type BuildShieldJSONRequestBody = MoatRequest
 
 // AddUserJSONRequestBody defines body for AddUser for application/json ContentType.
 type AddUserJSONRequestBody = User
 
-// WallPromptJSONRequestBody defines body for WallPrompt for application/json ContentType.
-type WallPromptJSONRequestBody = WallRequest
+// BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
+type BuildShieldJSONRequestBody = WallRequest

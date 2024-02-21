@@ -7,12 +7,10 @@ use (
 	./builder
 	./pkg/canary
 	./cmd/lambda_keep
-	./cmd/lambda_moat
 	./cmd/lambda_wall
 	./cmd/lambda_user
 	./internal/embeddings
 	./internal/keep
-	./internal/moat
 	./internal/pii
 	./internal/pii_aws
 	./internal/wall

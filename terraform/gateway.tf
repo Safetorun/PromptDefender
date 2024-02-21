@@ -40,7 +40,7 @@ resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
 resource "aws_lambda_permission" "apigw_lambda_permission_shield" {
   statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke-moat"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.aws_lambda_moat.arn
+  function_name = aws_lambda_function.aws_lambda_wall.arn
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/prod/*"
 }
@@ -57,7 +57,7 @@ resource "local_file" "built_open_api_spec" {
   filename = "../api/openapi.yml"
   content  = templatefile("../api/openapi.yml.tpl", {
     lambda_keep_arn = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.aws_Lambda_keep.arn}/invocations",
-    lambda_moat_arn = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.aws_lambda_moat.arn}/invocations",
+    lambda_wall_arn = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.aws_lambda_wall.arn}/invocations",
     lambda_user_arn = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.aws_lambda_user.arn}/invocations",
   })
 }

@@ -1,5 +1,5 @@
-resource "aws_iam_role" "lambda_role_moat" {
-  name = "${terraform.workspace}-lambda_role_moat"
+resource "aws_iam_role" "lambda_role_wall" {
+  name = "${terraform.workspace}-lambda_role_wall"
 
   assume_role_policy = jsonencode({
     Statement = [
@@ -16,11 +16,11 @@ resource "aws_iam_role" "lambda_role_moat" {
 }
 
 resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
-  role       = aws_iam_role.lambda_role_moat.name
+  role       = aws_iam_role.lambda_role_wall.name
   policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
 }
 
-resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" { #tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_wall" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${terraform.workspace}-lambda_cloudwatch_logs_policy"
   policy = jsonencode({
     Version   = "2012-10-17",
@@ -32,32 +32,32 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_moat" { #tfsec:ignore:a
           "logs:PutLogEvents"
         ],
         Effect   = "Allow",
-        Resource = "${aws_cloudwatch_log_group.lambda_log_group_moat.arn}:*"
+        Resource = "${aws_cloudwatch_log_group.lambda_log_group_wall.arn}:*"
       },
     ],
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_moat" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
-  name              = "/aws/lambda/${aws_lambda_function.aws_lambda_moat.function_name}"
+resource "aws_cloudwatch_log_group" "lambda_log_group_wall" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  name              = "/aws/lambda/${aws_lambda_function.aws_lambda_wall.function_name}"
   retention_in_days = 14
 }
 
-resource "aws_iam_role_policy_attachment" "xray_policy_attachment_moat" {
-  role       = aws_iam_role.lambda_role_moat.name
+resource "aws_iam_role_policy_attachment" "xray_policy_attachment_wall" {
+  role       = aws_iam_role.lambda_role_wall.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 
-resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_moat" {
-  role       = aws_iam_role.lambda_role_moat.name
-  policy_arn = aws_iam_policy.lambda_cloudwatch_logs_policy_moat.arn
+resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_wall" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.lambda_cloudwatch_logs_policy_wall.arn
 }
 
-resource "aws_lambda_function" "aws_lambda_moat" {
-  function_name    = "${terraform.workspace}-PromptDefender-Moat"
+resource "aws_lambda_function" "aws_lambda_wall" {
+  function_name    = "${terraform.workspace}-PromptDefender-Wall"
   handler          = "bootstrap"
-  role             = aws_iam_role.lambda_role_moat.arn
+  role             = aws_iam_role.lambda_role_wall.arn
   filename         = data.archive_file.lambda_moat_zip.output_path
   runtime          = "provided.al2"
   source_code_hash = data.archive_file.lambda_moat_zip.output_base64sha256
@@ -80,11 +80,11 @@ resource "aws_lambda_function" "aws_lambda_moat" {
 data "archive_file" "lambda_moat_zip" {
   type        = "zip"
   source_file = var.lambda_moat_path
-  output_path = "moat_function.zip"
+  output_path = "wall_function.zip"
 }
 
 
 variable "lambda_moat_path" {
   type    = string
-  default = "../cmd/lambda_moat/bootstrap"
+  default = "../cmd/lambda_wall/bootstrap"
 }

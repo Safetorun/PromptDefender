@@ -23,7 +23,7 @@ func SendRequestToMoat(ctx context.Context) (context.Context, error) {
 		return ctx, errors.New("request is nil")
 	}
 
-	request, ok := ctx.Value(RequestKey).(*MoatRequest)
+	request, ok := ctx.Value(RequestKey).(*WallRequest)
 
 	if ok == false {
 		return ctx, errors.New("request is not castable to MoatRequest")
@@ -48,7 +48,7 @@ func SendRequestToMoat(ctx context.Context) (context.Context, error) {
 }
 
 func RequestToMoat(ctx context.Context) (context.Context, error) {
-	return context.WithValue(ctx, RequestKey, &MoatRequest{}), nil
+	return context.WithValue(ctx, RequestKey, &WallRequest{}), nil
 }
 
 func CreateClient() (*ClientWithResponses, error) {
@@ -84,20 +84,20 @@ func SetPiiDetection(ctx context.Context, enablePii string) (context.Context, er
 	if err != nil {
 		return nil, err
 	}
-	request := ctx.Value(RequestKey).(*MoatRequest)
+	request := ctx.Value(RequestKey).(*WallRequest)
 	request.ScanPii = pii
 	return ctx, nil
 }
 
 func SetPromptBody(ctx context.Context, prompt string) (context.Context, error) {
-	request := ctx.Value(RequestKey).(*MoatRequest)
+	request := ctx.Value(RequestKey).(*WallRequest)
 	request.Prompt = prompt
 	return ctx, nil
 }
 
 func ValidateResponseXmlTagIsNil(context context.Context) error {
 
-	response := context.Value(ResponseKey).(*MoatResponse)
+	response := context.Value(ResponseKey).(*WallResponse)
 	if response.PotentialXmlEscaping != nil {
 		return errors.New("xml tag  should be nil")
 	}
@@ -111,7 +111,7 @@ func ValidateResponseXmlTag(context context.Context, xmlTag string) error {
 		return err
 	}
 
-	response := context.Value(ResponseKey).(*MoatResponse)
+	response := context.Value(ResponseKey).(*WallResponse)
 	if *response.PotentialXmlEscaping != detected {
 		return errors.New("xml tag not set correctly")
 	}
@@ -126,7 +126,7 @@ func ValidateResponseDetectedPii(context context.Context, piiDetected string) er
 		return err
 	}
 
-	response := context.Value(ResponseKey).(*MoatResponse)
+	response := context.Value(ResponseKey).(*WallResponse)
 	if *response.ContainsPii != detected {
 		return errors.New("pii detected not set correctly")
 	}
@@ -141,7 +141,7 @@ func ValidateSuspicousSessionInput(context context.Context, suspiciousSessionInp
 		return err
 	}
 
-	response := context.Value(ResponseKey).(*MoatResponse)
+	response := context.Value(ResponseKey).(*WallResponse)
 	if *response.SuspiciousSession != detected {
 		return errors.New("suspicious session input not set correctly")
 	}
@@ -156,7 +156,7 @@ func ValidateSuspicousUserInput(context context.Context, suspiciousUserInput str
 		return err
 	}
 
-	response := context.Value(ResponseKey).(*MoatResponse)
+	response := context.Value(ResponseKey).(*WallResponse)
 	if *response.SuspiciousUser != detected {
 		return errors.New("suspicious user input not set correctly")
 	}
@@ -165,19 +165,19 @@ func ValidateSuspicousUserInput(context context.Context, suspiciousUserInput str
 }
 
 func SetXmlTag(ctx context.Context, tag string) (context.Context, error) {
-	request := ctx.Value(RequestKey).(*MoatRequest)
+	request := ctx.Value(RequestKey).(*WallRequest)
 	request.XmlTag = &tag
 	return ctx, nil
 }
 
 func SetUserId(ctx context.Context, userId string) (context.Context, error) {
-	request := ctx.Value(RequestKey).(*MoatRequest)
+	request := ctx.Value(RequestKey).(*WallRequest)
 	request.UserId = &userId
 	return ctx, nil
 }
 
 func SetSessionId(ctx context.Context, sessionId string) (context.Context, error) {
-	request := ctx.Value(RequestKey).(*MoatRequest)
+	request := ctx.Value(RequestKey).(*WallRequest)
 	request.SessionId = &sessionId
 	return ctx, nil
 }
