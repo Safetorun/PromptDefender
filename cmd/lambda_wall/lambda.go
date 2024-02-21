@@ -32,20 +32,20 @@ type WallLambda struct {
 	url          string
 }
 
-func (m *WallLambda) Handle(moatRequest WallRequest) (*WallResponse, error) {
+func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 
 	t := tracer.NewTracer(m.context, wallTracer)
 
 	answer, err := m.wallInstance.CheckWall(wall.PromptToCheck{
-		Prompt:           moatRequest.Prompt,
-		ScanPii:          moatRequest.ScanPii,
-		XmlTagToCheckFor: moatRequest.XmlTag,
+		Prompt:           wallRequest.Prompt,
+		ScanPii:          wallRequest.ScanPii,
+		XmlTagToCheckFor: wallRequest.XmlTag,
 	},
 		t,
 	)
 
 	_, span := wallTracer.Start(m.context, "check_suspicious_user")
-	suspiciousUser, err := CheckSuspiciousUser(m.context, m.url, moatRequest.UserId, m.apiKey)
+	suspiciousUser, err := CheckSuspiciousUser(m.context, m.url, wallRequest.UserId, m.apiKey)
 
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (m *WallLambda) Handle(moatRequest WallRequest) (*WallResponse, error) {
 	span.End()
 
 	_, span = wallTracer.Start(m.context, "check_suspicious_session")
-	suspiciousSession, err := CheckSuspiciousUser(m.context, m.url, moatRequest.SessionId, m.apiKey)
+	suspiciousSession, err := CheckSuspiciousUser(m.context, m.url, wallRequest.SessionId, m.apiKey)
 
 	if err != nil {
 		return nil, err
@@ -110,11 +110,11 @@ func CheckSuspiciousUser(ctx context.Context, url string, userId *string, apiKey
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	ctx, span := wallTracer.Start(ctx, "moat_setup")
+	ctx, span := wallTracer.Start(ctx, "wall_setup")
 
 	openAIKey, exists := os.LookupEnv("open_ai_api_key")
 
-	log.Default().Println("Received request for moat lambda")
+	log.Default().Println("Received request for wall lambda")
 
 	if !exists {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")
@@ -127,13 +127,13 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		return nil
 	}
 
-	moatInstance, err := wall.New(addAllConfigurations)
+	wallInstance, err := wall.New(addAllConfigurations)
 
 	url := retrieveUrl(request)
 	log.Default().Println("Received request for moat lambda with url: ", url)
 
 	moatLambda := WallLambda{
-		wallInstance: moatInstance,
+		wallInstance: wallInstance,
 		context:      ctx,
 		apiKey:       request.RequestContext.Identity.APIKey,
 		url:          url,
@@ -144,7 +144,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	span.End()
-	ctx, span = wallTracer.Start(ctx, "moat_handler_exec")
+	ctx, span = wallTracer.Start(ctx, "wall_handler_exec")
 	defer span.End()
 
 	response, err := base_aws.BaseHandler[WallRequest, WallResponse](request, &moatLambda)

@@ -58,9 +58,9 @@ resource "aws_lambda_function" "aws_lambda_wall" {
   function_name    = "${terraform.workspace}-PromptDefender-Wall"
   handler          = "bootstrap"
   role             = aws_iam_role.lambda_role_wall.arn
-  filename         = data.archive_file.lambda_moat_zip.output_path
+  filename         = data.archive_file.lambda_wall_zip.output_path
   runtime          = "provided.al2"
-  source_code_hash = data.archive_file.lambda_moat_zip.output_base64sha256
+  source_code_hash = data.archive_file.lambda_wall_zip.output_base64sha256
 
   timeout = 60
 
@@ -77,7 +77,7 @@ resource "aws_lambda_function" "aws_lambda_wall" {
   }
 }
 
-data "archive_file" "lambda_moat_zip" {
+data "archive_file" "lambda_wall_zip" {
   type        = "zip"
   source_file = var.lambda_moat_path
   output_path = "wall_function.zip"

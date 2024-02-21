@@ -12,7 +12,7 @@ import (
 const RequestKey = "request"
 const ResponseKey = "response"
 
-func SendRequestToMoat(ctx context.Context) (context.Context, error) {
+func SendRequestToWall(ctx context.Context) (context.Context, error) {
 	gClient, err := CreateClient()
 
 	if err != nil {
@@ -26,7 +26,7 @@ func SendRequestToMoat(ctx context.Context) (context.Context, error) {
 	request, ok := ctx.Value(RequestKey).(*WallRequest)
 
 	if ok == false {
-		return ctx, errors.New("request is not castable to MoatRequest")
+		return ctx, errors.New("request is not castable to WallRequest")
 	}
 
 	response, err := gClient.BuildShieldWithResponse(context.Background(), *request)
@@ -47,7 +47,7 @@ func SendRequestToMoat(ctx context.Context) (context.Context, error) {
 
 }
 
-func RequestToMoat(ctx context.Context) (context.Context, error) {
+func RequestToWall(ctx context.Context) (context.Context, error) {
 	return context.WithValue(ctx, RequestKey, &WallRequest{}), nil
 }
 

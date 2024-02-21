@@ -8,7 +8,7 @@ export let options = {
 
 export default function () {
     let apiKey = __ENV.DEFENDER_API_KEY;
-    let URL = __ENV.URL + "/moat";
+    let URL = __ENV.URL + "/wall";
 
     let options = [
         {

@@ -75,6 +75,6 @@ Inside each test files are the response time to check for test adherence
 ### Expected response times 
 
 * Keep - Not applicable, speed time isn't important
-* Moat:
+* Wall:
     * Without PII detection 400ms
     * WIth PII Detection 500ms

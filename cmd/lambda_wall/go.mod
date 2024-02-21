@@ -1,4 +1,4 @@
-module github.com/safetorun/PromptDefender/deployments/aws/lambda_moat
+module github.com/safetorun/PromptDefender/deployments/aws/lambda_wall
 
 go 1.20
 
@@ -13,7 +13,6 @@ require (
 	github.com/safetorun/PromptDefender/badwords_embeddings v0.0.0-20231210112259-15b98f65cf67
 	github.com/safetorun/PromptDefender/embeddings v0.0.0-20231210112259-15b98f65cf67
 	github.com/safetorun/PromptDefender/internal/base_aws v0.0.0-20240130072532-9a4bc83dc7d2
-	github.com/safetorun/PromptDefender/moat v0.0.0-20231210112259-15b98f65cf67
 	github.com/safetorun/PromptDefender/pii_aws v0.0.0-20231210112259-15b98f65cf67
 	github.com/safetorun/PromptDefender/tracer v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda v0.48.0
