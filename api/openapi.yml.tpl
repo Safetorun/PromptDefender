@@ -12,35 +12,6 @@ servers:
     description: 'Production server'
 
 paths:
-  /wall:
-    post:
-      x-amazon-apigateway-integration:
-        uri: ${lambda_moat_arn}
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        type: "aws_proxy"
-      summary: 'Verify and Analyze Prompt'
-      description: 'This endpoint accepts a text prompt and provides a first layer of defense against prompt injection'
-      operationId: 'wallPrompt'
-      security:
-        - ApiKeyAuth: [ ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WallRequest'
-      responses:
-        '200':
-          description: 'Successful operation.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WallResponse'
-        '400':
-          description: 'Bad request. The prompt field is missing or invalid.'
-        '500':
-          description: 'Internal server error.'
   /keep:
     post:
       x-amazon-apigateway-integration:
@@ -70,15 +41,15 @@ paths:
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
           description: 'Internal server error.'
-  /moat:
+  /wall:
     post:
       x-amazon-apigateway-integration:
-        uri: ${lambda_moat_arn}
+        uri: ${lambda_wall_arn}
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
       summary: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
-      description: 'Moat is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
+      description: 'Wall is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
       operationId: 'buildShield'
       security:
         - ApiKeyAuth: [ ]
@@ -87,14 +58,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MoatRequest'
+              $ref: '#/components/schemas/WallRequest'
       responses:
         '200':
           description: 'Successful operation.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MoatResponse'
+                $ref: '#/components/schemas/WallResponse'
         '400':
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
@@ -228,7 +199,7 @@ components:
           type: 'string'
           description: 'The base prompt you want to build a keep for'
 
-    MoatRequest:
+    WallRequest:
       type: 'object'
       required:
         - 'prompt'
@@ -249,14 +220,6 @@ components:
         xml_tag:
           type: 'string'
           description: 'The XML tag that is used to escape user input in your prompt (this may have been generated with keep).'
-    WallRequest:
-      type: 'object'
-      required:
-        - 'prompt'
-      properties:
-        prompt:
-          type: 'string'
-          description: 'The text prompt to be verified.'
 
     KeepResponse:
       type: 'object'
@@ -271,7 +234,7 @@ components:
             type: 'string'
             description: 'The XML tag that is used to escape user input in your prompt.'
 
-    MoatResponse:
+    WallResponse:
       type: 'object'
       properties:
         contains_pii:
@@ -289,11 +252,3 @@ components:
         suspicious_session:
             type: 'boolean'
             description: 'Whether the session is suspicious.'
-
-    WallResponse:
-      type: 'object'
-      properties:
-        injection_score:
-          type: 'number'
-          format: 'float'
-          description: 'The score indicating the likelihood of prompt injection.'

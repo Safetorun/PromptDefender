@@ -67,7 +67,7 @@ func SendRequestKeep(ctx context.Context) (context.Context, error) {
 	request, ok := ctx.Value(RequestKey).(*KeepRequest)
 
 	if ok == false {
-		return ctx, errors.New("request is not castable to MoatRequest")
+		return ctx, errors.New("request is not castable to WallRequest")
 	}
 
 	response, err := gClient.BuildKeepWithResponse(context.Background(), *request)

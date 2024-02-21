@@ -13,7 +13,7 @@ func TestBasicMoatTest(t *testing.T) {
 		t.Errorf("error: %v", err)
 	}
 
-	shieldResponse, err := client.BuildShieldWithResponse(context.Background(), MoatRequest{
+	shieldResponse, err := client.BuildShieldWithResponse(context.Background(), WallRequest{
 		Prompt:  "Test",
 		ScanPii: false,
 		XmlTag:  nil,
