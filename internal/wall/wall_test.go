@@ -50,7 +50,7 @@ func (m *MockClosestMatcher) GetClosestMatch(text string) (*badwords.ClosestMatc
 	return nil, args.Error(1)
 }
 
-func newMoat(scanner pii.Scanner, badwordsCheck *badwords.BadWords) WallOpts {
+func newWall(scanner pii.Scanner, badwordsCheck *badwords.BadWords) WallOpts {
 	addAllConfigurations := func(c *Wall) error {
 		c.PiiScanner = scanner
 		c.BadWordsCheck = badwordsCheck
@@ -60,19 +60,19 @@ func newMoat(scanner pii.Scanner, badwordsCheck *badwords.BadWords) WallOpts {
 
 	return addAllConfigurations
 }
-func TestCheckMoat(t *testing.T) {
+func TestCheckWall(t *testing.T) {
 
 	t.Run("Check with bad words", func(t *testing.T) {
 
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
-		mt := newMoat(piiScanner, badWordsCheck)
+		mt := newWall(piiScanner, badWordsCheck)
 		m, _ := New(mt)
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
-		result, err := m.CheckWall(check, nil, nil)
+		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, err)
 		assert.NotNil(t, result.ContainsBadWords)
 	})
@@ -82,13 +82,13 @@ func TestCheckMoat(t *testing.T) {
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
-		mt := newMoat(piiScanner, badWordsCheck)
+		mt := newWall(piiScanner, badWordsCheck)
 		m, _ := New(mt)
 
 		piiScanner.On("Scan", "some text").Return(&pii.ScanResult{ContainingPii: true}, nil)
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: true}
-		result, err := m.CheckWall(check, nil, nil)
+		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, err)
 		assert.True(t, result.PiiResult.ContainsPii)
 	})
@@ -98,12 +98,12 @@ func TestCheckMoat(t *testing.T) {
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
 
-		mt := newMoat(piiScanner, badWordsCheck)
+		mt := newWall(piiScanner, badWordsCheck)
 		m, _ := New(mt)
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(nil, errors.New("an error"))
 		check := PromptToCheck{Prompt: "some text", ScanPii: false}
-		result, err := m.CheckWall(check, nil, nil)
+		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})
@@ -113,13 +113,13 @@ func TestCheckMoat(t *testing.T) {
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
 
-		mt := newMoat(piiScanner, badWordsCheck)
+		mt := newWall(piiScanner, badWordsCheck)
 		m, _ := New(mt)
 
 		piiScanner.On("Scan", "some text").Return(nil, errors.New("an error"))
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: true}
-		result, err := m.CheckWall(check, nil, nil)
+		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})

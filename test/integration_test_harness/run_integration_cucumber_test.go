@@ -21,11 +21,11 @@ func TestFeatures(t *testing.T) {
 }
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Step(`^I send a request to moat$`, RequestToWall)
+	ctx.Step(`^I send a request to wall$`, RequestToWall)
 	ctx.Step(`^I send a request to keep$`, RequestToKeep)
 	ctx.Step(`^I set PII detection to (true|false)$`, SetPiiDetection)
 	ctx.Step(`^the request is (.*)$`, SetPromptBody)
-	ctx.Step("^request is sent to moat$", SendRequestToWall)
+	ctx.Step("^request is sent to wall$", SendRequestToWall)
 	ctx.Step(`^Response should have PII detected set to (true|false)$`, ValidateResponseDetectedPii)
 	ctx.Step("^I set the XML tag to (.*)$", SetXmlTag)
 	ctx.Step("^Response should detect XML tag escaping: (true|false)$", ValidateResponseXmlTag)

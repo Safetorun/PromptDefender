@@ -79,12 +79,12 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
 data "archive_file" "lambda_wall_zip" {
   type        = "zip"
-  source_file = var.lambda_moat_path
+  source_file = var.lambda_wall_path
   output_path = "wall_function.zip"
 }
 
 
-variable "lambda_moat_path" {
+variable "lambda_wall_path" {
   type    = string
   default = "../cmd/lambda_wall/bootstrap"
 }

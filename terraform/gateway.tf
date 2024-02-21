@@ -38,7 +38,7 @@ resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission_shield" {
-  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke-moat"
+  statement_id  = "${terraform.workspace}-AllowAPIGatewayInvoke-wall"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.aws_lambda_wall.arn
   principal     = "apigateway.amazonaws.com"

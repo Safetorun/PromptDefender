@@ -130,9 +130,9 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	wallInstance, err := wall.New(addAllConfigurations)
 
 	url := retrieveUrl(request)
-	log.Default().Println("Received request for moat lambda with url: ", url)
+	log.Default().Println("Received request for wall lambda with url: ", url)
 
-	moatLambda := WallLambda{
+	wallLambda := WallLambda{
 		wallInstance: wallInstance,
 		context:      ctx,
 		apiKey:       request.RequestContext.Identity.APIKey,
@@ -147,7 +147,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	ctx, span = wallTracer.Start(ctx, "wall_handler_exec")
 	defer span.End()
 
-	response, err := base_aws.BaseHandler[WallRequest, WallResponse](request, &moatLambda)
+	response, err := base_aws.BaseHandler[WallRequest, WallResponse](request, &wallLambda)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
