@@ -19,7 +19,10 @@ with open("jailbreaking.txt") as jailbreaking_file:
             in_tag = True
         elif line.startswith("</details>"):
             in_tag = False
-            jailbreaks.append({"name": tag_content, "value": summary_content})
+            if summary_content == "" or tag_content == "":
+                continue
+            else:
+                jailbreaks.append({"value": tag_content, "name": summary_content})
             tag_content = ""
         elif line.startswith("  <summary>"):
             summary_content = line.removeprefix("  <summary>").removesuffix("</summary>")

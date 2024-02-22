@@ -1,11 +1,11 @@
-import time
-
+import json
 import openai
 import pandas as pd
-import os
 import tiktoken
-import numpy as np
-import json
+import time
+import os
+
+from embeddings import preprocess_text, embed_text
 
 max_tokens = 1000
 
@@ -41,45 +41,21 @@ def split_into_many(text, max_tokens=max_tokens):
     return chunks
 
 
-def convert_to_openai(x):
-    try:
-        return openai.Embedding.create(input=x, engine='text-embedding-ada-002')['data'][0]['embedding']
-    except Exception as ex:
-        print(ex)
-        print("Sleeping")
-        time.sleep(60)
-        print("Continue")
-        return convert_to_openai(x)
 
 
 def process_from_file(outname):
     texts = read_and_preprocess_json("jailbreaks.json")
 
     df = pd.DataFrame(texts, columns=['name', 'value'])
+    df = df[df['value'].notnull()]
+    df['value'].apply(preprocess_text)
     df.to_csv('scraped.csv')
+
     df.head()
-    tokenizer = tiktoken.get_encoding("cl100k_base")
 
-    shortened = []
+    df['embeddings'] = df.value.apply(lambda x: embed_text(x))
 
-    df['n_tokens'] = df.value.apply(lambda x: len(tokenizer.encode(x)))
-
-    for row in df.iterrows():
-        if row[1]['value'] is None:
-            continue
-
-        if row[1]['n_tokens'] > max_tokens:
-            shortened += list(map(lambda x: (row[1]['name'], x), split_into_many(row[1]['value'])))
-
-        else:
-            shortened.append((row[1]['name'], row[1]['value']))
-
-    df = pd.DataFrame(shortened, columns=['name', 'value'])
-
-    df['n_tokens'] = df.value.apply(lambda x: len(tokenizer.encode(x)))
-
-    df['embeddings'] = df.value.apply(
-        lambda x: convert_to_openai(x))
+    df = df.dropna()
 
     df.to_csv(outname)
     df.head()
