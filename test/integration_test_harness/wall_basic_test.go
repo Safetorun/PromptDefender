@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestBasicMoatTest(t *testing.T) {
+func TestBasicWallTest(t *testing.T) {
 	client, err := CreateClient()
 
 	if err != nil {

@@ -7,9 +7,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/safetorun/PromptDefender/aiprompt"
 	"github.com/safetorun/PromptDefender/internal/base_aws"
 	"github.com/safetorun/PromptDefender/keep"
@@ -17,18 +14,9 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
-	"log"
 	"os"
 	"time"
 )
-
-type PromptBuilderResponse struct {
-	NewPrompt string
-}
-
-type PromptBuilderRequest struct {
-	Prompt string `json:"prompt"`
-}
 
 type KeepLambda struct {
 	keepInstance *keep.Keep
@@ -58,12 +46,7 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 	return &KeepResponse{ShieldedPrompt: answer.NewPrompt, XmlTag: answer.Tag}, nil
 }
 
-var sqsQueueCallback = func(prompt string, newPrompt string, version string, request events.APIGatewayProxyRequest, startTime time.Time) error {
-	cfg, err := config.LoadDefaultConfig(context.Background())
-
-	if err != nil {
-		return err
-	}
+var requestCompleteCallback = func(prompt string, newPrompt string, version string, request events.APIGatewayProxyRequest, startTime time.Time) error {
 
 	keepRequest, err := json.Marshal(KeepRequest{Prompt: prompt})
 
@@ -85,39 +68,9 @@ var sqsQueueCallback = func(prompt string, newPrompt string, version string, req
 	queueMessage.Response = string(response)
 	queueMessage.Time = int(time.Since(startTime).Milliseconds())
 
-	jsonMessage, err := json.Marshal(queueMessage)
-
-	if err != nil {
-		log.Fatalf("JSON marshaling error: %v", err)
-	}
-
-	svc := sqs.NewFromConfig(cfg)
-
-	queueName := retrieveQueueNameOrPanic()
-
-	input := &sqs.SendMessageInput{
-		MessageBody: aws.String(string(jsonMessage)),
-		QueueUrl:    &queueName,
-	}
-
-	result, err := svc.SendMessage(context.Background(), input)
-	if err != nil {
-		log.Fatalf("Error sending message: %v", err)
-	}
-
-	fmt.Printf("Message sent: %s\n", *result.MessageId)
+	base_aws.LogSummaryMessage(queueMessage)
 
 	return nil
-}
-
-func retrieveQueueNameOrPanic() string {
-	queueName, exists := os.LookupEnv("keep_sqs_queue_url")
-
-	if !exists {
-		panic(fmt.Errorf("error retrieving API key: environment (keep_sqs_queue_url) variable not set"))
-	}
-
-	return queueName
 }
 
 // Handler is the lambda handler for the keep lambda
@@ -129,10 +82,9 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 	startTime := time.Now()
 	openAIKey := retrieveApiKeyOrPanic()
 	version := retrieveVersionOrPanic()
-	_ = retrieveQueueNameOrPanic() // Fail early if queue name does not exist
 
 	var addCallbackWithUserId keep.Callback = func(prompt string, newPrompt string) error {
-		return sqsQueueCallback(prompt, newPrompt, version, request, startTime)
+		return requestCompleteCallback(prompt, newPrompt, version, request, startTime)
 	}
 
 	addCallback := func(k *keep.Keep) {

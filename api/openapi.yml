@@ -15,7 +15,7 @@ paths:
   /keep:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:37-rename-moat-to-wa-PromptDefender-Keep/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:34-add-all-endpoints-PromptDefender-Keep/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -44,7 +44,7 @@ paths:
   /wall:
     post:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:37-rename-moat-to-wa-PromptDefender-Wall/invocations
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:34-add-all-endpoints-PromptDefender-Wall/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -74,7 +74,7 @@ paths:
   /user/{userId}:
     delete:
       x-amazon-apigateway-integration:
-        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:37-rename-moat-to-wa-PromptDefender-User/invocations
+        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:34-add-all-endpoints-PromptDefender-User/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -99,7 +99,7 @@ paths:
 
     get:
       x-amazon-apigateway-integration:
-        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:37-rename-moat-to-wa-PromptDefender-User/invocations
+        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:34-add-all-endpoints-PromptDefender-User/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -128,7 +128,7 @@ paths:
   /user:
     get:
       x-amazon-apigateway-integration:
-        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:37-rename-moat-to-wa-PromptDefender-User/invocations
+        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:34-add-all-endpoints-PromptDefender-User/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
@@ -150,7 +150,7 @@ paths:
           description: 'Internal server error.'
     post:
       x-amazon-apigateway-integration:
-        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:37-rename-moat-to-wa-PromptDefender-User/invocations
+        uri:  arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:34-add-all-endpoints-PromptDefender-User/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
