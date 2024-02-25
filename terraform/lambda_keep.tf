@@ -15,8 +15,7 @@ resource "aws_iam_role" "lambda_role_keep" {
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_keep" {
-  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_keep" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
   retention_in_days = 14
 }
