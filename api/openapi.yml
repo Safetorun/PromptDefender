@@ -203,7 +203,6 @@ components:
       type: 'object'
       required:
         - 'prompt'
-        - 'scan_pii'
       properties:
         user_id:
           type: 'string'

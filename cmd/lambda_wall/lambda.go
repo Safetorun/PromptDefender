@@ -70,7 +70,6 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 	var piiDetected *bool = nil
 
 	if answer.PiiResult != nil {
-
 		piiDetected = &answer.PiiResult.ContainsPii
 	}
 
