@@ -85,7 +85,7 @@ func SetPiiDetection(ctx context.Context, enablePii string) (context.Context, er
 		return nil, err
 	}
 	request := ctx.Value(RequestKey).(*WallRequest)
-	request.ScanPii = pii
+	request.ScanPii = &pii
 	return ctx, nil
 }
 
