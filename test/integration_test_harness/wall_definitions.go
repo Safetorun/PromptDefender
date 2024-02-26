@@ -124,6 +124,8 @@ func ValidateResponseDetectedPii(context context.Context, piiDetected string) er
 	if piiDetected == "nil" {
 		if (context.Value(ResponseKey).(*WallResponse)).ContainsPii != nil {
 			return errors.New("pii detected should be nil")
+		} else {
+			return nil
 		}
 	}
 
