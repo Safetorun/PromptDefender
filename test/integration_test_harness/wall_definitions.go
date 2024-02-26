@@ -121,6 +121,12 @@ func ValidateResponseXmlTag(context context.Context, xmlTag string) error {
 
 func ValidateResponseDetectedPii(context context.Context, piiDetected string) error {
 
+	if piiDetected == "nil" {
+		if (context.Value(ResponseKey).(*WallResponse)).ContainsPii != nil {
+			return errors.New("pii detected should be nil")
+		}
+	}
+
 	detected, err := strconv.ParseBool(piiDetected)
 	if err != nil {
 		return err

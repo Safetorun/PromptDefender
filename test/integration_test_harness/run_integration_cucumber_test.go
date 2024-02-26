@@ -1,8 +1,9 @@
 package integration_test_harness
 
 import (
-	"github.com/cucumber/godog"
 	"testing"
+
+	"github.com/cucumber/godog"
 )
 
 func TestFeatures(t *testing.T) {
@@ -26,7 +27,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^I set PII detection to (true|false)$`, SetPiiDetection)
 	ctx.Step(`^the request is (.*)$`, SetPromptBody)
 	ctx.Step("^request is sent to wall$", SendRequestToWall)
-	ctx.Step(`^Response should have PII detected set to (true|false)$`, ValidateResponseDetectedPii)
+	ctx.Step(`^Response should have PII detected set to (true|false|nil)$`, ValidateResponseDetectedPii)
 	ctx.Step("^I set the XML tag to (.*)$", SetXmlTag)
 	ctx.Step("^Response should detect XML tag escaping: (true|false)$", ValidateResponseXmlTag)
 	ctx.Step("^Response should have suspicious session input set to (true|false)$", ValidateSuspicousSessionInput)
