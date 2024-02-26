@@ -5,7 +5,15 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/safetorun/PromptDefender/request_log"
 	"log"
+	"time"
 )
+
+func RequestCallbackComplete(responseBody string, request events.APIGatewayProxyRequest, startTime time.Time) {
+	queueMessage := ToRequestLog(request)
+	queueMessage.Response = responseBody
+	queueMessage.Time = int(time.Since(startTime).Milliseconds())
+	LogSummaryMessage(queueMessage)
+}
 
 func LogSummaryMessage(message request_log.QueueMessage) {
 
@@ -32,5 +40,6 @@ func ToRequestLog(request events.APIGatewayProxyRequest) request_log.QueueMessag
 		},
 		HttpResponse: 200,
 		Endpoint:     request.Path,
+		Request:      request.Body,
 	}
 }

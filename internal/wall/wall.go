@@ -16,14 +16,11 @@ import (
 	"log"
 )
 
-type Callback func(result CheckResult) error
-
 type Wall struct {
 	PiiScanner         pii.Scanner
 	BadWordsCheck      *badwords.BadWords
 	XmlEscapingScanner XmlEscapingScanner
 	logger             *log.Logger
-	Callback           *Callback
 }
 
 type PromptToCheck struct {
@@ -89,13 +86,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 
 	}
 
-	result := CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}
-
-	if m.Callback != nil {
-		_ = (*m.Callback)(result)
-	}
-
-	return &result, nil
+	return &CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}, nil
 }
 
 func (m *Wall) checkForXmlEscaping(check PromptToCheck, t tracer.Tracer) (*XmlEscapingDetectionResult, error) {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -20,7 +19,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 )
 
 var (
@@ -104,28 +102,6 @@ func CheckSuspiciousUser(ctx context.Context, url string, userId *string, apiKey
 	return isSuspicous, nil
 }
 
-var requestCompleteCallback = func(wallResponse wall.CheckResult, gatewayRequest events.APIGatewayProxyRequest, startTime time.Time) error {
-
-	keepRequest := gatewayRequest.Body
-	response, err := json.Marshal(wallResponse)
-
-	if err != nil {
-		return err
-	}
-
-	queueMessage := base_aws.ToRequestLog(gatewayRequest)
-
-	queueMessage.Endpoint = "/wall"
-	queueMessage.Version = ""
-	queueMessage.Request = keepRequest
-	queueMessage.Response = string(response)
-	queueMessage.Time = int(time.Since(startTime).Milliseconds())
-
-	base_aws.LogSummaryMessage(queueMessage)
-
-	return nil
-}
-
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	ctx, span := wallTracer.Start(ctx, "wall_setup")
@@ -138,15 +114,10 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		return events.APIGatewayProxyResponse{StatusCode: 400}, fmt.Errorf("error with configuration")
 	}
 
-	var callback wall.Callback = func(result wall.CheckResult) error {
-		return requestCompleteCallback(result, request, time.Now())
-	}
-
 	addAllConfigurations := func(c *wall.Wall) error {
 		c.PiiScanner = pii_aws.New()
 		c.BadWordsCheck = badwords.New(badwords_embeddings.New(embeddings.New(openAIKey)))
 		c.XmlEscapingScanner = wall.NewBasicXmlEscapingScaner()
-		c.Callback = &callback
 		return nil
 	}
 

@@ -6,13 +6,10 @@ import (
 	"time"
 )
 
-type Callback func(prompt string, newPrompt string) error
-
 type KeepOption func(*Keep)
 
 type Keep struct {
-	openAi   aiprompt.RemoteAIChecker
-	Callback *Callback
+	openAi aiprompt.RemoteAIChecker
 }
 
 type StartingPrompt struct {
@@ -66,13 +63,6 @@ func (k *Keep) BuildKeep(startingPrompt StartingPrompt) (*NewPrompt, error) {
 
 	if err != nil {
 		return nil, err
-	}
-
-	if k.Callback != nil {
-		err := (*k.Callback)(startingPrompt.Prompt, *response)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return &NewPrompt{NewPrompt: *response, Tag: tag}, nil
