@@ -68,6 +68,14 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 		return nil, err
 	}
 
+var piiDetected *bool = nil
+
+if answer.PiiResult != nil {
+
+piiDetected = &answer.PiiResult.ContainsPii
+}
+
+
 	var xmlEscaping *bool = nil
 
 	if answer.XmlScannerResult != nil {
@@ -75,7 +83,7 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 	}
 
 	return &WallResponse{
-		ContainsPii:          &answer.PiiResult.ContainsPii,
+		ContainsPii:   piiDetected       ,
 		PotentialJailbreak:   &answer.ContainsBadWords,
 		PotentialXmlEscaping: xmlEscaping,
 		SuspiciousUser:       suspiciousUser,
