@@ -26,4 +26,4 @@ Feature: Pii Detection
     When I set PII detection to false
     And the request is benign and not containing PII
     And request is sent to wall
-    Then Response should have PII detected set to false
+    Then Response should have PII detected set to nil

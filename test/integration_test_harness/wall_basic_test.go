@@ -13,9 +13,10 @@ func TestBasicWallTest(t *testing.T) {
 		t.Errorf("error: %v", err)
 	}
 
+	scanPii := false
 	shieldResponse, err := client.BuildShieldWithResponse(context.Background(), WallRequest{
 		Prompt:  "Test",
-		ScanPii: false,
+		ScanPii: &scanPii,
 		XmlTag:  nil,
 	})
 

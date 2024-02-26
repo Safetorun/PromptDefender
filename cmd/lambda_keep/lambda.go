@@ -3,7 +3,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -15,7 +14,6 @@ import (
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
 	"os"
-	"time"
 )
 
 type KeepLambda struct {
@@ -46,52 +44,15 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 	return &KeepResponse{ShieldedPrompt: answer.NewPrompt, XmlTag: answer.Tag}, nil
 }
 
-var requestCompleteCallback = func(prompt string, newPrompt string, version string, request events.APIGatewayProxyRequest, startTime time.Time) error {
-
-	keepRequest, err := json.Marshal(KeepRequest{Prompt: prompt})
-
-	if err != nil {
-		return err
-	}
-
-	response, err := json.Marshal(KeepResponse{ShieldedPrompt: newPrompt})
-
-	if err != nil {
-		return err
-	}
-
-	queueMessage := base_aws.ToRequestLog(request)
-
-	queueMessage.Endpoint = "/keep"
-	queueMessage.Version = version
-	queueMessage.Request = string(keepRequest)
-	queueMessage.Response = string(response)
-	queueMessage.Time = int(time.Since(startTime).Milliseconds())
-
-	base_aws.LogSummaryMessage(queueMessage)
-
-	return nil
-}
-
 // Handler is the lambda handler for the keep lambda
 // The following enivorment variables are required:
 // open_ai_api_key: The OpenAI API key
 // version: The version of the lambda
 // keep_sqs_queue_url: The SQS queue URL to send the message to
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	startTime := time.Now()
 	openAIKey := retrieveApiKeyOrPanic()
-	version := retrieveVersionOrPanic()
 
-	var addCallbackWithUserId keep.Callback = func(prompt string, newPrompt string) error {
-		return requestCompleteCallback(prompt, newPrompt, version, request, startTime)
-	}
-
-	addCallback := func(k *keep.Keep) {
-		k.Callback = &addCallbackWithUserId
-	}
-
-	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey), addCallback)
+	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey))
 
 	handler := KeepLambda{keepInstance: keepBuilder}
 

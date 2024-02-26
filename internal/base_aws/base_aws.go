@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
+	"time"
 )
 
 type HandlerFunc[T any, V any] interface {
@@ -13,6 +14,8 @@ type HandlerFunc[T any, V any] interface {
 func BaseHandler[T any, V any](request events.APIGatewayProxyRequest, handlerFunc HandlerFunc[T, V]) (events.APIGatewayProxyResponse, error) {
 
 	var input T
+
+	startTime := time.Now()
 
 	if err := json.Unmarshal([]byte(request.Body), &input); err != nil {
 		fmt.Printf("error unmarshalling request: %v\n", err)
@@ -34,6 +37,8 @@ func BaseHandler[T any, V any](request events.APIGatewayProxyRequest, handlerFun
 	}
 
 	jsonString := string(jsonBytes)
+
+	RequestCallbackComplete(jsonString, request, startTime)
 
 	return events.APIGatewayProxyResponse{StatusCode: 200, Body: jsonString}, nil
 

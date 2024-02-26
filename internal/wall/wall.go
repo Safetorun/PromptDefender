@@ -10,25 +10,23 @@ package wall
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/pii"
 	"github.com/safetorun/PromptDefender/tracer"
-	"log"
 )
-
-type Callback func(result CheckResult) error
 
 type Wall struct {
 	PiiScanner         pii.Scanner
 	BadWordsCheck      *badwords.BadWords
 	XmlEscapingScanner XmlEscapingScanner
 	logger             *log.Logger
-	Callback           *Callback
 }
 
 type PromptToCheck struct {
 	Prompt           string
-	ScanPii          bool
+	ScanPii          *bool
 	XmlTagToCheckFor *string
 }
 
@@ -70,13 +68,17 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		return nil, err
 	}
 
-	if check.ScanPii {
+	if check.ScanPii == nil {
+		piiResult = nil
+	} else if *check.ScanPii {
 		piiRe, err := m.checkPromptForPii(check, t)
 		piiResult = piiRe
 
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		piiResult = &PiiDetectionResult{ContainsPii: false}
 	}
 
 	if check.XmlTagToCheckFor != nil {
@@ -89,13 +91,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 
 	}
 
-	result := CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}
-
-	if m.Callback != nil {
-		_ = (*m.Callback)(result)
-	}
-
-	return &result, nil
+	return &CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}, nil
 }
 
 func (m *Wall) checkForXmlEscaping(check PromptToCheck, t tracer.Tracer) (*XmlEscapingDetectionResult, error) {

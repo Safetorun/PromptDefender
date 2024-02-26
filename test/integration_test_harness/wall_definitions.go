@@ -85,7 +85,7 @@ func SetPiiDetection(ctx context.Context, enablePii string) (context.Context, er
 		return nil, err
 	}
 	request := ctx.Value(RequestKey).(*WallRequest)
-	request.ScanPii = pii
+	request.ScanPii = &pii
 	return ctx, nil
 }
 
@@ -120,6 +120,14 @@ func ValidateResponseXmlTag(context context.Context, xmlTag string) error {
 }
 
 func ValidateResponseDetectedPii(context context.Context, piiDetected string) error {
+
+	if piiDetected == "nil" {
+		if (context.Value(ResponseKey).(*WallResponse)).ContainsPii != nil {
+			return errors.New("pii detected should be nil")
+		} else {
+			return nil
+		}
+	}
 
 	detected, err := strconv.ParseBool(piiDetected)
 	if err != nil {
