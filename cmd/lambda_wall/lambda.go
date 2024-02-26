@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/safetorun/PromptDefender/badwords"
@@ -16,9 +20,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
-	"log"
-	"os"
-	"strings"
 )
 
 var (
@@ -66,6 +67,13 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 		return nil, err
 	}
 
+	var piiDetected *bool = nil
+
+	if answer.PiiResult != nil {
+
+		piiDetected = &answer.PiiResult.ContainsPii
+	}
+
 	var xmlEscaping *bool = nil
 
 	if answer.XmlScannerResult != nil {
@@ -73,7 +81,7 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 	}
 
 	return &WallResponse{
-		ContainsPii:          &answer.PiiResult.ContainsPii,
+		ContainsPii:          piiDetected,
 		PotentialJailbreak:   &answer.ContainsBadWords,
 		PotentialXmlEscaping: xmlEscaping,
 		SuspiciousUser:       suspiciousUser,
