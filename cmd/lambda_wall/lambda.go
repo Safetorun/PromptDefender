@@ -79,9 +79,17 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 		xmlEscaping = &answer.XmlScannerResult.ContainsXmlEscaping
 	}
 
+	jb := false
+	var potentialJailbreak = &jb
+
+	if answer.InjectionDetected || answer.ContainsBadWords {
+		jb := true
+		potentialJailbreak = &jb
+	}
+
 	return &WallResponse{
 		ContainsPii:          piiDetected,
-		PotentialJailbreak:   &answer.ContainsBadWords,
+		PotentialJailbreak:   potentialJailbreak,
 		PotentialXmlEscaping: xmlEscaping,
 		SuspiciousUser:       suspiciousUser,
 		SuspiciousSession:    suspiciousSession,
@@ -125,6 +133,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		c.PiiScanner = pii_aws.New()
 		c.BadWordsCheck = badwords.New(badwords_embeddings.New(embeddings.New(openAIKey)))
 		c.XmlEscapingScanner = wall.NewBasicXmlEscapingScaner()
+		var apiCaller = wall.NewRemoteApiCaller(os.Getenv("huggingface_token"))
+		c.RemoteApiCaller = &apiCaller
 		return nil
 	}
 

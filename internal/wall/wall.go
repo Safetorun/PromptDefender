@@ -21,6 +21,7 @@ type Wall struct {
 	PiiScanner         pii.Scanner
 	BadWordsCheck      *badwords.BadWords
 	XmlEscapingScanner XmlEscapingScanner
+	RemoteApiCaller    RemoteApiCaller
 	logger             *log.Logger
 }
 
@@ -35,9 +36,10 @@ type PiiDetectionResult struct {
 }
 
 type CheckResult struct {
-	PiiResult        *PiiDetectionResult
-	ContainsBadWords bool
-	XmlScannerResult *XmlEscapingDetectionResult
+	PiiResult         *PiiDetectionResult
+	ContainsBadWords  bool
+	XmlScannerResult  *XmlEscapingDetectionResult
+	InjectionDetected bool
 }
 
 type WallOpts func(*Wall) error
@@ -61,6 +63,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 
 	var piiResult *PiiDetectionResult = nil
 	var xmlResult *XmlEscapingDetectionResult = nil
+	var injectionDetected = false
 
 	containsBadWords, err := m.checkPromptContainsBadwords(check, t)
 
@@ -88,10 +91,24 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		}
 
 		xmlResult = xmlResultInner
-
 	}
 
-	return &CheckResult{PiiResult: piiResult, ContainsBadWords: *containsBadWords, XmlScannerResult: xmlResult}, nil
+	if m.RemoteApiCaller != nil {
+		injectionResponse, err := m.RemoteApiCaller.CallRemoteApi(check.Prompt)
+
+		injectionDetected = injectionResponse == ExactMatch || injectionResponse == VeryClose
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &CheckResult{
+		PiiResult:         piiResult,
+		ContainsBadWords:  *containsBadWords,
+		XmlScannerResult:  xmlResult,
+		InjectionDetected: injectionDetected,
+	}, nil
 }
 
 func (m *Wall) checkForXmlEscaping(check PromptToCheck, t tracer.Tracer) (*XmlEscapingDetectionResult, error) {
@@ -107,8 +124,6 @@ func (m *Wall) checkPromptForPii(check PromptToCheck, t tracer.Tracer) (*PiiDete
 }
 
 func (m *Wall) checkPromptContainsBadwords(check PromptToCheck, t tracer.Tracer) (*bool, error) {
-	// Wrap the method in a tracer
-
 	m.logger.Printf("Checking for bad words in prompt: %+v\n", check.Prompt)
 
 	wrappedMethod := tracer.TracerGenericsWrapper[string, *bool](m.BadWordsCheck.CheckPromptContainsBadWords)

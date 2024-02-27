@@ -4,6 +4,7 @@ import (
 	"github.com/drewlanenga/govector"
 	"github.com/safetorun/PromptDefender/badwords"
 	"github.com/safetorun/PromptDefender/embeddings"
+	"log"
 )
 
 type BadwordsEmbeddings struct {
@@ -37,6 +38,7 @@ func (bw BadwordsEmbeddings) GetClosestMatch(prompt string) (*badwords.ClosestMa
 		}
 	}
 
+	log.Default().Println("Lowest score: ", lowestScore, " for prompt: ", prompt)
 	return &badwords.ClosestMatchScore{Score: determineMatchLevel(lowestScore)}, nil
 }
 
@@ -46,7 +48,7 @@ func determineMatchLevel(value float64) badwords.MatchLevel {
 		return badwords.ExactMatch
 	case value < 0.1:
 		return badwords.VeryClose
-	case value < 0.5:
+	case value < 0.3:
 		return badwords.Medium
 	case value < 1.0:
 		return badwords.NoMatch
