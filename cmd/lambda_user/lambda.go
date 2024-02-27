@@ -49,6 +49,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		if request.PathParameters["userId"] == "" {
 			return events.APIGatewayProxyResponse{StatusCode: 400}, errors.New(fmt.Sprintf("userId is required and was not found in %v", request.PathParameters))
 		}
+		requestLog := base_aws.ToRequestLog(request)
+		base_aws.LogSummaryMessage(requestLog)
 		return handler.Handle(request.PathParameters["userId"]), nil
 	} else {
 		fmt.Println("Received a request with an unsupported method")

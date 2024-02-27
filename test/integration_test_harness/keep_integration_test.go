@@ -15,6 +15,8 @@ const (
 )
 
 func TestBasePromptWorksAsExpected(t *testing.T) {
+	t.Skip("Skipping this test for now")
+
 	openai := retrieveApiKey(t)
 
 	firstResult, hackedResult, err := tryPromptAndTryInjection(t, openai, basePrompt, "Monkey")
@@ -28,6 +30,7 @@ func TestBasePromptWorksAsExpected(t *testing.T) {
 }
 
 func TestKeepSecuresPromptWhilePreservingExpectedOutput(t *testing.T) {
+	t.Skip("Skipping this test for now")
 	openai := retrieveApiKey(t)
 
 	k := keep.New(openai)

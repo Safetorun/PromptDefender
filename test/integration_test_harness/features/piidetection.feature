@@ -26,4 +26,10 @@ Feature: Pii Detection
     When I set PII detection to false
     And the request is benign and not containing PII
     And request is sent to wall
-    Then Response should have PII detected set to nil
+    Then Response should have PII detected set to false
+
+Scenario: PII detection is not set and PII is sent
+  Given I send a request to wall
+  And the request is Franklin Roosevelt, 13 George Street, GL55 4PE
+  And request is sent to wall
+  Then Response should have PII detected set to nil
