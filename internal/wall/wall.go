@@ -94,10 +94,8 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 	}
 
 	if m.RemoteApiCaller != nil {
-		injectionResponse, err := m.RemoteApiCaller.CallRemoteApi(check.Prompt)
-
-		injectionDetected = injectionResponse == ExactMatch || injectionResponse == VeryClose
-
+		detected, err := m.checkForInjectionDetected(check, t)
+		injectionDetected = *detected
 		if err != nil {
 			return nil, err
 		}
@@ -109,6 +107,18 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		XmlScannerResult:  xmlResult,
 		InjectionDetected: injectionDetected,
 	}, nil
+}
+
+func (m *Wall) checkForInjectionDetected(check PromptToCheck, t tracer.Tracer) (*bool, error) {
+	wrappedMethod := tracer.TracerGenericsWrapper[string, MatchLevel](m.RemoteApiCaller.CallRemoteApi)
+	injectionResponse, err := t.TraceDecorator(wrappedMethod, "checking_remote_api")(check.Prompt)
+	injectionDetected := injectionResponse == ExactMatch || injectionResponse == VeryClose
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &injectionDetected, nil
 }
 
 func (m *Wall) checkForXmlEscaping(check PromptToCheck, t tracer.Tracer) (*XmlEscapingDetectionResult, error) {

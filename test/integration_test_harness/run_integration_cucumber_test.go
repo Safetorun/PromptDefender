@@ -48,4 +48,5 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step("^I delete the user with the user_id (.*)$", DeleteSuspiciousUser)
 	ctx.Step("^I retrieve the user with the user_id (.*)$", RetrieveSuspiciousUser)
 	ctx.Step("^I should get a 404 error", Validate404Error)
+	ctx.Step("^Response should have jailbreak detected set to (true|false)", ValidateResponsePotentialJailbreak)
 }
