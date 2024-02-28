@@ -64,6 +64,7 @@ func TestCheckWall(t *testing.T) {
 
 	t.Run("Check with bad words", func(t *testing.T) {
 
+		scanPii := false
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
@@ -71,7 +72,7 @@ func TestCheckWall(t *testing.T) {
 		m, _ := New(mt)
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
-		check := PromptToCheck{Prompt: "some text", ScanPii: false}
+		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
 		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, err)
 		assert.NotNil(t, result.ContainsBadWords)
@@ -79,6 +80,7 @@ func TestCheckWall(t *testing.T) {
 
 	t.Run("Check with PII", func(t *testing.T) {
 
+		scanPii := true
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
@@ -87,13 +89,14 @@ func TestCheckWall(t *testing.T) {
 
 		piiScanner.On("Scan", "some text").Return(&pii.ScanResult{ContainingPii: true}, nil)
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
-		check := PromptToCheck{Prompt: "some text", ScanPii: true}
+		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
 		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, err)
 		assert.True(t, result.PiiResult.ContainsPii)
 	})
 
 	t.Run("Error while checking bad words", func(t *testing.T) {
+		scanPii := false
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
@@ -102,13 +105,14 @@ func TestCheckWall(t *testing.T) {
 		m, _ := New(mt)
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(nil, errors.New("an error"))
-		check := PromptToCheck{Prompt: "some text", ScanPii: false}
+		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
 		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})
 
 	t.Run("Error while scanning PII", func(t *testing.T) {
+		scanPii := true
 		piiScanner := new(MockPiiScanner)
 		closestMatcher := new(MockClosestMatcher)
 		badWordsCheck := badwords.New(closestMatcher)
@@ -118,7 +122,7 @@ func TestCheckWall(t *testing.T) {
 
 		piiScanner.On("Scan", "some text").Return(nil, errors.New("an error"))
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
-		check := PromptToCheck{Prompt: "some text", ScanPii: true}
+		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
 		result, err := m.CheckWall(check, nil)
 		assert.Nil(t, result)
 		assert.Error(t, err)
