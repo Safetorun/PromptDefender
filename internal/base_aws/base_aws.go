@@ -22,8 +22,6 @@ func BaseHandler[T any, V any](request events.APIGatewayProxyRequest, handlerFun
 		return events.APIGatewayProxyResponse{StatusCode: 400}, err
 	}
 
-	fmt.Printf("Received request for %v\n\n", input)
-
 	response, err := handlerFunc.Handle(input)
 
 	if err != nil {

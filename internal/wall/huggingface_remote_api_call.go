@@ -36,7 +36,8 @@ type RemoteApiCallerImpl struct {
 }
 
 type Payload struct {
-	Inputs string `json:"inputs"`
+	Inputs       string `json:"inputs"`
+	WaitForModel bool   `json:"wait_for_model"`
 }
 
 func NewRemoteApiCaller(huggingfaceToken string) RemoteApiCallerImpl {
@@ -63,9 +64,17 @@ func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New(
+			fmt.Sprintf("Failed to call the remote API. Status code: %d", resp.StatusCode),
+		)
+	}
+
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
@@ -92,13 +101,14 @@ func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 
 // CallRemoteApi calls the remote API and returns the injection score
 func (r *RemoteApiCallerImpl) CallRemoteApi(prompt string) (MatchLevel, error) {
-	response, err := r.Query(Payload{Inputs: prompt})
-
-	r.logger.Println("Prompt is ", prompt, " Injection score is ", *response)
+	response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
 
 	if err != nil {
+		r.logger.Println("Failed to call the remote API. Error: ", err)
 		return -1, err
 	}
+
+	r.logger.Println("Prompt is ", prompt, " Injection score is ", *response)
 
 	return matchLevelForScore(*response), nil
 }
