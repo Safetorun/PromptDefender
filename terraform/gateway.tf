@@ -16,8 +16,7 @@ resource "aws_api_gateway_deployment" "api" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "api_logs" {
-  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "api_logs" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/api_gateway/${aws_api_gateway_rest_api.api.name}"
   retention_in_days = 14
 }

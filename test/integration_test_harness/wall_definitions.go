@@ -36,7 +36,7 @@ func SendRequestToWall(ctx context.Context) (context.Context, error) {
 	}
 
 	if response.StatusCode() != 200 {
-		return ctx, errors.New("error processing request")
+		return ctx, errors.New(fmt.Sprintf("error processing request: %d", response.StatusCode()))
 	}
 
 	if response.JSON200 == nil {
@@ -137,6 +137,20 @@ func ValidateResponseDetectedPii(context context.Context, piiDetected string) er
 	response := context.Value(ResponseKey).(*WallResponse)
 	if *response.ContainsPii != detected {
 		return errors.New("pii detected not set correctly")
+	}
+
+	return nil
+}
+
+func ValidateResponsePotentialJailbreak(context context.Context, jailbreakDetected string) error {
+	detected, err := strconv.ParseBool(jailbreakDetected)
+	if err != nil {
+		return err
+	}
+
+	response := context.Value(ResponseKey).(*WallResponse)
+	if *response.PotentialJailbreak != detected {
+		return errors.New("jailbreakDetected not set correctly")
 	}
 
 	return nil

@@ -56,4 +56,5 @@ jobs:
       - name: Deploy
         env:
           TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
+          TF_VAR_huggingface_api_key: ${{ secrets.HUGGINGFACE_TOKEN }}
         run: make deploy 
