@@ -59,6 +59,14 @@ resource "aws_lambda_permission" "apigw_lambda_permission_user" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/prod/*"
 }
 
+
+resource "aws_api_gateway_request_validator" "request_validator" {
+  name                        = "full"
+  rest_api_id                 = aws_api_gateway_rest_api.api.id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
 resource "local_file" "built_open_api_spec" {
   filename = "../api/openapi.yml"
   content  = templatefile("../api/openapi.yml.tpl", {
