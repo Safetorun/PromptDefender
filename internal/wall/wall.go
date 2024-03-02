@@ -99,9 +99,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 			m.logger.Println("Error checking for injection ", err)
 			return nil, err
 		}
-
 		injectionDetected = *detected
-
 	}
 
 	return &CheckResult{
