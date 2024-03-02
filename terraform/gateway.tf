@@ -16,7 +16,8 @@ resource "aws_api_gateway_deployment" "api" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "api_logs" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "api_logs" {
+  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/api_gateway/${aws_api_gateway_rest_api.api.name}"
   retention_in_days = 14
 }
@@ -57,14 +58,6 @@ resource "aws_lambda_permission" "apigw_lambda_permission_user" {
   function_name = aws_lambda_function.aws_lambda_user.arn
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/prod/*"
-}
-
-
-resource "aws_api_gateway_request_validator" "request_validator" {
-  name                        = "full"
-  rest_api_id                 = aws_api_gateway_rest_api.api.id
-  validate_request_body       = true
-  validate_request_parameters = true
 }
 
 resource "local_file" "built_open_api_spec" {
