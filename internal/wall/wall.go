@@ -95,10 +95,11 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 
 	if m.RemoteApiCaller != nil {
 		detected, err := m.checkForInjectionDetected(check, t)
-		injectionDetected = *detected
 		if err != nil {
+			m.logger.Println("Error checking for injection ", err)
 			return nil, err
 		}
+		injectionDetected = *detected
 	}
 
 	return &CheckResult{

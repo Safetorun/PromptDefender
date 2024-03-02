@@ -11,9 +11,14 @@ servers:
   - url: 'https://prompt.safetorun.com'
     description: 'Production server'
 
+x-amazon-apigateway-request-validators:
+    full:
+        validateRequestBody: true
+        validateRequestParameters: true
 paths:
   /keep:
     post:
+      x-amazon-apigateway-request-validator : "full"
       x-amazon-apigateway-integration:
         uri: ${lambda_keep_arn}
         passthroughBehavior: "when_no_match"
@@ -48,6 +53,7 @@ paths:
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
+      x-amazon-apigateway-request-validator : "full"
       summary: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
       description: 'Wall is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
       operationId: 'buildShield'
