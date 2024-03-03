@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 type MatchLevel int
@@ -101,7 +102,14 @@ func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 
 // CallRemoteApi calls the remote API and returns the injection score
 func (r *RemoteApiCallerImpl) CallRemoteApi(prompt string) (MatchLevel, error) {
-	response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
+	response, err := Retry(3, 1*time.Second, func() (*float64, error) {
+		response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
+		if err != nil {
+			return nil, stop{err}
+		}
+
+		return response, nil
+	})
 
 	if err != nil {
 		r.logger.Println("Failed to call the remote API. Error: ", err)
