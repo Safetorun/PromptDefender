@@ -16,6 +16,36 @@ x-amazon-apigateway-request-validators:
         validateRequestBody: true
         validateRequestParameters: true
 paths:
+  /wall:
+    post:
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:default-PromptDefender-Wall/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
+      x-amazon-apigateway-request-validator: "full"
+      summary: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
+      description: 'Wall is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
+      operationId: 'buildWall'
+      security:
+        - ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WallRequest'
+      responses:
+        '200':
+          description: 'Successful operation.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WallResponse'
+        '400':
+          description: 'Bad request. The prompt field is missing or invalid.'
+        '500':
+          description: 'Internal server error.'
   /keep:
     post:
       x-amazon-apigateway-request-validator : "full"
@@ -46,37 +76,6 @@ paths:
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':
           description: 'Internal server error.'
-  /wall:
-    post:
-      x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:478910673833:function:default-PromptDefender-Wall/invocations
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        type: "aws_proxy"
-      x-amazon-apigateway-request-validator : "full"
-      summary: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
-      description: 'Wall is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
-      operationId: 'buildShield'
-      security:
-        - ApiKeyAuth: [ ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WallRequest'
-      responses:
-        '200':
-          description: 'Successful operation.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WallResponse'
-        '400':
-          description: 'Bad request. The prompt field is missing or invalid.'
-        '500':
-          description: 'Internal server error.'
-
   /user/{userId}:
     delete:
       x-amazon-apigateway-integration:

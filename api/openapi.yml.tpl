@@ -16,36 +16,6 @@ x-amazon-apigateway-request-validators:
         validateRequestBody: true
         validateRequestParameters: true
 paths:
-  /keep:
-    post:
-      x-amazon-apigateway-request-validator : "full"
-      x-amazon-apigateway-integration:
-        uri: ${lambda_keep_arn}
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        type: "aws_proxy"
-      summary: 'Improve your prompts security with instruction defense'
-      description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
-      operationId: 'buildKeep'
-      security:
-        - ApiKeyAuth: [ ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/KeepRequest'
-      responses:
-        '200':
-          description: 'Successful operation.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeepResponse'
-        '400':
-          description: 'Bad request. The prompt field is missing or invalid.'
-        '500':
-          description: 'Internal server error.'
   /wall:
     post:
       x-amazon-apigateway-integration:
@@ -72,6 +42,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WallResponse'
+        '400':
+          description: 'Bad request. The prompt field is missing or invalid.'
+        '500':
+          description: 'Internal server error.'
+  /keep:
+    post:
+      x-amazon-apigateway-request-validator : "full"
+      x-amazon-apigateway-integration:
+        uri: ${lambda_keep_arn}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
+      summary: 'Improve your prompts security with instruction defense'
+      description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
+      operationId: 'buildKeep'
+      security:
+        - ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeepRequest'
+      responses:
+        '200':
+          description: 'Successful operation.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeepResponse'
         '400':
           description: 'Bad request. The prompt field is missing or invalid.'
         '500':

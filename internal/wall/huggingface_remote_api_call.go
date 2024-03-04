@@ -104,8 +104,9 @@ func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 func (r *RemoteApiCallerImpl) CallRemoteApi(prompt string) (MatchLevel, error) {
 	response, err := Retry(3, 1*time.Second, func() (*float64, error) {
 		response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
+
 		if err != nil {
-			return nil, stop{err}
+			return nil, err
 		}
 
 		return response, nil

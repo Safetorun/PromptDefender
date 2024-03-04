@@ -16,7 +16,6 @@ func Retry(attempts int, sleep time.Duration, fn RetryableFunc) (*float64, error
 		}
 
 		if attempts--; attempts > 0 {
-			// Add some sleep here if you want to prevent spamming retries
 			time.Sleep(sleep)
 			log.Default().Println("Retrying after error: ", err, " Attempts left: ", attempts)
 			return Retry(attempts, 2*sleep, fn)
