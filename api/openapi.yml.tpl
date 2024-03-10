@@ -18,15 +18,15 @@ x-amazon-apigateway-request-validators:
 paths:
   /wall:
     post:
+      x-amazon-apigateway-request-validator : "full"
       x-amazon-apigateway-integration:
         uri: ${lambda_wall_arn}
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
-      x-amazon-apigateway-request-validator : "full"
-      summary: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
-      description: 'Wall is an API that is called before every request to your API. It checks the request for PII and prompt injection, and returns a score indicating the likelihood of injection.'
-      operationId: 'buildShield'
+      summary: 'Verify a Prompt'
+      description: 'This endpoint accepts a text prompt, strips PII, and checks it for prompt injection, returning an injection score.'
+      operationId: 'buildWall'
       security:
         - ApiKeyAuth: [ ]
       requestBody:

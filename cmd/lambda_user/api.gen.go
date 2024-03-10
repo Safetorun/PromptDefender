@@ -73,5 +73,5 @@ type BuildKeepJSONRequestBody = KeepRequest
 // AddUserJSONRequestBody defines body for AddUser for application/json ContentType.
 type AddUserJSONRequestBody = User
 
-// BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
-type BuildShieldJSONRequestBody = WallRequest
+// BuildWallJSONRequestBody defines body for BuildWall for application/json ContentType.
+type BuildWallJSONRequestBody = WallRequest

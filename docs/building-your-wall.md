@@ -4,7 +4,7 @@ excerpt: Wall will look at if PII is being sent in the request, if the prompt it
 category: 652be292f7eae600244211de
 ---
 
-The next thing to do is to build your moat. This adds the first layer of defence, looking at if PII is being sent in the
+The next thing to do is to build your wall. This adds the first layer of defence, looking at if PII is being sent in the
 request, if the prompt itself contains "bad" words (indicating a jailbreak), or contains XML escaping (in an attempt to bypass
 your keep defence), it can also detect if the user or session is marked as suspicious.
 

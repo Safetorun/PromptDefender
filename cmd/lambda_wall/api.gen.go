@@ -86,8 +86,8 @@ type BuildKeepJSONRequestBody = KeepRequest
 // AddUserJSONRequestBody defines body for AddUser for application/json ContentType.
 type AddUserJSONRequestBody = User
 
-// BuildShieldJSONRequestBody defines body for BuildShield for application/json ContentType.
-type BuildShieldJSONRequestBody = WallRequest
+// BuildWallJSONRequestBody defines body for BuildWall for application/json ContentType.
+type BuildWallJSONRequestBody = WallRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -181,10 +181,10 @@ type ClientInterface interface {
 	// GetUser request
 	GetUser(ctx context.Context, userId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// BuildShieldWithBody request with any body
-	BuildShieldWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// BuildWallWithBody request with any body
+	BuildWallWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	BuildShield(ctx context.Context, body BuildShieldJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	BuildWall(ctx context.Context, body BuildWallJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) BuildKeepWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -271,8 +271,8 @@ func (c *Client) GetUser(ctx context.Context, userId string, reqEditors ...Reque
 	return c.Client.Do(req)
 }
 
-func (c *Client) BuildShieldWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewBuildShieldRequestWithBody(c.Server, contentType, body)
+func (c *Client) BuildWallWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewBuildWallRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -283,8 +283,8 @@ func (c *Client) BuildShieldWithBody(ctx context.Context, contentType string, bo
 	return c.Client.Do(req)
 }
 
-func (c *Client) BuildShield(ctx context.Context, body BuildShieldJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewBuildShieldRequest(c.Server, body)
+func (c *Client) BuildWall(ctx context.Context, body BuildWallJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewBuildWallRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -470,19 +470,19 @@ func NewGetUserRequest(server string, userId string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewBuildShieldRequest calls the generic BuildShield builder with application/json body
-func NewBuildShieldRequest(server string, body BuildShieldJSONRequestBody) (*http.Request, error) {
+// NewBuildWallRequest calls the generic BuildWall builder with application/json body
+func NewBuildWallRequest(server string, body BuildWallJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewBuildShieldRequestWithBody(server, "application/json", bodyReader)
+	return NewBuildWallRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewBuildShieldRequestWithBody generates requests for BuildShield with any type of body
-func NewBuildShieldRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewBuildWallRequestWithBody generates requests for BuildWall with any type of body
+func NewBuildWallRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -572,10 +572,10 @@ type ClientWithResponsesInterface interface {
 	// GetUserWithResponse request
 	GetUserWithResponse(ctx context.Context, userId string, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
 
-	// BuildShieldWithBodyWithResponse request with any body
-	BuildShieldWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BuildShieldResponse, error)
+	// BuildWallWithBodyWithResponse request with any body
+	BuildWallWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BuildWallResponse, error)
 
-	BuildShieldWithResponse(ctx context.Context, body BuildShieldJSONRequestBody, reqEditors ...RequestEditorFn) (*BuildShieldResponse, error)
+	BuildWallWithResponse(ctx context.Context, body BuildWallJSONRequestBody, reqEditors ...RequestEditorFn) (*BuildWallResponse, error)
 }
 
 type BuildKeepResponse struct {
@@ -686,14 +686,14 @@ func (r GetUserResponse) StatusCode() int {
 	return 0
 }
 
-type BuildShieldResponse struct {
+type BuildWallResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *WallResponse
 }
 
 // Status returns HTTPResponse.Status
-func (r BuildShieldResponse) Status() string {
+func (r BuildWallResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -701,7 +701,7 @@ func (r BuildShieldResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r BuildShieldResponse) StatusCode() int {
+func (r BuildWallResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -769,21 +769,21 @@ func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, userId st
 	return ParseGetUserResponse(rsp)
 }
 
-// BuildShieldWithBodyWithResponse request with arbitrary body returning *BuildShieldResponse
-func (c *ClientWithResponses) BuildShieldWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BuildShieldResponse, error) {
-	rsp, err := c.BuildShieldWithBody(ctx, contentType, body, reqEditors...)
+// BuildWallWithBodyWithResponse request with arbitrary body returning *BuildWallResponse
+func (c *ClientWithResponses) BuildWallWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BuildWallResponse, error) {
+	rsp, err := c.BuildWallWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseBuildShieldResponse(rsp)
+	return ParseBuildWallResponse(rsp)
 }
 
-func (c *ClientWithResponses) BuildShieldWithResponse(ctx context.Context, body BuildShieldJSONRequestBody, reqEditors ...RequestEditorFn) (*BuildShieldResponse, error) {
-	rsp, err := c.BuildShield(ctx, body, reqEditors...)
+func (c *ClientWithResponses) BuildWallWithResponse(ctx context.Context, body BuildWallJSONRequestBody, reqEditors ...RequestEditorFn) (*BuildWallResponse, error) {
+	rsp, err := c.BuildWall(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseBuildShieldResponse(rsp)
+	return ParseBuildWallResponse(rsp)
 }
 
 // ParseBuildKeepResponse parses an HTTP response from a BuildKeepWithResponse call
@@ -896,15 +896,15 @@ func ParseGetUserResponse(rsp *http.Response) (*GetUserResponse, error) {
 	return response, nil
 }
 
-// ParseBuildShieldResponse parses an HTTP response from a BuildShieldWithResponse call
-func ParseBuildShieldResponse(rsp *http.Response) (*BuildShieldResponse, error) {
+// ParseBuildWallResponse parses an HTTP response from a BuildWallWithResponse call
+func ParseBuildWallResponse(rsp *http.Response) (*BuildWallResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &BuildShieldResponse{
+	response := &BuildWallResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
