@@ -1,7 +1,7 @@
 ---
 title: Building your keep
 excerpt: Building your keep involves taking a prompt and adding additional protections to the instructions itself. It is a really basic step and should get you up and running with a more secure application in no time
-category: 652be292f7eae600244211de
+category: 65f04f2f72dd030072cde553
 ---
 
 To build your keep, we will use the prompt defender app application. Head over to the app and create an account if

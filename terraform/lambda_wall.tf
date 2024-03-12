@@ -62,7 +62,7 @@ resource "aws_lambda_function" "aws_lambda_wall" {
   runtime          = "provided.al2"
   source_code_hash = data.archive_file.lambda_wall_zip.output_base64sha256
 
-  timeout = 60
+  timeout = 120
 
   layers = ["arn:aws:lambda:${var.aws_region}:901920570463:layer:aws-otel-collector-amd64-ver-0-90-1:1"]
 

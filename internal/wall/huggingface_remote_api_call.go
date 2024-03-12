@@ -102,7 +102,7 @@ func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 
 // CallRemoteApi calls the remote API and returns the injection score
 func (r *RemoteApiCallerImpl) CallRemoteApi(prompt string) (MatchLevel, error) {
-	response, err := Retry(5, 1*time.Second, func() (*float64, error) {
+	response, err := Retry(7, 1*time.Second, func() (*float64, error) {
 		response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
 
 		if err != nil {

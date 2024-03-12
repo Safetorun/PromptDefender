@@ -1,7 +1,7 @@
 ---
 title: Package structure
 excerpt: The package structure of the application follows the unofficial standard Go package structure
-category: 652f7b9ea6bf5e000bb8dc94
+category: 65f04fac26c66f0010cbf3c7
 ---
 
 The package structure of the application follows the unofficial standard Go package structur
