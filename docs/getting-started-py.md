@@ -9,7 +9,7 @@ category: 65f04fd9bf46c7003666a5fb
 To get started with python, first install the python packages using pip:
 
 ```shell
-pip install PromptDefender-wall PromptDefender-drawbridge
+pip install prompt-defender
 ```
 
 # API key
