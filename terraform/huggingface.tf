@@ -8,6 +8,6 @@ module "huggingface_sagemaker" {
   hf_task              = "text-classification"
   serverless_config    = {
     max_concurrency   = 3
-    memory_size_in_mb = 2048
+    memory_size_in_mb = 3072
   }
 }

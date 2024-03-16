@@ -35,15 +35,17 @@ func New(endpointUrl string) RemoteSagemakerCaller {
 func (c *RemoteSagemakerCaller) Query(payload Payload) (*float64, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:     aws.String("eu-west-1"),
-		MaxRetries: aws.Int(20),
+		MaxRetries: aws.Int(3),
 	})
 	if err != nil {
 		return nil, err
 	}
 	sm := sagemakerruntime.New(sess)
 
+	inputBytes, err := json.Marshal(payload)
+
 	input := &sagemakerruntime.InvokeEndpointInput{
-		Body:         []byte(payload.Inputs),
+		Body:         inputBytes,
 		EndpointName: aws.String(c.endpointUrl),
 		ContentType:  aws.String("application/json"),
 	}
@@ -54,14 +56,16 @@ func (c *RemoteSagemakerCaller) Query(payload Payload) (*float64, error) {
 		return nil, err
 	}
 
-	var response []InjectionResponse
+	var response InjectionResponse
 	err = json.Unmarshal(result.Body, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, re := range response[0] {
+	for _, re := range response {
 		if re.Label == "INJECTION" {
+			return &re.Score, nil
+		} else if re.Label == "LEGIT" {
 			return &re.Score, nil
 		}
 	}
