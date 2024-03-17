@@ -1,39 +1,30 @@
-package wall
+package huggingface_jailbreak_model
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/safetorun/PromptDefender/wall"
 	"io"
 	"log"
 	"net/http"
 	"time"
 )
 
-type MatchLevel int
-
-const (
-	ExactMatch MatchLevel = iota
-	VeryClose
-	Medium
-	NoMatch
-	TotallyDifferent
-)
-
 const (
 	ApiUrl = "https://api-inference.huggingface.co/models/deepset/deberta-v3-base-injection"
 )
 
-type InjectionResponse []struct {
-	Label string  `json:"label"`
-	Score float64 `json:"score"`
-}
-
-type RemoteApiCallerImpl struct {
+type HuggingfaceRemoteApiCallerImpl struct {
 	huggingfaceToken string // token to call the remote API
 	huggingfaceUrl   string // URL of the remote API
 	logger           *log.Logger
+}
+
+type InjectionResponse []struct {
+	Label string  `json:"label"`
+	Score float64 `json:"score"`
 }
 
 type Payload struct {
@@ -41,15 +32,15 @@ type Payload struct {
 	WaitForModel bool   `json:"wait_for_model"`
 }
 
-func NewRemoteApiCaller(huggingfaceToken string) RemoteApiCallerImpl {
-	return RemoteApiCallerImpl{
+func NewRemoteApiCaller(huggingfaceToken string) HuggingfaceRemoteApiCallerImpl {
+	return HuggingfaceRemoteApiCallerImpl{
 		huggingfaceToken: huggingfaceToken,
 		huggingfaceUrl:   ApiUrl,
 		logger:           log.Default(),
 	}
 }
 
-func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
+func (c *HuggingfaceRemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
@@ -101,8 +92,8 @@ func (c *RemoteApiCallerImpl) Query(payload Payload) (*float64, error) {
 }
 
 // CallRemoteApi calls the remote API and returns the injection score
-func (r *RemoteApiCallerImpl) CallRemoteApi(prompt string) (MatchLevel, error) {
-	response, err := Retry(7, 1*time.Second, func() (*float64, error) {
+func (r *HuggingfaceRemoteApiCallerImpl) CallRemoteApi(prompt string) (wall.MatchLevel, error) {
+	response, err := wall.Retry(7, 1*time.Second, func() (*float64, error) {
 		response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
 
 		if err != nil {
@@ -122,16 +113,16 @@ func (r *RemoteApiCallerImpl) CallRemoteApi(prompt string) (MatchLevel, error) {
 	return matchLevelForScore(*response), nil
 }
 
-func matchLevelForScore(score float64) MatchLevel {
+func matchLevelForScore(score float64) wall.MatchLevel {
 	if score == 1.0 {
-		return ExactMatch
+		return wall.ExactMatch
 	}
 	if score > 0.9 {
-		return VeryClose
+		return wall.VeryClose
 	}
 	if score > 0.5 {
-		return Medium
+		return wall.Medium
 	}
 
-	return NoMatch
+	return wall.NoMatch
 }

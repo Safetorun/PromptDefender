@@ -38,6 +38,27 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_wall" { #tfsec:ignore:a
   })
 }
 
+resource "aws_iam_policy" "sagemaker_invoke_policy" {
+  name   = "${terraform.workspace}-sagemaker_invoke_policy"
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "sagemaker:InvokeEndpoint"
+        ],
+        Effect   = "Allow",
+        Resource = module.huggingface_sagemaker.sagemaker_endpoint.arn
+      },
+    ],
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "sagemaker_invoke_policy_attachment" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.sagemaker_invoke_policy.arn
+}
+
 resource "aws_cloudwatch_log_group" "lambda_log_group_wall" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_lambda_wall.function_name}"
   retention_in_days = 14
@@ -47,7 +68,6 @@ resource "aws_iam_role_policy_attachment" "xray_policy_attachment_wall" {
   role       = aws_iam_role.lambda_role_wall.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
-
 
 resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_wall" {
   role       = aws_iam_role.lambda_role_wall.name
@@ -72,8 +92,9 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
   environment {
     variables = {
-      open_ai_api_key = var.openai_secret_key
-      huggingface_token = var.huggingface_api_key
+      open_ai_api_key              = var.openai_secret_key
+      huggingface_token            = var.huggingface_api_key
+      SAGEMAKER_ENDPOINT_JAILBREAK = module.huggingface_sagemaker.sagemaker_endpoint.name
     }
   }
 }

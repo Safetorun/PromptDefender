@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	sagemaker_jailbreak_model "github.com/safetorun/PromptDefender/remote_sagemaker_call"
 	"log"
 	"os"
 	"strings"
@@ -133,7 +134,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		c.PiiScanner = pii_aws.New()
 		c.BadWordsCheck = badwords.New(badwords_embeddings.New(embeddings.New(openAIKey)))
 		c.XmlEscapingScanner = wall.NewBasicXmlEscapingScaner()
-		var apiCaller = wall.NewRemoteApiCaller(os.Getenv("huggingface_token"))
+		var apiCaller = sagemaker_jailbreak_model.New(os.Getenv("SAGEMAKER_ENDPOINT_JAILBREAK"))
 		c.RemoteApiCaller = &apiCaller
 		return nil
 	}
