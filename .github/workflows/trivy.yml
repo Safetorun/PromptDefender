@@ -16,4 +16,4 @@ jobs:
       - uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: terraform
-          additional_args: --config-file terraform/ tfsec.yml
+          additional_args: --config-file terraform/tfsec.yml
