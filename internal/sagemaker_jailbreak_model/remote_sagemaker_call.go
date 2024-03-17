@@ -66,7 +66,8 @@ func (c *RemoteSagemakerCaller) Query(payload Payload) (*float64, error) {
 		if re.Label == "INJECTION" {
 			return &re.Score, nil
 		} else if re.Label == "LEGIT" {
-			return &re.Score, nil
+			score := 1.0 - re.Score
+			return &score, nil
 		}
 	}
 
