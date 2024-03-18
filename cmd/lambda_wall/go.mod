@@ -15,6 +15,7 @@ require (
 	github.com/safetorun/PromptDefender/internal/base_aws v0.0.0-20240130072532-9a4bc83dc7d2
 	github.com/safetorun/PromptDefender/pii_aws v0.0.0-20231210112259-15b98f65cf67
 	github.com/safetorun/PromptDefender/tracer v0.0.0-00010101000000-000000000000
+	github.com/safetorun/PromptDefender/wall v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda v0.48.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda/xrayconfig v0.48.0
 	go.opentelemetry.io/contrib/propagators/aws v1.23.0
@@ -34,7 +35,6 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/safetorun/PromptDefender/pii v0.0.0-20231210081706-40db07878111 // indirect
-	github.com/safetorun/PromptDefender/wall v0.0.0-00010101000000-000000000000 // indirect
 	github.com/sashabaranov/go-openai v1.19.2 // indirect
 	go.opentelemetry.io/contrib/detectors/aws/lambda v0.48.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.23.0 // indirect
@@ -49,5 +49,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240102182953-50ed04b92917 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240102182953-50ed04b92917 // indirect
 	google.golang.org/grpc v1.61.0 // indirect
-	google.golang.org/protobuf v1.32.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 )
