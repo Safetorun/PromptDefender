@@ -12,6 +12,11 @@ To use the remote API in wall or drawbridge, you'll first need an API key. You c
 
 [https://defender.safetorun.com](https://defender.safetorun.com)
 
+# Authentication 
+
+Authentication with the API involves setting the `x-api-key` header with your API key. This works for all
+requests to the API.
+
 # Next steps
 
 Prompt Defender is a straightforward API to use, to try out the API, check out the API reference for the

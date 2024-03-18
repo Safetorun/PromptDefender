@@ -29,7 +29,7 @@ func SendRequestToWall(ctx context.Context) (context.Context, error) {
 		return ctx, errors.New("request is not castable to WallRequest")
 	}
 
-	response, err := gClient.BuildShieldWithResponse(context.Background(), *request)
+	response, err := gClient.BuildWallWithResponse(context.Background(), *request)
 
 	if err != nil {
 		return ctx, fmt.Errorf("got error (%s) when building shield", err)
