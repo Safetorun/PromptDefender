@@ -93,7 +93,6 @@ resource "aws_lambda_function" "aws_lambda_wall" {
   environment {
     variables = {
       open_ai_api_key              = var.openai_secret_key
-      huggingface_token            = var.huggingface_api_key
       SAGEMAKER_ENDPOINT_JAILBREAK = module.huggingface_sagemaker.sagemaker_endpoint.name
     }
   }
