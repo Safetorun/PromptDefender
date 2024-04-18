@@ -30,9 +30,10 @@ resource "aws_api_gateway_stage" "api_stage" {
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
-    format          = "$context.identity.sourceIp - [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId $context.identity.apiKeyId"
+    format          = "{\"apiId\":\"$context.apiId\",\"requestId\":\"$context.requestId\",\"requestTime\":\"$context.requestTime\",\"protocol\":\"$context.protocol\",\"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.path\",\"requestHostHeader\":\"$context.domainName\",\"requestUserAgentHeader\":\"$context.identity.userAgent\",\"ip\":\"$context.identity.sourceIp\",\"status\":\"$context.status\",\"responseLength\":\"$context.responseLength\",\"durationMs\":\"$context.responseLatency\",\"caller\":\"$context.identity.caller\",\"user\":\"$context.identity.user\",\"principalId\":\"$context.authorizer.principalId\",\"cognitoIdentityId\":\"$context.identity.cognitoIdentityId\",\"userArn\":\"$context.identity.userArn\",\"apiKeyId\":\"$context.identity.apiKeyId\",\"metadata\":{\"apiKey\":\"$context.identity.apiKey\",\"stage\":\"$context.stage\"}}"
   }
 }
+
 
 
 resource "aws_lambda_permission" "apigw_lambda_permission_protect" {
