@@ -1,6 +1,10 @@
 package wall
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"github.com/safetorun/PromptDefender/cache"
 	"log"
 	"time"
 )
@@ -24,6 +28,62 @@ func Retry(attempts int, sleep time.Duration, fn RetryableFunc) (*float64, error
 		return nil, err
 	}
 	return returnVal, nil
+}
+
+func HashString(s string) string {
+	hash := sha256.Sum256([]byte(s))
+	return hex.EncodeToString(hash[:])
+}
+
+func checkCache(cache *cache.Cache, prompt PromptToCheck) (bool, *CheckResult, error) {
+	if cache == nil {
+		return false, nil, nil
+	}
+
+	b, err := json.Marshal(prompt)
+
+	if err != nil {
+		return false, nil, err
+	}
+
+	cachedResult, err := (*cache).Get(HashString(string(b)))
+
+	if err != nil {
+		return false, nil, err
+	}
+
+	if cachedResult != nil {
+		var cachedResultReturn *CheckResult
+		err := json.Unmarshal([]byte(*cachedResult), &cachedResultReturn)
+
+		if err != nil {
+			return false, nil, err
+		}
+
+		return true, cachedResultReturn, nil
+	}
+
+	return false, nil, nil
+}
+
+func storeCache(cache *cache.Cache, prompt PromptToCheck, result *CheckResult) error {
+	if cache == nil {
+		return nil
+	}
+
+	b, err := json.Marshal(prompt)
+
+	if err != nil {
+		return err
+	}
+
+	bResult, err := json.Marshal(result)
+
+	if err != nil {
+		return err
+	}
+
+	return (*cache).Set(HashString(string(b)), string(bResult))
 }
 
 type stop struct {
