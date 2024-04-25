@@ -70,10 +70,12 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 	if m.Cache != nil {
 		cached, cachedResult, err := checkCache(m.Cache, check)
 		if err != nil {
+			m.logger.Println(fmt.Sprintf("Error checking cache: %v", err))
 			return nil, err
 		}
 
 		if cached {
+			println("Returning cached result")
 			return cachedResult, nil
 		}
 	}

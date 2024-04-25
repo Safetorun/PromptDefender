@@ -7,6 +7,6 @@ resource "aws_dynamodb_table" "cache_table" {
 
   attribute {
     name = "Id"
-    type = "N"
+    type = "S"
   }
 }

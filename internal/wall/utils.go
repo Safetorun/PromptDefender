@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"github.com/safetorun/PromptDefender/cache"
 	"log"
 	"time"
@@ -37,18 +38,21 @@ func HashString(s string) string {
 
 func checkCache(cache *cache.Cache, prompt PromptToCheck) (bool, *CheckResult, error) {
 	if cache == nil {
+		println("Cache is nil")
 		return false, nil, nil
 	}
 
 	b, err := json.Marshal(prompt)
 
 	if err != nil {
+		println("Error marshalling cache: ", err)
 		return false, nil, err
 	}
 
 	cachedResult, err := (*cache).Get(HashString(string(b)))
 
 	if err != nil {
+		println(fmt.Sprintf("Error getting cache: %v", err))
 		return false, nil, err
 	}
 
@@ -57,6 +61,7 @@ func checkCache(cache *cache.Cache, prompt PromptToCheck) (bool, *CheckResult, e
 		err := json.Unmarshal([]byte(*cachedResult), &cachedResultReturn)
 
 		if err != nil {
+			println("Error unmarshalling cache: ", err)
 			return false, nil, err
 		}
 
