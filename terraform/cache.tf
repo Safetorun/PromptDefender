@@ -1,16 +1,12 @@
-resource "aws_elasticache_serverless_cache" "prompt-defender-cache" {
-  engine = "redis"
-  name   = "prompt-defender-cache"
+resource "aws_dynamodb_table" "cache_table" {
+  name           = "${terraform.workspace}-Prompt-Defender-cache_table"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 20
+  write_capacity = 20
+  hash_key       = "Id"
 
-  cache_usage_limits {
-    data_storage {
-      maximum = 10
-      unit    = "GB"
-    }
-    ecpu_per_second {
-      maximum = 5000
-    }
+  attribute {
+    name = "Id"
+    type = "N"
   }
-  description          = "Cache used for Prompt Defender"
-  major_engine_version = "7"
 }
