@@ -10,6 +10,7 @@ package wall
 
 import (
 	"fmt"
+	"github.com/safetorun/PromptDefender/cache"
 	"log"
 
 	"github.com/safetorun/PromptDefender/badwords"
@@ -23,6 +24,7 @@ type Wall struct {
 	XmlEscapingScanner XmlEscapingScanner
 	RemoteApiCaller    RemoteApiCaller
 	logger             *log.Logger
+	Cache              *cache.Cache
 }
 
 type PromptToCheck struct {
@@ -65,6 +67,18 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 	var xmlResult *XmlEscapingDetectionResult = nil
 	var injectionDetected = false
 
+	if m.Cache != nil {
+		cached, cachedResult, err := checkCache(m.Cache, check)
+		if err != nil {
+			m.logger.Println(fmt.Sprintf("Error checking cache: %v", err))
+			return nil, err
+		}
+
+		if cached {
+			println("Returning cached result")
+			return cachedResult, nil
+		}
+	}
 	containsBadWords, err := m.checkPromptContainsBadwords(check, t)
 
 	if err != nil {
@@ -102,12 +116,20 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		injectionDetected = *detected
 	}
 
-	return &CheckResult{
+	checkResult := CheckResult{
 		PiiResult:         piiResult,
 		ContainsBadWords:  *containsBadWords,
 		XmlScannerResult:  xmlResult,
 		InjectionDetected: injectionDetected,
-	}, nil
+	}
+
+	err = storeCache(m.Cache, check, &checkResult)
+
+	if err != nil {
+		m.logger.Printf("Error storing cache: %v\n", err)
+	}
+
+	return &checkResult, nil
 }
 
 func (m *Wall) checkForInjectionDetected(check PromptToCheck, t tracer.Tracer) (*bool, error) {

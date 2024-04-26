@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/safetorun/PromptDefender/cache"
 	sagemaker_jailbreak_model "github.com/safetorun/PromptDefender/remote_sagemaker_call"
 	"log"
 	"os"
@@ -136,6 +137,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		c.XmlEscapingScanner = wall.NewBasicXmlEscapingScaner()
 		var apiCaller = sagemaker_jailbreak_model.New(os.Getenv("SAGEMAKER_ENDPOINT_JAILBREAK"))
 		c.RemoteApiCaller = &apiCaller
+		ddbCache := cache.New(os.Getenv("CACHE_TABLE_NAME"))
+		c.Cache = &ddbCache
 		return nil
 	}
 
