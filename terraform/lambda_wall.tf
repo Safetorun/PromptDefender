@@ -66,7 +66,7 @@ resource "aws_iam_policy" "dynamodb_read_write_policy_wall" {
           "dynamodb:UpdateItem"
         ],
         Effect   = "Allow",
-        Resource = "*"
+        Resource = aws_dynamodb_table.cache_table.arn
       },
     ],
   })
