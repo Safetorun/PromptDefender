@@ -6,8 +6,7 @@ category: 65f7e5d65b0c910060007711
 
 The next thing to do is to build your wall. This adds the first layer of defence, looking at if PII is being sent in the
 request, if the prompt itself contains "bad" words (indicating a jailbreak), or contains XML escaping (in an attempt to
-bypass
-your keep defence), it can also detect if the user or session is marked as suspicious.
+bypass your keep defence), it can also detect if the user or session is marked as suspicious.
 
 ## Recipe
 
@@ -55,6 +54,7 @@ wall = create_wall(
 
 response = wall.validate_prompt("What is the capital of France?")
 ```
+
 ```json
 {
   "prompt": "What is the capital of France?"
@@ -66,6 +66,7 @@ Your response will include:
 ```python
 response.potential_jailbreak == False
 ```
+
 ```json
 {
   "potential_jailbreak": false
@@ -93,6 +94,7 @@ wall = create_wall(
 )
 response = wall.validate_prompt("What is the capital of France?")
 ```
+
 ```json
 {
   "prompt": "What is the capital of France?",
@@ -100,12 +102,12 @@ response = wall.validate_prompt("What is the capital of France?")
 }
 ```
 
-
 Your response will include:
 
 ```python
 response.contains_pii == False
 ```
+
 ```json
 {
   "contains_pii": true
@@ -120,7 +122,6 @@ who is attempting to attack your system, and you want to block them from using y
 
 To use this, you will need to add the following to your request:
 
-
 ```python
 from wall import create_wall
 
@@ -134,6 +135,7 @@ wall = create_wall(
 )
 response = wall.validate_prompt("What is the capital of France?")
 ```
+
 ```json
 {
   "prompt": "What is the capital of France?",
@@ -148,6 +150,7 @@ Both are optional - you can use either, neither or both. Your response will incl
 response.suspicious_user == False
 response.suspicious_session == False
 ```
+
 ```json
 {
   "suspicious_session": true,
@@ -181,6 +184,7 @@ wall = create_wall(
 )
 response = wall.validate_prompt("What is the capital of France?")
 ```
+
 ```json
 {
   "xml_tag": "user_input"
@@ -192,6 +196,7 @@ Your response will then contain:
 ```python
 response.potential_xml_escaping == False
 ```
+
 ```json
 {
   "potential_xml_escaping": true
