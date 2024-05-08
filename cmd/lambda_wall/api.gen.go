@@ -46,6 +46,9 @@ type User struct {
 
 // WallRequest defines model for WallRequest.
 type WallRequest struct {
+	// CheckBadwords Whether to scan for badwords in the prompt.
+	CheckBadwords *bool `json:"check_badwords,omitempty"`
+
 	// Prompt The text prompt to be verified.
 	Prompt string `json:"prompt"`
 
