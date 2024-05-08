@@ -225,7 +225,9 @@ components:
         xml_tag:
           type: 'string'
           description: 'The XML tag that is used to escape user input in your prompt (this may have been generated with keep).'
-
+        check_badwords:
+          type: 'boolean'
+          description: 'Whether to scan for badwords in the prompt.'
     KeepResponse:
       type: 'object'
       required:

@@ -25,12 +25,14 @@ type Wall struct {
 	RemoteApiCaller    RemoteApiCaller
 	logger             *log.Logger
 	Cache              *cache.Cache
+	Naive              *bool
 }
 
 type PromptToCheck struct {
 	Prompt           string
 	ScanPii          *bool
 	XmlTagToCheckFor *string
+	CheckForBadWords *bool
 }
 
 type PiiDetectionResult struct {
@@ -79,10 +81,16 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 			return cachedResult, nil
 		}
 	}
-	containsBadWords, err := m.checkPromptContainsBadwords(check, t)
 
-	if err != nil {
-		return nil, err
+	var containsBadWords = false
+	if check.CheckForBadWords == nil {
+		bw, err := m.checkPromptContainsBadwords(check, t)
+
+		if err != nil {
+			return nil, err
+		}
+
+		containsBadWords = *bw
 	}
 
 	if check.ScanPii == nil {
@@ -118,12 +126,12 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 
 	checkResult := CheckResult{
 		PiiResult:         piiResult,
-		ContainsBadWords:  *containsBadWords,
+		ContainsBadWords:  containsBadWords,
 		XmlScannerResult:  xmlResult,
 		InjectionDetected: injectionDetected,
 	}
 
-	err = storeCache(m.Cache, check, &checkResult)
+	err := storeCache(m.Cache, check, &checkResult)
 
 	if err != nil {
 		m.logger.Printf("Error storing cache: %v\n", err)
