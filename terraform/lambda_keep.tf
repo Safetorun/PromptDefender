@@ -48,6 +48,11 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
   policy_arn = aws_iam_policy.lambda_logging_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment_keep" {
+  role       = aws_iam_role.lambda_role_keep.name
+  policy_arn = aws_iam_policy.dynamodb_read_write_policy_wall.arn
+}
+
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name    = "${terraform.workspace}-PromptDefender-Keep"
   handler          = "bootstrap"
@@ -66,6 +71,7 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
     variables = {
       open_ai_api_key = var.openai_secret_key
       version         = var.commit_version
+      CACHE_TABLE_NAME             = aws_dynamodb_table.cache_table.name
     }
   }
 }

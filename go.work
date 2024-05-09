@@ -19,8 +19,9 @@ use (
 	./internal/base_aws
 	./pkg/request_log
 	./internal/user_repository
-	internal/user_repository_ddb
-	internal/sagemaker_jailbreak_model
-	internal/huggingface_jailbreak_model
-	internal/cache
+	./internal/user_repository_ddb
+	./internal/sagemaker_jailbreak_model
+	./internal/huggingface_jailbreak_model
+	./internal/cache
+	./internal/utils
 )

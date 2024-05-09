@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/safetorun/PromptDefender/aiprompt"
+	"github.com/safetorun/PromptDefender/cache"
 	"github.com/safetorun/PromptDefender/internal/base_aws"
 	"github.com/safetorun/PromptDefender/keep"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-lambda-go/otellambda"
@@ -52,7 +53,12 @@ func (k *KeepLambda) Handle(promptRequest KeepRequest) (*KeepResponse, error) {
 func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	openAIKey := retrieveApiKeyOrPanic()
 
-	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey))
+	var keepOpts keep.KeepOption = func(c *keep.Keep) {
+		ddbCache := cache.New(os.Getenv("CACHE_TABLE_NAME"))
+		c.Cache = &ddbCache
+	}
+
+	keepBuilder := keep.New(aiprompt.NewOpenAI(openAIKey), keepOpts)
 
 	handler := KeepLambda{keepInstance: keepBuilder}
 
@@ -63,15 +69,6 @@ func Handler(_ context.Context, request events.APIGatewayProxyRequest) (events.A
 	}
 
 	return response, nil
-}
-
-func retrieveVersionOrPanic() string {
-	version, exists := os.LookupEnv("version")
-
-	if !exists {
-		panic(fmt.Errorf("error retrieving API key: environment (version) variable not set"))
-	}
-	return version
 }
 
 func retrieveApiKeyOrPanic() string {

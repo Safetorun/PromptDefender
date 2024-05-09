@@ -77,8 +77,10 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		}
 
 		if cached {
-			m.logger.Println("Returning cached result")
+			m.logger.Println("Cache hit")
 			return cachedResult, nil
+		} else {
+			m.logger.Println("Cache miss")
 		}
 	}
 

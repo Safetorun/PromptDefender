@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/safetorun/PromptDefender/utils"
 	"github.com/safetorun/PromptDefender/wall"
 	"io"
 	"log"
@@ -93,7 +94,7 @@ func (c *HuggingfaceRemoteApiCallerImpl) Query(payload Payload) (*float64, error
 
 // CallRemoteApi calls the remote API and returns the injection score
 func (r *HuggingfaceRemoteApiCallerImpl) CallRemoteApi(prompt string) (wall.MatchLevel, error) {
-	response, err := wall.Retry(7, 1*time.Second, func() (*float64, error) {
+	response, err := utils.Retry(7, 1*time.Second, func() (*float64, error) {
 		response, err := r.Query(Payload{Inputs: prompt, WaitForModel: true})
 
 		if err != nil {
