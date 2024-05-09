@@ -228,6 +228,9 @@ components:
         check_badwords:
           type: 'boolean'
           description: 'Whether to scan for badwords in the prompt.'
+        fast_check:
+            type: 'boolean'
+            description: 'Whether to perform a fast check on the prompt instead of a full check.'
     KeepResponse:
       type: 'object'
       required:
