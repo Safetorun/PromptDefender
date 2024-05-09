@@ -50,7 +50,7 @@ jobs:
         with:
           terraform_wrapper: false
       - name: Deploy
-        run: make deploy integration_test
+        run: make deploy && sleep 10 && make integration_test
         env:
           TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
           open_ai_api_key: ${{ secrets.OPENAI_API_KEY }}
