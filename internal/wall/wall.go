@@ -77,7 +77,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		}
 
 		if cached {
-			println("Returning cached result")
+			m.logger.Println("Returning cached result")
 			return cachedResult, nil
 		}
 	}
@@ -115,7 +115,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		xmlResult = xmlResultInner
 	}
 
-	if m.RemoteApiCaller != nil && check.FastCheck != nil && !*check.FastCheck {
+	if m.RemoteApiCaller != nil && (check.FastCheck == nil || !*check.FastCheck) {
 		detected, err := m.checkForInjectionDetected(check, t)
 		if err != nil {
 			m.logger.Println("Error checking for injection ", err)
