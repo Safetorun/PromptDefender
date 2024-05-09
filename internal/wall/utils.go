@@ -1,40 +1,11 @@
 package wall
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/safetorun/PromptDefender/cache"
-	"log"
-	"time"
+	"github.com/safetorun/PromptDefender/utils"
 )
-
-type RetryableFunc func() (*float64, error)
-
-func Retry(attempts int, sleep time.Duration, fn RetryableFunc) (*float64, error) {
-	returnVal, err := fn()
-
-	if err != nil {
-		if s, ok := err.(stop); ok {
-			return nil, s.error
-		}
-
-		if attempts--; attempts > 0 {
-			time.Sleep(sleep)
-			log.Default().Println("Retrying after error: ", err, " Attempts left: ", attempts)
-			return Retry(attempts, 2*sleep, fn)
-		}
-
-		return nil, err
-	}
-	return returnVal, nil
-}
-
-func HashString(s string) string {
-	hash := sha256.Sum256([]byte(s))
-	return hex.EncodeToString(hash[:])
-}
 
 func checkCache(cache *cache.Cache, prompt PromptToCheck) (bool, *CheckResult, error) {
 	if cache == nil {
@@ -49,7 +20,7 @@ func checkCache(cache *cache.Cache, prompt PromptToCheck) (bool, *CheckResult, e
 		return false, nil, err
 	}
 
-	cachedResult, err := (*cache).Get(HashString(string(b)))
+	cachedResult, err := (*cache).Get(utils.HashString(string(b)))
 
 	if err != nil {
 		println(fmt.Sprintf("Error getting cache: %v", err))
@@ -88,9 +59,5 @@ func storeCache(cache *cache.Cache, prompt PromptToCheck, result *CheckResult) e
 		return err
 	}
 
-	return (*cache).Set(HashString(string(b)), string(bResult))
-}
-
-type stop struct {
-	error
+	return (*cache).Set(utils.HashString(string(b)), string(bResult))
 }
