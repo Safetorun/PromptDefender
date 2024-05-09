@@ -49,9 +49,6 @@ type WallRequest struct {
 	// CheckBadwords Whether to scan for badwords in the prompt.
 	CheckBadwords *bool `json:"check_badwords,omitempty"`
 
-	// FastCheck Whether to perform a fast check on the prompt instead of a full check.
-	FastCheck *bool `json:"fast_check,omitempty"`
-
 	// Prompt The text prompt to be verified.
 	Prompt string `json:"prompt"`
 
