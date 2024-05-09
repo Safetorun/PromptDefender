@@ -25,7 +25,6 @@ type Wall struct {
 	RemoteApiCaller    RemoteApiCaller
 	logger             *log.Logger
 	Cache              *cache.Cache
-	Naive              *bool
 }
 
 type PromptToCheck struct {
@@ -33,6 +32,7 @@ type PromptToCheck struct {
 	ScanPii          *bool
 	XmlTagToCheckFor *string
 	CheckForBadWords *bool
+	FastCheck        *bool
 }
 
 type PiiDetectionResult struct {
@@ -117,7 +117,7 @@ func (m *Wall) CheckWall(check PromptToCheck, t tracer.Tracer) (*CheckResult, er
 		xmlResult = xmlResultInner
 	}
 
-	if m.RemoteApiCaller != nil {
+	if m.RemoteApiCaller != nil && (check.FastCheck == nil || !*check.FastCheck) {
 		detected, err := m.checkForInjectionDetected(check, t)
 		if err != nil {
 			m.logger.Println("Error checking for injection ", err)

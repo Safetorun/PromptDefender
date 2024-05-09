@@ -44,6 +44,7 @@ func (m *WallLambda) Handle(wallRequest WallRequest) (*WallResponse, error) {
 		ScanPii:          wallRequest.ScanPii,
 		XmlTagToCheckFor: wallRequest.XmlTag,
 		CheckForBadWords: wallRequest.CheckBadwords,
+		FastCheck:        wallRequest.FastCheck,
 	},
 		t,
 	)
