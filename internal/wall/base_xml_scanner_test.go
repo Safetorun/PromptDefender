@@ -6,7 +6,7 @@ import (
 )
 
 func TestBasicXmlScanner_Scan(t *testing.T) {
-	scanner := BasicXmlScanner{}
+	scanner := NewBasicXmlEscapingScaner()
 
 	tests := []struct {
 		name           string

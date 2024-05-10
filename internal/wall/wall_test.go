@@ -2,6 +2,7 @@ package wall
 
 import (
 	"errors"
+	"github.com/safetorun/PromptDefender/tracer"
 	"testing"
 
 	"github.com/safetorun/PromptDefender/badwords"
@@ -26,6 +27,8 @@ func (m *MockPiiScanner) Scan(text string) (*pii.ScanResult, error) {
 type MockBadWords struct {
 	mock.Mock
 }
+
+var emptyTracer = &tracer.EmptyTracer{}
 
 func (m *MockBadWords) CheckPromptContainsBadWords(text string) (*bool, error) {
 	args := m.Called(text)
@@ -73,7 +76,7 @@ func TestCheckWall(t *testing.T) {
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
-		result, err := m.CheckWall(check, nil)
+		result, err := m.CheckWall(check, emptyTracer)
 		assert.Nil(t, err)
 		assert.NotNil(t, result.ContainsBadWords)
 	})
@@ -90,7 +93,7 @@ func TestCheckWall(t *testing.T) {
 		piiScanner.On("Scan", "some text").Return(&pii.ScanResult{ContainingPii: true}, nil)
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
-		result, err := m.CheckWall(check, nil)
+		result, err := m.CheckWall(check, emptyTracer)
 		assert.Nil(t, err)
 		assert.True(t, result.PiiResult.ContainsPii)
 	})
@@ -106,7 +109,7 @@ func TestCheckWall(t *testing.T) {
 
 		closestMatcher.On("GetClosestMatch", "some text").Return(nil, errors.New("an error"))
 		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
-		result, err := m.CheckWall(check, nil)
+		result, err := m.CheckWall(check, emptyTracer)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})
@@ -123,7 +126,7 @@ func TestCheckWall(t *testing.T) {
 		piiScanner.On("Scan", "some text").Return(nil, errors.New("an error"))
 		closestMatcher.On("GetClosestMatch", "some text").Return(&badwords.ClosestMatchScore{Score: badwords.Medium}, nil)
 		check := PromptToCheck{Prompt: "some text", ScanPii: &scanPii}
-		result, err := m.CheckWall(check, nil)
+		result, err := m.CheckWall(check, emptyTracer)
 		assert.Nil(t, result)
 		assert.Error(t, err)
 	})

@@ -2,6 +2,7 @@ package wall
 
 import (
 	"errors"
+	"github.com/safetorun/PromptDefender/utils"
 	"testing"
 	"time"
 )
@@ -17,7 +18,7 @@ func TestRetry(t *testing.T) {
 		return &val, nil
 	}
 
-	val, err := Retry(5, 1*time.Millisecond, mockFunc)
+	val, err := utils.Retry(5, 1*time.Millisecond, mockFunc)
 	if err != nil {
 		t.Errorf("Retry function failed: %v", err)
 	}
