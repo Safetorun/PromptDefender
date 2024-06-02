@@ -3,6 +3,19 @@ TEST_MODULES := $(shell (find . -type f -name '*.go' -maxdepth 3 ! -path './test
 AWS_MODULES := $(shell cd cmd && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
 PROJECT_DIR := $(shell pwd)
 API_DIR := $(shell pwd)/api
+PYTHON_PACKAGES := $(shell cd cmd && find . -type f -name '*.py' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
+
+build-python:
+	for python_module in $(PYTHON_PACKAGES) ; do \
+	   cd $$python_module &&\
+	   mkdir -p dist && cp -r * dist/ &&\
+	   python3 -m venv venv &&\
+	   source venv/bin/activate &&\
+	   pip install -r requirements.txt &&\
+		runtime=$$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 2)	    && \
+	   cp -r venv/lib/python3.$$runtime/site-packages/* dist/ &&\
+	   cd $(PROJECT_DIR) ; \
+	done
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
@@ -32,7 +45,7 @@ test: build
 	   cd $$testable_module && go test -v ./... -cover || exit 1; cd $(PROJECT_DIR) ; \
 	done
 
-build: generate
+build: build-python generate
 	for aws_module in $(AWS_MODULES) ; do \
 	   cd $$aws_module && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap || exit 1; cd $(PROJECT_DIR) ; \
 	done

@@ -20,6 +20,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group_keep" { #tfsec:ignore:aws-
   retention_in_days = 14
 }
 
+
 resource "aws_iam_policy" "lambda_logging_policy" {
   name   = "${terraform.workspace}-lambda_logging_policy_keep"
   policy = jsonencode({
@@ -55,10 +56,10 @@ resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment
 
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name    = "${terraform.workspace}-PromptDefender-Keep"
-  handler          = "bootstrap"
+  handler          = "app.lambda_handler"
   role             = aws_iam_role.lambda_role_keep.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
-  runtime          = "provided.al2"
+  runtime          = "python3.12"
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
   timeout          = 60
 
@@ -78,11 +79,11 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
 
 data "archive_file" "lambda_keep_zip" {
   type        = "zip"
-  source_file = var.lambda_keep_path
+  source_dir = var.lambda_keep_path
   output_path = "keep_function.zip"
 }
 
 variable "lambda_keep_path" {
   type    = string
-  default = "../cmd/lambda_keep/bootstrap"
+  default = "../cmd/lambda_keep_py/dist"
 }
