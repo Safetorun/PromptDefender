@@ -16,7 +16,7 @@ def __retrieve_item_if_exists__(key):
         return None
 
 
-def lambda_handler(context, event):
+def lambda_handler(event, context):
     open_api_key = os.getenv("open_ai_api_key")
 
     return_data = {}

@@ -14,6 +14,8 @@ build-python:
 	   pip install -r requirements.txt &&\
 		runtime=$$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 2)	    && \
 	   cp -r venv/lib/python3.$$runtime/site-packages/* dist/ &&\
+	   rm -rf dist/venv &&\
+	   rm -rf dist/dist && \
 	   cd $(PROJECT_DIR) ; \
 	done
 
