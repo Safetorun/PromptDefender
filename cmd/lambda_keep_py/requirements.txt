@@ -1,0 +1,2 @@
+prompt-defender==0.1.1
+boto3
