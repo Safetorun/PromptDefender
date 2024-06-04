@@ -3,4 +3,4 @@ prompt-defender-llm-defences>=0.1.4
 langchain>=0.2.1
 langchain_openai>=0.1.8
 aws_lambda_powertools>=2.38.1
-pydantic-core>=2.18.4
+pydantic>=2.7.3
