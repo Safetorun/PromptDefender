@@ -8,14 +8,24 @@ PYTHON_PACKAGES := $(shell cd cmd && find . -type f -name '*.py' -maxdepth 2 | s
 build-python:
 	for python_module in $(PYTHON_PACKAGES) ; do \
 	   cd $$python_module &&\
-	   mkdir -p dist && cp -r * dist/ &&\
+	   rm -rf dist &&\
+	   mkdir -p dist &&\
 	   python3 -m venv venv &&\
 	   source venv/bin/activate &&\
 	   pip install -r requirements.txt &&\
-		runtime=$$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 2)	    && \
-	   cp -r venv/lib/python3.$$runtime/site-packages/* dist/ &&\
+	   runtime=$$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 2) &&\
+	   mkdir -p python &&\
+	   cp -r venv/lib python/ &&\
+	   zip -r dependencies.zip python &&\
+	   rm -rf ../deps/$$python_module/* &&\
+	   mkdir -p ../deps/$$python_module &&\
+	   mv dependencies.zip ../deps/$$python_module/dependencies.zip &&\
+	   rm -rf python &&\
+	   rm -rf dist &&\
+	   mkdir dist &&\
+	   cp -r * dist/ &&\
 	   rm -rf dist/venv &&\
-	   rm -rf dist/dist && \
+	   rm -rf dist/dist &&\
 	   cd $(PROJECT_DIR) ; \
 	done
 

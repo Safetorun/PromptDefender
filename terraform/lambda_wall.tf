@@ -55,22 +55,6 @@ resource "aws_iam_role_policy_attachment" "sagemaker_invoke_policy_attachment" {
   policy_arn = aws_iam_policy.sagemaker_invoke_policy.arn
 }
 
-resource "aws_iam_policy" "dynamodb_read_write_policy_wall" {
-  policy = jsonencode({
-    Version   = "2012-10-17",
-    Statement = [
-      {
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
-        ],
-        Effect   = "Allow",
-        Resource = aws_dynamodb_table.cache_table.arn
-      },
-    ],
-  })
-}
 
 resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment" {
   role       = aws_iam_role.lambda_role_wall.name
