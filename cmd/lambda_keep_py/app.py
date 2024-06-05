@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from cache.cache import retrieve_item_if_exists
 from settings.ssm_retriever import get_secret
 
-logger = Logger(service="APP")
+logger = Logger(service="PromptDefender-Keep")
 tracer = Tracer()
 
 os.environ["OPENAI_API_KEY"] = get_secret(os.getenv("OPENAI_SECRET_NAME"))
@@ -61,7 +61,7 @@ def lambda_handler(event: KeepRequest, _: LambdaContext):
     llm = ChatOpenAI(model="gpt-4o")
     executor = KeepExecutorLlm(llm=llm)
 
-    safe_prompt = executor.generate_prompt(event.prompt)
+    safe_prompt = executor.generate_prompt(event.prompt, event.randomise_xml_tag)
 
     return_data = {
         "shielded_prompt": safe_prompt.safe_prompt,
@@ -70,3 +70,8 @@ def lambda_handler(event: KeepRequest, _: LambdaContext):
     }
 
     return {"statusCode": 200, "body": json.dumps(KeepResponse(**return_data).json())}
+
+
+if __name__ == "__main__":
+    request = KeepRequest(prompt="hello", randomise_xml_tag=False)
+    print(lambda_handler(request, None))
