@@ -1,16 +1,3 @@
-resource "aws_lambda_layer_version" "lambda_layer" {
-  filename            = var.dependencies_layer_path
-  layer_name          = "deps-layer"
-  compatible_runtimes = ["python3.12"]
-  source_code_hash    = filesha256(var.dependencies_layer_path)
-}
-
-
-variable "dependencies_layer_path" {
-  type    = string
-  default = "../cmd/deps/cmd/lambda_keep_py/dependencies.zip"
-}
-
 resource "aws_iam_role" "lambda_role_keep" {
   name = "${terraform.workspace}-lambda_role_keep"
 
@@ -28,8 +15,7 @@ resource "aws_iam_role" "lambda_role_keep" {
   })
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_keep" {
-  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_keep" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_Lambda_keep.function_name}"
   retention_in_days = 14
 }
@@ -82,7 +68,7 @@ resource "aws_iam_role_policy_attachment" "ssm_read_policy_attachment_keep" {
 
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name = "${terraform.workspace}-PromptDefender-Keep"
-  layers        = [aws_lambda_layer_version.lambda_layer.arn]
+  layers        = [aws_lambda_layer_version.lambda_layer.arn, aws_lambda_layer_version.langchain_lambda_layer.arn]
 
   handler          = "app.lambda_handler"
   role             = aws_iam_role.lambda_role_keep.arn

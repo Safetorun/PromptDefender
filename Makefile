@@ -6,28 +6,10 @@ API_DIR := $(shell pwd)/api
 PYTHON_PACKAGES := $(shell cd cmd && find . -type f -name '*.py' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
 
 build-python:
-	for python_module in $(PYTHON_PACKAGES) ; do \
-	   cd $$python_module &&\
-	   rm -rf dist &&\
-	   mkdir -p dist &&\
-	   python3 -m venv venv &&\
-	   source venv/bin/activate &&\
-	   pip install -r requirements.txt &&\
-	   runtime=$$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 2) &&\
-	   mkdir -p python &&\
-	   cp -r venv/lib python/ &&\
-	   zip -r dependencies.zip python &&\
-	   rm -rf ../deps/$$python_module/* &&\
-	   mkdir -p ../deps/$$python_module &&\
-	   mv dependencies.zip ../deps/$$python_module/dependencies.zip &&\
-	   rm -rf python &&\
-	   rm -rf dist &&\
-	   mkdir dist &&\
-	   cp -r * dist/ &&\
-	   rm -rf dist/venv &&\
-	   rm -rf dist/dist &&\
-	   cd $(PROJECT_DIR) ; \
-	done
+	for python_module in $(PYTHON_PACKAGES); do \
+		bash scripts/build_python.sh $$python_module; \
+	done &&\
+	bash scripts/langchain_layer.sh
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \

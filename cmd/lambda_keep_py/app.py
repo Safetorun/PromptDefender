@@ -1,14 +1,17 @@
 import json
 import os
+from typing import Optional
 
 import boto3
 from aws_lambda_powertools import Logger
+from aws_lambda_powertools import Tracer
 from aws_lambda_powertools.utilities.parser import event_parser
+from aws_lambda_powertools.utilities.parser.envelopes import ApiGatewayEnvelope
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from langchain_openai.chat_models import ChatOpenAI
 from prompt_defender_llm_defences import KeepExecutorLlm
 from pydantic import BaseModel
-from aws_lambda_powertools import Tracer
+
 from cache.cache import retrieve_item_if_exists
 from settings.ssm_retriever import get_secret
 
@@ -33,25 +36,25 @@ def __retrieve_item_if_exists__(key):
 
 class KeepRequest(BaseModel):
     prompt: str
-    randomise_xml_tag: bool
+    randomise_xml_tag: Optional[bool] = False
 
 
 class KeepResponse(BaseModel):
     shielded_prompt: str
     xml_tag: str
-    canary: str
+    canary: Optional[str]
 
 
 @tracer.capture_lambda_handler
-@event_parser(model=KeepRequest)
-def lambda_handler(event: KeepRequest, _: LambdaContext) -> KeepResponse:
+@event_parser(model=KeepRequest, envelope=ApiGatewayEnvelope)
+def lambda_handler(event: KeepRequest, _: LambdaContext):
     logger.debug("Received event", event=event.dict())
 
     return_data = retrieve_item_if_exists(event.json(), retrieve_function=__retrieve_item_if_exists__)
 
     if return_data is not None:
         logger.debug("Retrieved from cache", return_data=return_data)
-        return KeepResponse(**return_data)
+        return {"statusCode": 200, "body": json.dumps(KeepResponse(**return_data).json())}
 
     logger.debug("Not found in cache, generating new data")
 
@@ -66,4 +69,4 @@ def lambda_handler(event: KeepRequest, _: LambdaContext) -> KeepResponse:
         "canary": safe_prompt.canary
     }
 
-    return KeepResponse(**return_data)
+    return {"statusCode": 200, "body": json.dumps(KeepResponse(**return_data).json())}
