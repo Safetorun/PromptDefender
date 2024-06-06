@@ -9,11 +9,12 @@ def hash_string(s):
 
 
 PrepareFunction = Callable[[str], str]
-StoreFunction = Callable[[str], Dict]
+RetrieveFunction = Callable[[str], Dict]
+StoreFunction = Callable[[str, dict], None]
 
 
 def retrieve_item_if_exists(key: str,
-                            retrieve_function: StoreFunction,
+                            retrieve_function: RetrieveFunction,
                             prepare_function: PrepareFunction = hash_string) -> \
         Optional[Dict]:
     """
@@ -25,3 +26,17 @@ def retrieve_item_if_exists(key: str,
     """
     prepared_key = prepare_function(key)
     return retrieve_function(prepared_key)
+
+
+def store_item(key: str, item: any,
+               store_function: StoreFunction,
+               prepare_function: PrepareFunction = hash_string
+               ):
+    """
+    Store an item in cache
+
+    :param key: key to store - this will be "prepared" (i.e. hashed) before being used
+    :param item: the item to store
+    """
+    prepared_key = prepare_function(key)
+    store_function(prepared_key, item)

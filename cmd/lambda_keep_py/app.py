@@ -12,7 +12,7 @@ from langchain_openai.chat_models import ChatOpenAI
 from prompt_defender_llm_defences import KeepExecutorLlm
 from pydantic import BaseModel
 
-from cache.cache import retrieve_item_if_exists
+from cache.cache import retrieve_item_if_exists, store_item
 from settings.ssm_retriever import get_secret
 
 logger = Logger(service="PromptDefender-Keep")
@@ -32,6 +32,14 @@ def __retrieve_item_if_exists__(key):
         return json.loads(response['Item'])
     else:
         return None
+
+
+def __store_item__(key, item):
+    cache_table_name = os.getenv('CACHE_TABLE_NAME')
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(cache_table_name)
+
+    table.put_item(Item={"Id": key, **item})
 
 
 class KeepRequest(BaseModel):
@@ -68,6 +76,8 @@ def lambda_handler(event: KeepRequest, _: LambdaContext):
         "xml_tag": safe_prompt.xml_tag,
         "canary": safe_prompt.canary
     }
+
+    store_item(event.json(), return_data, store_function=__store_item__)
 
     return {"statusCode": 200, "body": json.dumps(KeepResponse(**return_data).json())}
 
