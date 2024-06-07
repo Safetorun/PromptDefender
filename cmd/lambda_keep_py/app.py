@@ -1,8 +1,6 @@
-import json
 import os
 from typing import Optional
 
-import boto3
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools import Tracer
 from aws_lambda_powertools.utilities.parser import event_parser
@@ -12,9 +10,8 @@ from langchain_openai.chat_models import ChatOpenAI
 from prompt_defender_llm_defences import KeepExecutorLlm
 from pydantic import BaseModel
 
-from cache.cache import store_item
-from shared import cachable_result
 from settings.ssm_retriever import get_secret
+from shared import cachable_result, log_result_information
 
 logger = Logger(service="PromptDefender-Keep")
 tracer = Tracer()
@@ -35,6 +32,7 @@ class KeepResponse(BaseModel):
 
 @tracer.capture_lambda_handler
 @cachable_result
+@log_result_information
 @event_parser(model=KeepRequest, envelope=ApiGatewayEnvelope)
 def lambda_handler(event: KeepRequest, _: LambdaContext):
     logger.info("Received event", event=event.dict())
