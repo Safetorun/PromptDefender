@@ -40,6 +40,8 @@ def cachable_result(
         event: dict,
         context: LambdaContext,
 ) -> dict:
+    start_time = time.time()
+
     return_data = retrieve_item_if_exists(event['body'], retrieve_function=__retrieve_item_if_exists__)
 
     if return_data is not None:
@@ -52,6 +54,12 @@ def cachable_result(
     logger.info("Storing in cache {}", result)
 
     store_item(event['body'], result['body'], store_function=__store_item__)
+
+    queue_message = to_request_log(event)
+    queue_message["Response"] = result["body"]
+    queue_message["Time"] = int((time.time() - start_time) * 1000)
+
+    log_summary_message(queue_message)
 
     return result
 
@@ -88,7 +96,6 @@ def log_result_information(
         event: dict,
         context: LambdaContext,
 ) -> dict:
-
     start_time = time.time()
 
     result = handler(event, context)

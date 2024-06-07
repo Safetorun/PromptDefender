@@ -31,8 +31,8 @@ class KeepResponse(BaseModel):
 
 
 @tracer.capture_lambda_handler
-@cachable_result
 @log_result_information
+@cachable_result
 @event_parser(model=KeepRequest, envelope=ApiGatewayEnvelope)
 def lambda_handler(event: KeepRequest, _: LambdaContext):
     logger.info("Received event", event=event.dict())
