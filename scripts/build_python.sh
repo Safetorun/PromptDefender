@@ -50,14 +50,14 @@ if [ "$changed" = true ]; then
    pip install --platform manylinux2014_x86_64 -t python/lib/python3.${runtime}/site-packages/ --only-binary=:all: -r requirements.txt
 
    # Create a zip file of the Python directory
-   zip -r dependencies.zip python
 
    # Remove any existing dependencies in the deps directory and create a new one
    rm -rf ../deps/${python_module}/*
    mkdir -p ../deps/${python_module}
 
    # Move the dependencies.zip file to the deps directory
-   mv dependencies.zip ../deps/${python_module}/dependencies.zip
+   mkdir -p ../deps/${python_module}/dist
+   mv python ../deps/${python_module}/dist
 
    # Store the hash in the requirements.lock file
    echo $hash > requirements.lock

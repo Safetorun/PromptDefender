@@ -23,12 +23,11 @@ pip install -r requirements.txt
 runtime=$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 2)
 
 mkdir -p python/lib/python3.${runtime}/site-packages/
+mkdir -p dist
+
+mv python dist/
 
 pip install --platform manylinux2014_x86_64 -t python/lib/python3.${runtime}/site-packages/ --only-binary=:all: -r requirements.txt
-
-zip -r dependencies.zip python
-
-rm -rf python
 
 # Store the hash in the requirements.lock file
 echo $hash > requirements.lock
