@@ -5,6 +5,10 @@ PROJECT_DIR := $(shell pwd)
 API_DIR := $(shell pwd)/api
 PYTHON_PACKAGES := $(shell cd cmd && find . -type f -name '*.py' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
 
+deploy-base-infrastructure:
+	cd terraform-base-infrastructure && terraform init && terraform apply -auto-approve &&\
+	terraform output -json > terraform_output.json
+
 build-python:
 	for python_module in $(PYTHON_PACKAGES); do \
 		bash scripts/build_python.sh $$python_module; \

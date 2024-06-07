@@ -237,6 +237,9 @@ components:
         - 'shielded_prompt'
         - 'xml_tag'
       properties:
+        canary:
+          type: 'string'
+          description: 'The canary string that is used to detect prompt injection.'
         shielded_prompt:
           type: 'string'
           description: 'The shielded prompt.'

@@ -12,34 +12,14 @@ from langchain_openai.chat_models import ChatOpenAI
 from prompt_defender_llm_defences import KeepExecutorLlm
 from pydantic import BaseModel
 
-from cache.cache import retrieve_item_if_exists, store_item
+from cache.cache import store_item
+from shared import cachable_result
 from settings.ssm_retriever import get_secret
 
 logger = Logger(service="PromptDefender-Keep")
 tracer = Tracer()
 
 os.environ["OPENAI_API_KEY"] = get_secret(os.getenv("OPENAI_SECRET_NAME"))
-
-
-def __retrieve_item_if_exists__(key):
-    cache_table_name = os.getenv('CACHE_TABLE_NAME')
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(cache_table_name)
-
-    response = table.get_item(Key={"Id": key})
-
-    if 'Item' in response:
-        return json.loads(response['Item'])
-    else:
-        return None
-
-
-def __store_item__(key, item):
-    cache_table_name = os.getenv('CACHE_TABLE_NAME')
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(cache_table_name)
-
-    table.put_item(Item={"Id": key, **item})
 
 
 class KeepRequest(BaseModel):
@@ -54,17 +34,10 @@ class KeepResponse(BaseModel):
 
 
 @tracer.capture_lambda_handler
+@cachable_result
 @event_parser(model=KeepRequest, envelope=ApiGatewayEnvelope)
 def lambda_handler(event: KeepRequest, _: LambdaContext):
-    logger.debug("Received event", event=event.dict())
-
-    return_data = retrieve_item_if_exists(event.json(), retrieve_function=__retrieve_item_if_exists__)
-
-    if return_data is not None:
-        logger.debug("Retrieved from cache", return_data=return_data)
-        return {"statusCode": 200, "body": json.dumps(KeepResponse(**return_data).json())}
-
-    logger.debug("Not found in cache, generating new data")
+    logger.info("Received event", event=event.dict())
 
     llm = ChatOpenAI(model="gpt-4o")
     executor = KeepExecutorLlm(llm=llm)
@@ -77,11 +50,8 @@ def lambda_handler(event: KeepRequest, _: LambdaContext):
         "canary": safe_prompt.canary
     }
 
-    store_item(event.json(), return_data, store_function=__store_item__)
-
-    return {"statusCode": 200, "body": json.dumps(KeepResponse(**return_data).json())}
+    return {"statusCode": 200, "body": KeepResponse(**return_data).json()}
 
 
 if __name__ == "__main__":
-    request = KeepRequest(prompt="hello", randomise_xml_tag=False)
-    print(lambda_handler(request, None))
+    print(lambda_handler(KeepRequest(prompt="hello", randomise_xml_tag=False), None))
