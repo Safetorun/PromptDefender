@@ -5,3 +5,5 @@ terraform/*tfstate*
 terraform/funtion.zip
 main
 .vscode/
+/cmd/*/dist/
+/cmd/*/venv/

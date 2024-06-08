@@ -96,6 +96,7 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/safetorun/PromptDefender/aiprompt v0.0.0-20231204191015-931fb010b80b/go.mod h1:jlwvD4JjHhc+4gYMLlDHIVawDoVPMMBlB1/B+vrt0Ro=
 github.com/safetorun/PromptDefender/badwords v0.0.0-20231204191015-931fb010b80b/go.mod h1:plW+2/gdgv2rTO/+saDt18AuSht9G4ecUvjF7l68fFI=
 github.com/safetorun/PromptDefender/embeddings v0.0.0-20231204191015-931fb010b80b/go.mod h1:Ead2Lqb/JSWT9upS5Z8aG9Hq9/daLK7Q2yiiOlQynH4=
+github.com/safetorun/PromptDefender/keep v0.0.0-20231204191015-931fb010b80b h1:TDj0vnnr5pyehTDpYv1pMCfXZHIvqrfJRHfRYzxpK84=
 github.com/safetorun/PromptDefender/keep v0.0.0-20231204191015-931fb010b80b/go.mod h1:n8ooJy/VnwErTL/R63OIGpqo8NB+0V8W1ex39vc7xGg=
 github.com/safetorun/PromptDefender/pii v0.0.0-20231204191015-931fb010b80b/go.mod h1:CW+LIsOwq/ehHUqv2ul8Zmj/+fVefnvuTpIRvYWxauo=
 github.com/safetorun/PromptDefender/prompt v0.0.0-20231204191015-931fb010b80b h1:KHxRxacYo6tIdfSwvyJXu0X09127sUVintv+utyBdiY=
