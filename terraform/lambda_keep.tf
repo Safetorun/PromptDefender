@@ -73,7 +73,7 @@ resource "aws_lambda_function" "aws_Lambda_keep" {
   handler          = "app.lambda_handler"
   role             = aws_iam_role.lambda_role_keep.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
-  runtime          = "python3.12"
+  runtime          = "python3.10"
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
   timeout          = 60
 
