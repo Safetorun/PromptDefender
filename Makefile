@@ -3,6 +3,17 @@ TEST_MODULES := $(shell (find . -type f -name '*.go' -maxdepth 3 ! -path './test
 AWS_MODULES := $(shell cd cmd && find . -type f -name '*.go' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
 PROJECT_DIR := $(shell pwd)
 API_DIR := $(shell pwd)/api
+PYTHON_PACKAGES := $(shell cd cmd && find . -type f -name '*.py' -maxdepth 2 | sed -r 's|^\./|cmd/|' | grep "lambda_" | sed -r 's|/[^/]+$$||' | sort | uniq)
+
+deploy-base-infrastructure:
+	cd terraform-base-infrastructure && terraform init && terraform apply -auto-approve &&\
+	terraform output -json > terraform_output.json
+
+build-python:
+	for python_module in $(PYTHON_PACKAGES); do \
+		bash scripts/build_python.sh $$python_module; \
+	done &&\
+	bash scripts/langchain_layer.sh
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
@@ -32,7 +43,7 @@ test: build
 	   cd $$testable_module && go test -v ./... -cover || exit 1; cd $(PROJECT_DIR) ; \
 	done
 
-build: generate
+build: build-python generate
 	for aws_module in $(AWS_MODULES) ; do \
 	   cd $$aws_module && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap || exit 1; cd $(PROJECT_DIR) ; \
 	done

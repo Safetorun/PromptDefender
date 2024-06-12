@@ -18,6 +18,9 @@ type KeepRequest struct {
 
 // KeepResponse defines model for KeepResponse.
 type KeepResponse struct {
+	// Canary The canary string that is used to detect prompt injection.
+	Canary *string `json:"canary,omitempty"`
+
 	// ShieldedPrompt The shielded prompt.
 	ShieldedPrompt string `json:"shielded_prompt"`
 

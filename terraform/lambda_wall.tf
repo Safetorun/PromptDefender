@@ -2,8 +2,8 @@ resource "aws_iam_role" "lambda_role_wall" {
   assume_role_policy = jsonencode({
     Statement = [
       {
-        Action    = "sts:AssumeRole",
-        Effect    = "Allow",
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -18,9 +18,10 @@ resource "aws_iam_role_policy_attachment" "comprehend_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
 }
 
-resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_wall" { #tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_wall" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
       {
         Action = [
@@ -37,14 +38,14 @@ resource "aws_iam_policy" "lambda_cloudwatch_logs_policy_wall" { #tfsec:ignore:a
 
 resource "aws_iam_policy" "sagemaker_invoke_policy" {
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
       {
         Action = [
           "sagemaker:InvokeEndpoint"
         ],
         Effect   = "Allow",
-        Resource = module.huggingface_sagemaker.sagemaker_endpoint.arn
+        Resource = data.aws_ssm_parameter.sagemaker_endpoint.value
       },
     ],
   })
@@ -55,22 +56,6 @@ resource "aws_iam_role_policy_attachment" "sagemaker_invoke_policy_attachment" {
   policy_arn = aws_iam_policy.sagemaker_invoke_policy.arn
 }
 
-resource "aws_iam_policy" "dynamodb_read_write_policy_wall" {
-  policy = jsonencode({
-    Version   = "2012-10-17",
-    Statement = [
-      {
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
-        ],
-        Effect   = "Allow",
-        Resource = aws_dynamodb_table.cache_table.arn
-      },
-    ],
-  })
-}
 
 resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment" {
   role       = aws_iam_role.lambda_role_wall.name
@@ -111,7 +96,7 @@ resource "aws_lambda_function" "aws_lambda_wall" {
   environment {
     variables = {
       open_ai_api_key              = var.openai_secret_key
-      SAGEMAKER_ENDPOINT_JAILBREAK = module.huggingface_sagemaker.sagemaker_endpoint.name
+      SAGEMAKER_ENDPOINT_JAILBREAK = data.aws_ssm_parameter.sagemaker_endpoint_name.value
       CACHE_TABLE_NAME             = aws_dynamodb_table.cache_table.name
     }
   }

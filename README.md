@@ -72,9 +72,23 @@ There are a k6 load tests in the test/load directory.
 Inside each test files are the response time to check for test adherence
 
 
-### Expected response times 
+### Deployment
 
-* Keep - Not applicable, speed time isn't important
-* Wall:
-    * Without PII detection 400ms
-    * WIth PII Detection 500ms
+* First, deploy the terraform-base-infrastructure which contains the huggingface/debert dataset. To do this, run:
+
+`make deploy-base-infrastructure`
+
+* Now, deploy the main infrastructure. To do this, run:
+
+`make deploy`
+
+Get the URL and API key from the terraform output and set them as environment variables:
+
+```bash
+export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'`
+export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select
+```
+
+* Now, run the integration tests if you want to check the setup:
+
+`make integration_test`
