@@ -14,6 +14,7 @@ build-python:
 		bash scripts/build_python.sh $$python_module; \
 	done &&\
 	bash scripts/langchain_layer.sh
+	bash scripts/build_openai_client.sh
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
@@ -95,6 +96,9 @@ generate:
 	done
 	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > test/integration_test_harness/api.gen.go
 	oapi-codegen -package main -generate types,client $(API_DIR)/openapi.yml > cmd/lambda_wall/api.gen.go
+	pip install openapi-python-client
+	openapi-python-client generate --path $(API_DIR)/openapi.yml --output-path cmd/client --overwrite --config $(API_DIR)/generator_config.yml
+	pip install -e cmd/client
 
 generate_jailbreak:
 	cd builder\
@@ -121,3 +125,7 @@ load_test:
 	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
 	cd test/load && k6 run wall_load.js
+
+
+prepare-for-dev: generate
+	pip install -e cmd/client

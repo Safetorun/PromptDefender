@@ -62,7 +62,8 @@ resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment
   policy_arn = aws_iam_policy.dynamodb_read_write_policy_wall.arn
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_wall" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_wall" {
+  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_lambda_wall.function_name}"
   retention_in_days = 14
 }
@@ -78,16 +79,17 @@ resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_wall" {
 }
 
 resource "aws_lambda_function" "aws_lambda_wall" {
-  function_name    = "${terraform.workspace}-PromptDefender-Wall"
-  handler          = "bootstrap"
-  role             = aws_iam_role.lambda_role_wall.arn
+  function_name = "${terraform.workspace}-PromptDefender-Wall"
+
+  handler          = "app.lambda_handler"
   filename         = data.archive_file.lambda_wall_zip.output_path
-  runtime          = "provided.al2"
+  role             = aws_iam_role.lambda_role_wall.arn
+  runtime          = var.python_version
   source_code_hash = data.archive_file.lambda_wall_zip.output_base64sha256
 
   timeout = 120
 
-  layers = ["arn:aws:lambda:${var.aws_region}:901920570463:layer:aws-otel-collector-amd64-ver-0-90-1:1"]
+  layers = [aws_lambda_layer_version.lambda_layer_wall.arn, aws_lambda_layer_version.langchain_lambda_layer.arn]
 
   tracing_config {
     mode = "Active"
@@ -104,12 +106,12 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
 data "archive_file" "lambda_wall_zip" {
   type        = "zip"
-  source_file = var.lambda_wall_path
+  source_dir  = var.lambda_wall_path
   output_path = "wall_function.zip"
 }
 
-
 variable "lambda_wall_path" {
   type    = string
-  default = "../cmd/lambda_wall/bootstrap"
+  default = "../cmd/lambda_wall_py/dist"
 }
+

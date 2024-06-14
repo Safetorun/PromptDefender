@@ -68,12 +68,12 @@ resource "aws_iam_role_policy_attachment" "ssm_read_policy_attachment_keep" {
 
 resource "aws_lambda_function" "aws_Lambda_keep" {
   function_name = "${terraform.workspace}-PromptDefender-Keep"
-  layers        = [aws_lambda_layer_version.lambda_layer.arn, aws_lambda_layer_version.langchain_lambda_layer.arn]
+  layers        = [aws_lambda_layer_version.lambda_layer_keep.arn, aws_lambda_layer_version.langchain_lambda_layer.arn]
 
   handler          = "app.lambda_handler"
   role             = aws_iam_role.lambda_role_keep.arn
   filename         = data.archive_file.lambda_keep_zip.output_path
-  runtime          = "python3.10"
+  runtime          = var.python_version
   source_code_hash = data.archive_file.lambda_keep_zip.output_base64sha256
   timeout          = 60
 
