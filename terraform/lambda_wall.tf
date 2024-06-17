@@ -89,7 +89,7 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
   timeout = 120
 
-  layers = [aws_lambda_layer_version.lambda_layer_wall.arn, aws_lambda_layer_version.langchain_lambda_layer.arn]
+  layers = [aws_lambda_layer_version.lambda_layer_wall.arn]
 
   tracing_config {
     mode = "Active"
@@ -100,6 +100,7 @@ resource "aws_lambda_function" "aws_lambda_wall" {
       open_ai_api_key              = var.openai_secret_key
       SAGEMAKER_ENDPOINT_JAILBREAK = data.aws_ssm_parameter.sagemaker_endpoint_name.value
       CACHE_TABLE_NAME             = aws_dynamodb_table.cache_table.name
+      USERS_TABLE = aws_dynamodb_table.UserAndSessionDb.name
     }
   }
 }
@@ -114,4 +115,15 @@ variable "lambda_wall_path" {
   type    = string
   default = "../cmd/lambda_wall_py/dist"
 }
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach_wall--index" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_access-index.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach_wall" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
+}
+
 

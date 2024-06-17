@@ -46,8 +46,9 @@ if [ "$changed" = true ]; then
    # Create a new directory for the Python site-packages
    mkdir -p python/lib/python3.${runtime}/site-packages/
 
+
    # Install the Python packages specified in the requirements.txt file to the site-packages directory
-   pip install --platform manylinux2014_x86_64 -t python/lib/python3.${runtime}/site-packages/ --only-binary=:all: -r requirements.txt
+   pip install  --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple --platform manylinux2014_x86_64 -t python/lib/python3.${runtime}/site-packages/ --only-binary=:all: -r requirements.txt
 
    # Create a zip file of the Python directory
 

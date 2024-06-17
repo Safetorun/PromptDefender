@@ -43,6 +43,8 @@ func SendRequestToWall(ctx context.Context) (context.Context, error) {
 		return ctx, errors.New("response is nil")
 	}
 
+	println(fmt.Sprintf("Response: ---- %+v", *response.JSON200))
+
 	return context.WithValue(ctx, ResponseKey, response.JSON200), nil
 
 }
@@ -149,6 +151,9 @@ func ValidateResponsePotentialJailbreak(context context.Context, jailbreakDetect
 	}
 
 	response := context.Value(ResponseKey).(*WallResponse)
+	if response == nil {
+		return errors.New("response is nil for jailbreakDetected")
+	}
 	if *response.PotentialJailbreak != detected {
 		return errors.New("jailbreakDetected not set correctly")
 	}
