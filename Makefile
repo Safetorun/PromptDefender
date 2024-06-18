@@ -14,7 +14,7 @@ build-python:
 		bash scripts/build_python.sh $$python_module; \
 	done &&\
 	bash scripts/langchain_layer.sh
-	bash scripts/build_openai_client.sh
+	bash scripts/embeddings_layer.sh
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
@@ -88,6 +88,9 @@ clean:
 	   cd $$aws_module && go clean -testcache || exit 1; cd $(PROJECT_DIR) ; \
 	done
 	cd test/integration_test_harness && go clean -testcache || exit 1; cd $(PROJECT_DIR) ;
+	for python_module in $(PYTHON_PACKAGES); do \
+		bash scripts/clean_python.sh $$python_module; \
+	done
 
 generate:
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
@@ -97,13 +100,12 @@ generate:
 	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > test/integration_test_harness/api.gen.go
 	oapi-codegen -package main -generate types,client $(API_DIR)/openapi.yml > cmd/lambda_wall/api.gen.go
 	pip install openapi-python-client
-	openapi-python-client generate --path $(API_DIR)/openapi.yml --output-path cmd/client --overwrite --config $(API_DIR)/generator_config.yml
-	pip install -e cmd/client
 
 generate_jailbreak:
 	cd builder\
-	 && pip install -r requirements.txt && python3 clean_jailbreaks_into_json.py\
-  	 && python3 jailbreak_embeddings.py && go build -o main && ./main
+	 && pip install -r requirements.txt \
+	 && python3 clean_jailbreaks_into_json.py \
+  	 && python3 jailbreak_embeddings.py
 
 integration_test:
 	go install github.com/tomwright/dasel/cmd/dasel@latest
@@ -125,7 +127,3 @@ load_test:
 	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'` &&\
 	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'` &&\
 	cd test/load && k6 run wall_load.js
-
-
-prepare-for-dev: generate
-	pip install -e cmd/client

@@ -62,7 +62,7 @@ resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment
 
 resource "aws_iam_role_policy_attachment" "ssm_read_policy_attachment_keep" {
   role       = aws_iam_role.lambda_role_keep.name
-  policy_arn = aws_iam_policy.ssm_read_policy_wall.arn
+  policy_arn = aws_iam_policy.ssm_read_policy_openapi_key.arn
 }
 
 

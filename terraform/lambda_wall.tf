@@ -89,7 +89,7 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
   timeout = 120
 
-  layers = [aws_lambda_layer_version.lambda_layer_wall.arn]
+  layers = [aws_lambda_layer_version.lambda_layer_wall.arn, aws_lambda_layer_version.lambda_layer_embeddings.arn]
 
   tracing_config {
     mode = "Active"
@@ -97,10 +97,10 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
   environment {
     variables = {
-      open_ai_api_key              = var.openai_secret_key
+      OPENAI_SECRET_NAME           = aws_ssm_parameter.openai_api_key.name
       SAGEMAKER_ENDPOINT_JAILBREAK = data.aws_ssm_parameter.sagemaker_endpoint_name.value
       CACHE_TABLE_NAME             = aws_dynamodb_table.cache_table.name
-      USERS_TABLE = aws_dynamodb_table.UserAndSessionDb.name
+      USERS_TABLE                  = aws_dynamodb_table.UserAndSessionDb.name
     }
   }
 }
@@ -124,6 +124,11 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach_wall--i
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach_wall" {
   role       = aws_iam_role.lambda_role_wall.name
   policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_read_policy_attachment_wall" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.ssm_read_policy_openapi_key.arn
 }
 
 

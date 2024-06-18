@@ -41,6 +41,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step("^the user_id is (.*)$", SetUserId)
 	ctx.Step("^the session_id is (.*)$", SetSessionId)
 	ctx.Step("^fast-check is (true|false)", SetFastCheck)
+	ctx.Step("^check-badwords is (true|false)", SetCheckBadwords)
 	ctx.Step("^Response should have shielded prompt containing (.*)$", ShieldedPromptContains)
 	ctx.Step("^I create a suspicious user with the user_id (.*)$", CreateSuspiciousUser)
 	ctx.Step("^I retrieve a list of all users$", RetrieveSuspiciousUsers)

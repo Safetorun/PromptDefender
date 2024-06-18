@@ -15,7 +15,7 @@ resource "aws_iam_policy" "dynamodb_read_write_policy_wall" {
   })
 }
 
-resource "aws_iam_policy" "ssm_read_policy_wall" {
+resource "aws_iam_policy" "ssm_read_policy_openapi_key" {
   policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [

@@ -218,3 +218,13 @@ func SetFastCheck(ctx context.Context, fastCheck string) (context.Context, error
 	request.FastCheck = &fast
 	return ctx, nil
 }
+
+func SetCheckBadwords(ctx context.Context, checkBadwords string) (context.Context, error) {
+	check, err := strconv.ParseBool(checkBadwords)
+	if err != nil {
+		return nil, err
+	}
+	request := ctx.Value(RequestKey).(*WallRequest)
+	request.CheckBadwords = &check
+	return ctx, nil
+}

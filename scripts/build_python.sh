@@ -57,7 +57,7 @@ if [ "$changed" = true ]; then
    mkdir -p ../deps/${python_module}
 
    # Move the dependencies.zip file to the deps directory
-   mkdir -p ../deps/${python _module}/dist
+   mkdir -p ../deps/${python_module}/dist
    mv python ../deps/${python_module}/dist
 
    # Store the hash in the requirements.lock file
