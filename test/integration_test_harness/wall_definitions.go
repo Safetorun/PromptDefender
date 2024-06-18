@@ -208,3 +208,13 @@ func SetSessionId(ctx context.Context, sessionId string) (context.Context, error
 	request.SessionId = &sessionId
 	return ctx, nil
 }
+
+func SetFastCheck(ctx context.Context, fastCheck string) (context.Context, error) {
+	fast, err := strconv.ParseBool(fastCheck)
+	if err != nil {
+		return nil, err
+	}
+	request := ctx.Value(RequestKey).(*WallRequest)
+	request.FastCheck = &fast
+	return ctx, nil
+}

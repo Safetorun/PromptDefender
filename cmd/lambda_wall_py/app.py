@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union, Dict, Any, Type
+from typing import Optional, Dict
 
 import boto3
 from aws_lambda_powertools import Logger
@@ -11,6 +11,7 @@ from prompt_defender import build_xml_scanner
 from prompt_defender_aws_defences.wall import AwsPIIScannerWallExecutor, SagemakerWallExecutor
 from pydantic import BaseModel
 
+from badwords import find_lowest_score
 from shared import log_result_information, cachable_result
 
 logger = Logger(service="PromptDefender-Wall")
@@ -78,7 +79,10 @@ def lambda_handler(event: Dict, _: LambdaContext):
         logger.info('Skipping PII scan')
 
     if event.check_badwords:
-        pass
+        logger.info("Going to check for bad words")
+        lowest_score, _, _ = find_lowest_score(event.prompt)
+        logger.info('Lowest score:', lowest_score)
+        response.potential_jailbreak = lowest_score < 0.20
 
     if not event.fast_check and not response.potential_jailbreak:
         logger.info("Going to check for potential jailbreak")

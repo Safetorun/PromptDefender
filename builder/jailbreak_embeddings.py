@@ -1,10 +1,11 @@
-import time
-
-import openai
-import pandas as pd
 import os
+
+import time
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+import pandas as pd
 import tiktoken
-import numpy as np
 import json
 
 max_tokens = 1000
@@ -43,7 +44,7 @@ def split_into_many(text, max_tokens=max_tokens):
 
 def convert_to_openai(x):
     try:
-        return openai.Embedding.create(input=x, engine='text-embedding-ada-002')['data'][0]['embedding']
+        return client.embeddings.create(input=[x], model='text-embedding-3-small').data[0].embedding
     except Exception as ex:
         print(ex)
         print("Sleeping")
@@ -53,10 +54,10 @@ def convert_to_openai(x):
 
 
 def process_from_file(outname):
-    texts = read_and_preprocess_json("jailbreaks.json")
+    texts = list(map(lambda x: {"value": x}, read_and_preprocess_json("injections.json")))
 
-    df = pd.DataFrame(texts, columns=['name', 'value'])
-    df.to_csv('scraped.csv')
+    df = pd.DataFrame(texts, columns=['value'])
+    df.to_csv('injections.csv')
     df.head()
     tokenizer = tiktoken.get_encoding("cl100k_base")
 
@@ -69,12 +70,12 @@ def process_from_file(outname):
             continue
 
         if row[1]['n_tokens'] > max_tokens:
-            shortened += list(map(lambda x: (row[1]['name'], x), split_into_many(row[1]['value'])))
+            shortened += list(map(lambda x: (split_into_many(row[1]['value']))))
 
         else:
-            shortened.append((row[1]['name'], row[1]['value']))
+            shortened.append((row[1]['value']))
 
-    df = pd.DataFrame(shortened, columns=['name', 'value'])
+    df = pd.DataFrame(shortened, columns=['value'])
 
     df['n_tokens'] = df.value.apply(lambda x: len(tokenizer.encode(x)))
 
@@ -85,10 +86,5 @@ def process_from_file(outname):
     df.head()
 
 
-def setup_openai():
-    openai.api_key = os.environ.get('OPENAI_API_KEY')
-
-
 if __name__ == "__main__":
-    setup_openai()
-    process_from_file("scanned.csv")
+    process_from_file("injections_embeddings.csv")
