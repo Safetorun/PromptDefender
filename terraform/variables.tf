@@ -10,5 +10,5 @@ variable "aws_region" {
 
 variable "python_version" {
   type    = string
-  default = "python3.12"
+  default = "python3.10"
 }
