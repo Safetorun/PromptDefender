@@ -62,8 +62,7 @@ resource "aws_iam_role_policy_attachment" "dynamodb_read_write_policy_attachment
   policy_arn = aws_iam_policy.dynamodb_read_write_policy_wall.arn
 }
 
-resource "aws_cloudwatch_log_group" "lambda_log_group_wall" {
-  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "lambda_log_group_wall" { #tfsec:ignore:aws-cloudwatch-log-group-customer-key
   name              = "/aws/lambda/${aws_lambda_function.aws_lambda_wall.function_name}"
   retention_in_days = 14
 }
