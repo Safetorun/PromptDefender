@@ -54,9 +54,9 @@ jobs:
         env:
           TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
           open_ai_api_key: ${{ secrets.OPENAI_API_KEY }}
-      - name: Destroy
-        run: sleep 10 && make destroy
-        if: always()
-        env:
-          TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
+#      - name: Destroy
+#        run: sleep 10 && make destroy
+#        if: always()
+#        env:
+#          TF_VAR_openai_secret_key: ${{ secrets.OPENAI_API_KEY }}
 
