@@ -78,16 +78,17 @@ resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attach_wall" {
 }
 
 resource "aws_lambda_function" "aws_lambda_wall" {
-  function_name    = "${terraform.workspace}-PromptDefender-Wall"
-  handler          = "bootstrap"
-  role             = aws_iam_role.lambda_role_wall.arn
+  function_name = "${terraform.workspace}-PromptDefender-Wall"
+
+  handler          = "app.lambda_handler"
   filename         = data.archive_file.lambda_wall_zip.output_path
-  runtime          = "provided.al2"
+  role             = aws_iam_role.lambda_role_wall.arn
+  runtime          = var.python_version
   source_code_hash = data.archive_file.lambda_wall_zip.output_base64sha256
 
   timeout = 120
 
-  layers = ["arn:aws:lambda:${var.aws_region}:901920570463:layer:aws-otel-collector-amd64-ver-0-90-1:1"]
+  layers = [aws_lambda_layer_version.lambda_layer_wall.arn, aws_lambda_layer_version.lambda_layer_embeddings.arn]
 
   tracing_config {
     mode = "Active"
@@ -95,21 +96,38 @@ resource "aws_lambda_function" "aws_lambda_wall" {
 
   environment {
     variables = {
-      open_ai_api_key              = var.openai_secret_key
+      OPENAI_SECRET_NAME           = aws_ssm_parameter.openai_api_key.name
       SAGEMAKER_ENDPOINT_JAILBREAK = data.aws_ssm_parameter.sagemaker_endpoint_name.value
       CACHE_TABLE_NAME             = aws_dynamodb_table.cache_table.name
+      USERS_TABLE                  = aws_dynamodb_table.UserAndSessionDb.name
     }
   }
 }
 
 data "archive_file" "lambda_wall_zip" {
   type        = "zip"
-  source_file = var.lambda_wall_path
+  source_dir  = var.lambda_wall_path
   output_path = "wall_function.zip"
 }
 
-
 variable "lambda_wall_path" {
   type    = string
-  default = "../cmd/lambda_wall/bootstrap"
+  default = "../cmd/lambda_wall_py/dist"
 }
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach_wall--index" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_access-index.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access_attach_wall" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_read_policy_attachment_wall" {
+  role       = aws_iam_role.lambda_role_wall.name
+  policy_arn = aws_iam_policy.ssm_read_policy_openapi_key.arn
+}
+
+

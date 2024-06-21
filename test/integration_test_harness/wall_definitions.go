@@ -43,6 +43,8 @@ func SendRequestToWall(ctx context.Context) (context.Context, error) {
 		return ctx, errors.New("response is nil")
 	}
 
+	println(fmt.Sprintf("Response: ---- %+v", *response.JSON200))
+
 	return context.WithValue(ctx, ResponseKey, response.JSON200), nil
 
 }
@@ -149,6 +151,9 @@ func ValidateResponsePotentialJailbreak(context context.Context, jailbreakDetect
 	}
 
 	response := context.Value(ResponseKey).(*WallResponse)
+	if response == nil {
+		return errors.New("response is nil for jailbreakDetected")
+	}
 	if *response.PotentialJailbreak != detected {
 		return errors.New("jailbreakDetected not set correctly")
 	}
@@ -201,5 +206,25 @@ func SetUserId(ctx context.Context, userId string) (context.Context, error) {
 func SetSessionId(ctx context.Context, sessionId string) (context.Context, error) {
 	request := ctx.Value(RequestKey).(*WallRequest)
 	request.SessionId = &sessionId
+	return ctx, nil
+}
+
+func SetFastCheck(ctx context.Context, fastCheck string) (context.Context, error) {
+	fast, err := strconv.ParseBool(fastCheck)
+	if err != nil {
+		return nil, err
+	}
+	request := ctx.Value(RequestKey).(*WallRequest)
+	request.FastCheck = &fast
+	return ctx, nil
+}
+
+func SetCheckBadwords(ctx context.Context, checkBadwords string) (context.Context, error) {
+	check, err := strconv.ParseBool(checkBadwords)
+	if err != nil {
+		return nil, err
+	}
+	request := ctx.Value(RequestKey).(*WallRequest)
+	request.CheckBadwords = &check
 	return ctx, nil
 }

@@ -63,6 +63,9 @@ type WallResponse struct {
 	// ContainsPii Whether the prompt contains PII.
 	ContainsPii *bool `json:"contains_pii,omitempty"`
 
+	// ModifiedPrompt The prompt, modified in some way - e.g. by summarising it as per the configuration specified in the request.
+	ModifiedPrompt *string `json:"modified_prompt,omitempty"`
+
 	// PotentialJailbreak Whether the prompt contains a potential jailbreak.
 	PotentialJailbreak *bool `json:"potential_jailbreak,omitempty"`
 

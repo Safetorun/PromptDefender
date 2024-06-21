@@ -49,7 +49,3 @@ def lambda_handler(event: KeepRequest, _: LambdaContext):
     }
 
     return {"statusCode": 200, "body": KeepResponse(**return_data).json()}
-
-
-if __name__ == "__main__":
-    print(lambda_handler(KeepRequest(prompt="hello", randomise_xml_tag=False), None))

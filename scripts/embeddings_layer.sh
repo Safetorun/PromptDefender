@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-cd cmd/deps/cmd/langchain_layer
+cd cmd/deps/cmd/embeddings_layer
 
 # Calculate the SHA256 hash of the requirements.txt file
 hash=$(shasum -a 256 requirements.txt | awk '{ print $1 }')

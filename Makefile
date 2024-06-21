@@ -14,6 +14,7 @@ build-python:
 		bash scripts/build_python.sh $$python_module; \
 	done &&\
 	bash scripts/langchain_layer.sh
+	bash scripts/embeddings_layer.sh
 
 setup-workspace:
 	if [ -n "$$GITHUB_REF_NAME" ]; then \
@@ -87,6 +88,9 @@ clean:
 	   cd $$aws_module && go clean -testcache || exit 1; cd $(PROJECT_DIR) ; \
 	done
 	cd test/integration_test_harness && go clean -testcache || exit 1; cd $(PROJECT_DIR) ;
+	for python_module in $(PYTHON_PACKAGES); do \
+		bash scripts/clean_python.sh $$python_module; \
+	done
 
 generate:
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
@@ -94,12 +98,13 @@ generate:
 	   cd $$aws_module && oapi-codegen -package main -generate types $(API_DIR)/openapi.yml > api.gen.go || exit 1; cd $(PROJECT_DIR); \
 	done
 	oapi-codegen -package integration_test_harness -generate types,client $(API_DIR)/openapi.yml > test/integration_test_harness/api.gen.go
-	oapi-codegen -package main -generate types,client $(API_DIR)/openapi.yml > cmd/lambda_wall/api.gen.go
+	pip install openapi-python-client
 
 generate_jailbreak:
 	cd builder\
-	 && pip install -r requirements.txt && python3 clean_jailbreaks_into_json.py\
-  	 && python3 jailbreak_embeddings.py && go build -o main && ./main
+	 && pip install -r requirements.txt \
+	 && python3 clean_jailbreaks_into_json.py \
+  	 && python3 jailbreak_embeddings.py
 
 integration_test:
 	go install github.com/tomwright/dasel/cmd/dasel@latest

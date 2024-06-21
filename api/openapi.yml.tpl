@@ -265,3 +265,6 @@ components:
         suspicious_session:
             type: 'boolean'
             description: 'Whether the session is suspicious.'
+        modified_prompt:
+            type: 'string'
+            description: 'The prompt, modified in some way - e.g. by summarising it as per the configuration specified in the request.'
