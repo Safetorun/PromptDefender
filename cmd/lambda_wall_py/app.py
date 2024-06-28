@@ -80,7 +80,7 @@ def lambda_handler(event: Dict, _: LambdaContext):
 
     if event.check_badwords:
         logger.info("Going to check for bad words")
-        lowest_score, _, _ = find_lowest_score(event.prompt)
+        lowest_score = find_lowest_score(event.prompt)
         logger.info('Lowest score:', lowest_score)
         response.potential_jailbreak = lowest_score < 0.20
 
