@@ -4,7 +4,7 @@ module "huggingface_sagemaker" {
   pytorch_version      = "1.9.1"
   transformers_version = "4.12.3"
   instance_type        = "cpu"
-  hf_model_id          = "deepset/deberta-v3-base-injection"
+  hf_model_id          = "protectai/deberta-v3-base-prompt-injection"
   hf_task              = "text-classification"
   serverless_config = {
     max_concurrency   = 3

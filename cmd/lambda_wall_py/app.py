@@ -25,7 +25,7 @@ class WallRequest(BaseModel):
     scan_pii: Optional[bool] = None
     xml_tag: Optional[str] = None
     check_badwords: Optional[bool] = None
-    fast_check: Optional[bool] = None
+    fast_check: bool = True
 
 
 class WallResponse(BaseModel):
