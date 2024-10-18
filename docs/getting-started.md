@@ -77,7 +77,18 @@ parameter.
 }
 [/block]
 
-# Finish it up with a Drawbridge (Coming soon)
+# Finish it up with a Drawbridge
 
 With Prompt Defender - Drawbridge, you can detect leaks in your prompts, detect PII about to be escaped and strip any
 potentially damaging XSS from being release
+
+[block:build-a-drawbridge]
+{
+"backgroundColor": "#018FF4",
+"emoji": "🦉",
+"id": "65ce4ca087d73c004bcc343e",
+"link": "https://promptshield.readme.io/v1.0/recipes/building-your-drawbridge",
+"slug": "building-your-drawbridge",
+"title": "Build your Drawbridge"
+}
+[/block]
