@@ -18,29 +18,33 @@ attacks. You can use this with any LLM APIs (whether Bard, LlaMa, ChatGPT - or a
 complex, and are difficult to solve with a single layer of defence - as such, a prompt shield is made up of multiple '
 rings' of defence.
 
-**Ring 1 - Wall**
+**Wall**
 
-Ring 1 is the first layer of defence, and is intended to sanitise input before it moves through the layers of defence.
+Wall is the first layer of defence, and is intended to sanitise input before it moves through the layers of defence.
 This will typically look at prompt input, and ensure that it meets certain rules. For example:
 
 - Does it contain keywords that are known for jail-breaking attacks
 - Does the information reveal PII which should not be provided to your LLM (e.g. email addresses, phone numbers, etc)
 - Is this prompt from a user / ip address (or any other identifier you want to provide) which is probing or attacking
-  your system? [Coming soon]
+  your system? 
 
-**Ring 2 - Keep**
+**Keep**
 
-Ring 2 is a layer of defence on the prompt itself - it effectively wraps your prompt in an effective 'prompt defence'
+Keep is a layer of defence on the prompt itself - it effectively wraps your prompt in an effective 'prompt defence' or 'instruction defence'
 which provides instructions to the LLM as part of the prompt on what should happen, and what it should avoid doing (e.g.
 reminders not to leak a secret key)
 
-**Ring 3 - Drawbridge [Coming soon] **
+**Drawbridge [Coming soon] **
 
-Ring 3 is a final protection which looks at the returned value prior to it being provided to a client or using it for a
-follow-up action; this can contain defences such as:
+Drawbridge is a part of the Prompt Defender project that is responsible for validating the response of an LLM execution.
 
-- Avoid returning data containing a XSS or script tags
-- Avoid returning information which has proprietary or secret information in it
+That is - after you have executed an LLM, you can use Drawbridge to check the response for any potential security
+issues.
+
+Drawbridge is used to validate the response of an LLM execution. It has two main functionalities:
+
+- Checking for a canary in the response.
+- Cleaning the response by removing scripts if allow_unsafe_scripts is set to False.
 
 ## Running integration tests
 
@@ -60,8 +64,8 @@ DEFENDER_API_KEY
 You can get these after a `make deploy` with the following commands:
 
 ```bash
-	export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'`
-	export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'`
+export URL=`cd terraform && terraform output -json | dasel select -p json '.api_url.value' | tr -d '"'`
+export DEFENDER_API_KEY=`cd terraform && terraform output -json | dasel select -p json '.api_key_value.value' | tr -d '"'`
 ```
 
 ## Response times
